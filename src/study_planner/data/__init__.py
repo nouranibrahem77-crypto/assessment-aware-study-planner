@@ -1,1 +1,1 @@
-"""Data loading and preparation components."""
+"""Data acquisition, validation, and preparation components."""
