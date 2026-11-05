@@ -1,28 +1,21 @@
 # Strict FFF neural regression experiment
 
-## Run status
+## Data and protocol
 
-**Training and evaluation did not run.** The current Python 3.12 environment has
-none of NumPy, pandas, scikit-learn, joblib, or PyTorch installed. The pinned
-CPU-only ML extra was added, but its installation timed out while downloading
-the 16.7 MB NumPy wheel (about 2.1 MB had transferred). No baseline or MLP
-metrics, selected hyperparameters, training duration, checkpoints, or model
-artifacts are available. No results are estimated or fabricated.
+Strict OULAD FFF features only. The prediction cutoff is the start of
+the assessment deadline day; the strict feature manifest excludes all
+prior assessment scores. Identifiers are audit-only. No demographic
+variables or future assessment outcomes enter the model.
 
-The source files, strict manifest, and processed CSV headers were inspected;
-the data rows below are verified from the existing strict artifacts.
-
-## Verified input data
-
-| Split | Presentation(s) | Rows | Strict input features | Target |
-| --- | --- | ---: | ---: | --- |
-| Train | 2013B, 2013J | 25,229 | 19 | `target_score` |
-| Validation | 2014B | 9,013 | 19 | `target_score` |
-| Test | 2014J | 14,241 | 19 | `target_score` |
-
-The target is the continuous assessment score in [0, 100]. The feature manifest
-is strict mode; it has no previous-assessment-score features. Four identifiers
-and `target_score` are excluded from model inputs. No demographics are used.
+Train, validation, and test rows: 25,229, 9,013, 14,241.
+Model inputs: 19 strict source columns; 18 transformed columns.
+The assessment type is reconstructed from the strict one-hot columns and
+encoded with a training-fitted OneHotEncoder (`handle_unknown='ignore'`).
+Numeric columns use training-median imputation (with missingness flags)
+and training-fitted standard scaling. The preprocessor is fit on train
+only; the saved preprocessing object is reused for validation, test, and
+inference. Predictions from all models are clipped to [0, 100] before
+metrics and saved prediction outputs.
 
 ### Input feature list
 
@@ -46,56 +39,98 @@ and `target_score` are excluded from model inputs. No demographics are used.
 - `click_collaboration_week_3`
 - `click_collaboration_week_4`
 
-## Implemented experiment protocol
+## Baselines and selected model
 
-The added pipeline fits a scikit-learn preprocessor on training rows only:
-numeric median imputation with missingness indicators, standard scaling, and
-assessment-type one-hot encoding with `handle_unknown="ignore"`. The source
-assessment-type indicators are decoded as a categorical input; identifiers and
-the target are schema-rejected. Validation and test are transformed with the
-fitted training preprocessor.
+Ridge alpha was selected from `[0.1, 1.0, 10.0, 100.0]` using validation MAE. The MLP search had two documented candidates:
+`(32,)` with no dropout and `(64, 32)` with 0.1 dropout. Both used
+Adam, learning rate 0.001, weight decay 0.0001, Huber loss, batches of
+512, and early stopping on
+validation Huber loss (patience 6, maximum 40 epochs). Three seeds
+were run: `[42, 123, 2025]`. Selection minimized mean validation
+MAE across seeds; test data did not participate in selection.
+MLP targets are divided by 100 for optimization and predictions are
+rescaled to score units before clipping and metric calculation.
 
-The baselines are a training-mean `DummyRegressor` and Ridge regression. Ridge
-alpha candidates are 0.1, 1, 10, and 100, selected by validation MAE. The small
-MLP search compares hidden sizes `(32,)` with no dropout and `(64, 32)` with 0.1
-dropout. The intended run uses Adam, learning rate 0.001, weight decay 0.0001,
-Huber loss, batch size 512, at most 40 epochs, early stopping after six stale
-validation-loss epochs, and deterministic CPU execution. Seeds are 11, 23, and
-42. MLP configuration selection uses mean validation MAE across seeds; test
-data is used only after selection. Raw model outputs are clipped to [0, 100]
-for all reported metrics and inference. MLP targets are divided by 100 during
-optimization and predictions are rescaled to score units before clipping.
+Selected MLP: `mlp_64_32_dropout`, hidden sizes `[64, 32]`, dropout 0.1, Huber loss. Ridge alpha: 100.0.
 
-## Metrics and model selection
+Selected MLP train metrics (mean ± standard deviation across seeds):
 
-| Requested result | Status |
-| --- | --- |
-| Dummy and Ridge baseline metrics | Not run; ML dependencies unavailable. |
-| MLP train and validation metrics | Not run. |
-| Final test MAE, RMSE, and R² | Not run; no test-driven selection occurred. |
-| Per-assessment-type test metrics and sample counts | Not run. |
-| Selected Ridge alpha and MLP configuration | None selected. |
-| Training curves, duration, and three-seed mean/std | Not available; training did not start. |
-| Model and preprocessing artifacts | Not created. Intended output: `data/processed/nn_experiment/`. |
+| MAE | RMSE | R² |
+| ---: | ---: | ---: |
+| 10.082 ± 0.038 | 13.002 ± 0.042 | 0.1292 ± 0.0056 |
 
-To run after installing the optional dependencies, use:
+MLP candidate validation results (selection used mean MAE):
 
-```bash
-python -m pip install -e '.[ml]' --extra-index-url https://download.pytorch.org/whl/cpu
-train-fff-nn
-```
+| Candidate | Mean validation MAE | Std. dev. |
+| --- | ---: | ---: |
+| mlp_32 | 10.276 | 0.036 |
+| mlp_64_32_dropout | 10.239 | 0.029 |
+
+| Model | Validation MAE | Validation RMSE | Validation R² |
+| --- | ---: | ---: | ---: |
+| Dummy mean | 10.648 ± 0.000 | 13.977 ± 0.000 | -0.0037 ± 0.0000 |
+| Ridge | 10.424 ± 0.000 | 13.472 ± 0.000 | 0.0676 ± 0.0000 |
+| MLP (selected config, seed mean) | 10.239 ± 0.029 | 13.124 ± 0.021 | 0.1151 ± 0.0028 |
+
+## Final test results
+
+Reported only after configuration and Ridge alpha selection on
+validation. MLP seed mean ± standard deviation is across the three
+selected-configuration seed models. The inference artifact averages
+those three seed predictions and is reported separately.
+
+| Model | Test MAE | Test RMSE | Test R² | n |
+| --- | ---: | ---: | ---: | ---: |
+| Dummy mean | 10.489 | 13.405 | -0.0097 | 14241 |
+| Ridge | 10.240 | 13.070 | 0.0401 | 14241 |
+| MLP seed mean | 10.089 ± 0.061 | 12.872 ± 0.080 | 0.0690 ± 0.0115 | 14241 |
+| MLP seed ensemble | 10.062 | 12.834 | 0.0745 | 14241 |
+
+### Test metrics by assessment type and model
+
+| Model | Type | n | MAE | RMSE | R² |
+| --- | --- | ---: | ---: | ---: | ---: |
+| Dummy mean | CMA | 8260 | 10.127 | 12.387 | -0.0425 |
+| Dummy mean | TMA | 5981 | 10.988 | 14.697 | -0.0005 |
+| Ridge | CMA | 8260 | 9.475 | 11.935 | 0.0322 |
+| Ridge | TMA | 5981 | 11.297 | 14.494 | 0.0270 |
+| MLP seed ensemble | CMA | 8260 | 9.302 | 11.780 | 0.0571 |
+| MLP seed ensemble | TMA | 5981 | 11.110 | 14.162 | 0.0710 |
+
+## Training curves and run time
+
+Checkpoint restoration minimizes validation Huber loss. Full epoch
+curves for all candidates and seeds are saved in `training_curves.csv`.
+Selected configuration checkpoints:
+Total experiment runtime including preprocessing and evaluation: 44.28 seconds; MLP search: 43.94 seconds.
+
+| Seed | Epochs run | Best epoch | Best validation Huber loss | Duration (s) |
+| ---: | ---: | ---: | ---: | ---: |
+| 42 | 23 | 17 | 0.00863 | 5.35 |
+| 123 | 35 | 29 | 0.00858 | 8.27 |
+| 2025 | 40 | 40 | 0.00863 | 7.99 |
+
+Representative selected-model training curve (seed 42):
+
+| Epoch | Train Huber loss | Validation Huber loss | Validation MAE |
+| ---: | ---: | ---: | ---: |
+| 1 | 0.07686 | 0.01634 | 13.628 |
+| 2 | 0.01952 | 0.01265 | 12.331 |
+| 3 | 0.01602 | 0.01083 | 11.365 |
+| 5 | 0.01285 | 0.00922 | 10.666 |
+| 17 | 0.00995 | 0.00863 | 10.235 |
+| 23 | 0.00985 | 0.00867 | 10.374 |
 
 ## Limitations
 
-OULAD engagement is observational. This experiment cannot establish that clicks
-cause marks. Activity dates have day-level resolution, prior-score features are
-excluded in strict mode, and target scores are retrospective labels. Prediction
-clipping is an explicit output policy; the MLP has an unconstrained linear
-output and no monotonic constraint. No study sessions, causal conversion, or
-planner counterfactuals are implemented.
+OULAD engagement is observational: these metrics do not show that
+clicks cause marks. The dataset has day-level activity timestamps, no
+grade-release times, and target scores are retrospective labels.
+Prediction clipping is a reporting/deployment policy, not a monotonic
+constraint. No study sessions or causal effects are inferred.
 
-## Checks
+## Artifacts
 
-- `./.venv/bin/python -m pytest`: 23 passed; the ML-specific test module was
-  skipped because NumPy is unavailable.
-- `./.venv/bin/ruff check .`: all checks passed.
+All experiment files are under `data/processed/nn_experiment`: fitted preprocessor, Dummy/Ridge estimators, selected-seed MLP state dictionaries, strict
+feature schema, configuration and versions, evaluation JSON, test
+predictions, and full training curves.

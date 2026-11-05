@@ -39,7 +39,7 @@ class FeatureSplit:
 
 @dataclass(frozen=True)
 class StrictFeatureData:
-    """Validated train, validation, and test rows from strict feature files."""
+    """Validated requested rows from strict feature split files."""
 
     feature_names: tuple[str, ...]
     numeric_feature_names: tuple[str, ...]
@@ -97,8 +97,25 @@ def _model_frame(
     return frame, categories
 
 
-def load_strict_feature_data(processed_dir: Path) -> StrictFeatureData:
-    """Load strict FFF splits and reject schema, target, and split drift."""
+def load_strict_feature_data(
+    processed_dir: Path,
+    split_names: tuple[str, ...] = ("train", "validation", "test"),
+) -> StrictFeatureData:
+    """Load requested strict FFF splits without touching unrequested files.
+
+    Training workflows that must not access held-out test data should request
+    only ``("train", "validation")``. Both splits are required for model fit
+    and selection; test is optional.
+    """
+    if len(split_names) != len(set(split_names)):
+        raise DatasetSchemaError("Requested split names must be unique")
+    unknown_splits = set(split_names) - set(SPLIT_PRESENTATIONS)
+    if unknown_splits:
+        raise DatasetSchemaError(
+            f"Unknown requested split(s): {sorted(unknown_splits)}"
+        )
+    if not {"train", "validation"}.issubset(split_names):
+        raise DatasetSchemaError("Strict model data requires train and validation")
     manifest_path = processed_dir / "fff_preprocessing.json"
     if not manifest_path.is_file():
         raise FileNotFoundError(f"Missing preprocessing manifest: {manifest_path}")
@@ -125,7 +142,8 @@ def load_strict_feature_data(processed_dir: Path) -> StrictFeatureData:
 
     split_files = manifest.get("split_files", {})
     splits: dict[str, FeatureSplit] = {}
-    for split_name, expected_presentations in SPLIT_PRESENTATIONS.items():
+    for split_name in split_names:
+        expected_presentations = SPLIT_PRESENTATIONS[split_name]
         filename = split_files.get(split_name)
         if not isinstance(filename, str):
             raise DatasetSchemaError(f"Manifest lacks {split_name} split file")
