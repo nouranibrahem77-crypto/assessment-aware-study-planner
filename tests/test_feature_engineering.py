@@ -9,6 +9,7 @@ import pytest
 
 from study_planner.data.feature_engineering.constants import click_feature_name
 from study_planner.data.feature_engineering.features import (
+    FeatureBuildResult,
     build_features,
     click_window_index,
 )
@@ -361,6 +362,84 @@ def test_same_deadline_assessment_is_not_a_prior_score(tmp_path: Path) -> None:
     assert same_cutoff.features["previous_assessment_score_lag_1"] == 0.0
 
 
+@pytest.mark.parametrize(
+    ("column_index", "replacement"),
+    [(2, "41"), (3, "1"), (4, "101")],
+    ids=("late", "banked", "invalid-score"),
+)
+def test_ineligible_historical_marks_are_not_used_as_prior_features(
+    tmp_path: Path, column_index: int, replacement: str
+) -> None:
+    files = _fixture(tmp_path)
+    path = files["studentAssessment.csv"]
+    with path.open(newline="", encoding="utf-8") as file:
+        rows = list(csv.reader(file))
+    # Assessment 102 is due on day 40; assessment 103 is the later target.
+    for row in rows[1:]:
+        if row[0] == "102" and row[1] == "student-1":
+            row[column_index] = replacement
+    _write_csv(path, rows[0], rows[1:])
+
+    result = build_features(
+        files, inspect_fff_inputs(files), chunk_size=2, score_mode="proxy"
+    )
+    later_target = next(
+        row
+        for row in result.rows_by_split["train"]
+        if row.code_presentation == "2013B"
+        and row.id_student == "student-1"
+        and row.id_assessment == "103"
+    )
+
+    assert later_target.features["previous_assessment_score_lag_1"] is None
+    assert later_target.features["previous_assessment_score_lag_1_available"] == 0
+
+
+def test_future_assessment_score_does_not_enter_earlier_target_features(
+    tmp_path: Path,
+) -> None:
+    files = _fixture(tmp_path)
+    first_result = build_features(
+        files, inspect_fff_inputs(files), chunk_size=2, score_mode="proxy"
+    )
+    path = files["studentAssessment.csv"]
+    with path.open(newline="", encoding="utf-8") as file:
+        rows = list(csv.reader(file))
+    for row in rows[1:]:
+        if row[0] == "103" and row[1] == "student-1":
+            row[4] = "1"
+    _write_csv(path, rows[0], rows[1:])
+    second_result = build_features(
+        files, inspect_fff_inputs(files), chunk_size=2, score_mode="proxy"
+    )
+
+    def target_features(
+        result: FeatureBuildResult,
+    ) -> dict[str, int | float | None]:
+        target = next(
+            row
+            for row in result.rows_by_split["train"]
+            if row.code_presentation == "2013B"
+            and row.id_student == "student-1"
+            and row.id_assessment == "102"
+        )
+        return target.features
+
+    assert target_features(first_result) == target_features(second_result)
+    assert target_features(first_result)["previous_assessment_score_lag_1"] == 0.0
+
+
+def test_duplicate_assessment_identifiers_are_rejected(tmp_path: Path) -> None:
+    files = _fixture(tmp_path)
+    path = files["assessments.csv"]
+    with path.open(newline="", encoding="utf-8") as file:
+        rows = list(csv.reader(file))
+    _write_csv(path, rows[0], [*rows[1:], rows[1]])
+
+    with pytest.raises(FeatureDataError, match="duplicate assessment identifier"):
+        inspect_fff_inputs(files)
+
+
 def test_assessment_type_categories_are_derived_from_training_only(
     tmp_path: Path,
 ) -> None:
@@ -384,7 +463,10 @@ def test_assessment_type_categories_are_derived_from_training_only(
     assert "assessment_type_exam" not in validation_row.features
 
 
-def test_target_score_changes_do_not_change_input_features(tmp_path: Path) -> None:
+@pytest.mark.parametrize("score_mode", ["strict", "proxy"])
+def test_target_score_changes_do_not_change_input_features(
+    tmp_path: Path, score_mode: str
+) -> None:
     source_a = tmp_path / "source-a"
     source_b = tmp_path / "source-b"
     files_a = _fixture(source_a)
@@ -397,8 +479,12 @@ def test_target_score_changes_do_not_change_input_features(tmp_path: Path) -> No
             row[4] = "10"
     _write_csv(path, rows[0], rows[1:])
 
-    result_a = build_features(files_a, inspect_fff_inputs(files_a), chunk_size=2)
-    result_b = build_features(files_b, inspect_fff_inputs(files_b), chunk_size=2)
+    result_a = build_features(
+        files_a, inspect_fff_inputs(files_a), chunk_size=2, score_mode=score_mode
+    )
+    result_b = build_features(
+        files_b, inspect_fff_inputs(files_b), chunk_size=2, score_mode=score_mode
+    )
     row_a = next(
         row
         for row in result_a.rows_by_split["train"]

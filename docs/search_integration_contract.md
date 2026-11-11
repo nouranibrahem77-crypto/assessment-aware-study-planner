@@ -2,9 +2,11 @@
 
 ## Status and scope
 
-This document defines the proposed control flow before implementation. It
-preserves the existing strict NN schema, inference interface, architecture,
-and artifacts. It does not add code or claim session effects are causal.
+This document defines the proposed Search–NN–CSP control flow. The generic CSP
+contracts and baseline Backtracking solver now exist; Forward Checking,
+AC-3, schedule enumeration, and final NN/CSP orchestration are not implemented.
+The contract preserves the existing strict NN schema, inference interface,
+architecture, and artifacts, and does not claim session effects are causal.
 
 ## Official requirements
 
@@ -25,7 +27,10 @@ and artifacts. It does not add code or claim session effects are causal.
 
 ## Proposed component interfaces
 
-These are design contracts, not implemented Python APIs.
+The Search–NN–CSP integration contracts below remain design-level interfaces.
+The generic CSP foundation implements the whole-plan manifest, problem,
+constraint, intermediate evaluation, baseline BT, and lazy BT schedule
+enumeration contracts, but not the final verification result.
 
 | Component | Input | Output |
 | --- | --- | --- |
@@ -41,10 +46,12 @@ These are design contracts, not implemented Python APIs.
 `WholePlanIdentity` binds the student and course, all three assignment
 allocations in canonical assignment-ID order, each assignment's base feature
 context fingerprint, and the mapping-scenario identity. Each assignment entry
-projects to the current `CandidateIdentity` fields (student, assignment,
-allocation, base-row fingerprint, scenario). The full identity remains the
-authority for CSP matching; matching one assignment projection alone does not
-prove that cross-assignment constraints were checked.
+projects to an assignment candidate identity bound to student, course,
+assignment, allocation, base-row fingerprint, and scenario. Candidate and
+whole-plan identities remain separate, and the manifest rejects candidate
+substitutions with a mismatched student, course, assignment, or scenario. The
+full identity remains the authority for CSP matching; matching one assignment
+projection alone does not prove that cross-assignment constraints were checked.
 
 `ScheduleData` contains data only and is never sufficient for final prediction.
 The future CSP contract returns a `WholePlanVerificationResult` for each
@@ -64,6 +71,37 @@ schedule. The enumerator returns a separate `WholePlanSearchOutcome` to report
 whether it exhausted all schedules (with none or some feasible), stopped at a
 limit/cancellation, or encountered an operational error. Only an exhaustive
 outcome can establish that no feasible schedule exists for the allocation.
+
+The generic CSP foundation now models a complete WholePlanManifest, including
+all three assignment candidates and zero-session allocations. Its CspEvaluation
+is bound to both the manifest identity and a CSP problem identity covering
+capacity, domains, an immutable finite ordering-policy snapshot, and constraint
+configuration. The problem captures required ordering pairs and the policy's
+slot relation over its finite domain slots, then rebinds ordering constraints
+to that snapshot. Mutation of the original policy cannot alter problem
+behavior. The evaluation is an intermediate local-validation record only:
+BRANCH_REJECTED rejects the current branch, INCOMPLETE leaves the decision
+open, and FEASIBLE is created only after exact variable coverage, in-domain
+values, and every constraint pass. The solver outcome independently repeats
+these checks for its attached feasible evaluation. It cannot report whole-plan
+infeasibility. A future solver-level outcome may report INFEASIBLE only after
+exhaustive search; limits and cancellation remain INCOMPLETE.
+
+Constraints expose explicit scopes. Binary constraints expose compatibility,
+support, and revision operations for a future AC-3 solver without manufacturing
+full assignments. BT exposes a deterministic lazy enumerator; a failed final NN
+target evaluation can request the next distinct feasible schedule from the same
+traversal. INCOMPLETE enumeration does not establish allocation infeasibility.
+These contracts do not yet create the final WholePlanVerificationResult
+described above and are not usable by the NN adapter as feasibility provenance.
+Every feasible schedule yielded by the BT enumerator must pass through the
+future whole-plan verifier to create a `WholePlanVerificationResult` bound to
+the schedule and problem before final NN goal evaluation. `CspEvaluation` is a
+local validator record and must never be treated as that final verification
+provenance. If the final prediction misses its target, orchestration may ask the
+same non-incomplete enumerator for another schedule, then verify that schedule
+before evaluating it. An `INCOMPLETE` enumerator is terminal and cannot resume;
+restarting creates a new traversal from the first schedule.
 
 The NN adapter's current `evaluate_final` method and
 `CspVerificationResult._from_solver` are still assignment-scoped. The proposed

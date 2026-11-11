@@ -15,6 +15,7 @@ make-oulad-data = "study_planner.data.oulad:main"
 make-fff-features = "study_planner.data.feature_engineering.pipeline:main"
 train-fff-nn = "study_planner.nn.training:main"
 train-fff-nn-validation = "study_planner.nn.training:validation_only_main"
+train-previous-marks-nn = "study_planner.nn.previous_marks_training:main"
 
 [project.optional-dependencies]
 dev = [

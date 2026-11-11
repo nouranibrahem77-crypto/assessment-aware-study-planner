@@ -11,8 +11,10 @@ import numpy as np
 import pandas as pd
 
 from study_planner.data.feature_engineering.constants import (
+    ACTIVITY_GROUPS,
     IDENTIFIER_COLUMNS,
     TARGET_COLUMN,
+    click_feature_name,
 )
 
 SPLIT_PRESENTATIONS: dict[str, frozenset[str]] = {
@@ -48,10 +50,48 @@ class StrictFeatureData:
     manifest: dict[str, Any]
 
 
+def _validate_previous_marks_schema(
+    feature_names: tuple[str, ...], assessment_type_columns: tuple[str, ...]
+) -> None:
+    """Require Model B to add only the documented five score/availability pairs."""
+    prior_pairs = tuple(
+        name
+        for lag in range(1, 6)
+        for name in (
+            f"previous_assessment_score_lag_{lag}",
+            f"previous_assessment_score_lag_{lag}_available",
+        )
+    )
+    metadata_names = (
+        "assessment_weight",
+        "assessment_weight_available",
+        "assessment_deadline_day",
+        "weeks_since_course_start",
+    )
+    click_names = tuple(
+        click_feature_name(group, week)
+        for group in ACTIVITY_GROUPS
+        for week in range(1, 5)
+    )
+    expected = (
+        *assessment_type_columns,
+        *metadata_names,
+        *prior_pairs,
+        *click_names,
+    )
+    if feature_names != expected:
+        raise DatasetSchemaError(
+            "Previous Marks schema must be the strict schema plus the five "
+            "ordered score/availability pairs"
+        )
+
+
 def _model_frame(
     raw: pd.DataFrame,
     feature_names: tuple[str, ...],
     assessment_type_columns: tuple[str, ...],
+    *,
+    allow_previous_scores: bool = False,
 ) -> tuple[pd.DataFrame, np.ndarray]:
     missing = sorted(set(feature_names) - set(raw.columns))
     extra = sorted(set(raw.columns) - set(feature_names))
@@ -59,7 +99,9 @@ def _model_frame(
         raise DatasetSchemaError(
             f"Input feature schema mismatch; missing={missing}, extra={extra}"
         )
-    if any(name.startswith("previous_assessment_score") for name in feature_names):
+    if not allow_previous_scores and any(
+        name.startswith("previous_assessment_score") for name in feature_names
+    ):
         raise DatasetSchemaError("Strict inputs cannot include previous score features")
 
     raw_types = raw.loc[:, list(assessment_type_columns)]
@@ -97,11 +139,13 @@ def _model_frame(
     return frame, categories
 
 
-def load_strict_feature_data(
+def _load_feature_data(
     processed_dir: Path,
-    split_names: tuple[str, ...] = ("train", "validation", "test"),
+    split_names: tuple[str, ...],
+    *,
+    expected_mode: str,
 ) -> StrictFeatureData:
-    """Load requested strict FFF splits without touching unrequested files.
+    """Load requested FFF splits for one explicitly selected feature mode.
 
     Training workflows that must not access held-out test data should request
     only ``("train", "validation")``. Both splits are required for model fit
@@ -122,8 +166,11 @@ def load_strict_feature_data(
     manifest = json.loads(manifest_path.read_text(encoding="utf-8"))
     if manifest.get("course_module") != "FFF":
         raise DatasetSchemaError("Expected FFF feature manifest")
-    if manifest.get("score_feature_mode") != "strict":
-        raise DatasetSchemaError("Primary model training requires strict feature mode")
+    if manifest.get("score_feature_mode") != expected_mode:
+        raise DatasetSchemaError(
+            f"Expected {expected_mode} feature mode, got "
+            f"{manifest.get('score_feature_mode')!r}"
+        )
     if manifest.get("target") != TARGET_COLUMN:
         raise DatasetSchemaError("Manifest target does not match target_score")
     feature_names = tuple(manifest.get("feature_names", ()))
@@ -183,7 +230,10 @@ def load_strict_feature_data(
             raise DatasetSchemaError("Target scores must be finite and in [0, 100]")
 
         model_inputs, categories = _model_frame(
-            raw.loc[:, list(feature_names)], feature_names, assessment_type_columns
+            raw.loc[:, list(feature_names)],
+            feature_names,
+            assessment_type_columns,
+            allow_previous_scores=expected_mode == "proxy",
         )
         if any(name in model_inputs.columns for name in forbidden):
             raise DatasetSchemaError("Identifiers or target entered model inputs")
@@ -206,6 +256,47 @@ def load_strict_feature_data(
     )
 
 
+def load_strict_feature_data(
+    processed_dir: Path,
+    split_names: tuple[str, ...] = ("train", "validation", "test"),
+) -> StrictFeatureData:
+    """Load strict FFF splits; previous-score features remain forbidden."""
+    return _load_feature_data(processed_dir, split_names, expected_mode="strict")
+
+
+def load_previous_marks_feature_data(
+    processed_dir: Path,
+    split_names: tuple[str, ...] = ("train", "validation", "test"),
+) -> StrictFeatureData:
+    """Load proxy-mode FFF splits for the separate Previous Marks MLP.
+
+    The returned data container is shared with the strict loader, while the
+    manifest and schema are required to identify proxy-mode inputs explicitly.
+    Missing prior marks remain NaN and are handled by train-fitted preprocessing.
+    """
+    data = _load_feature_data(processed_dir, split_names, expected_mode="proxy")
+    _validate_previous_marks_schema(data.feature_names, data.assessment_type_columns)
+    for lag in range(1, 6):
+        score_name = f"previous_assessment_score_lag_{lag}"
+        available_name = f"{score_name}_available"
+        for split_name, split in data.splits.items():
+            indicator = split.X[available_name]
+            if indicator.isna().any() or not indicator.isin([0, 1]).all():
+                raise DatasetSchemaError(
+                    f"Invalid availability indicator values in {available_name}"
+                )
+            score = split.X[score_name]
+            inconsistent = ((indicator == 1) & score.isna()) | (
+                (indicator == 0) & score.notna()
+            )
+            if inconsistent.any():
+                raise DatasetSchemaError(
+                    f"Score values and availability disagree for {score_name} "
+                    f"in {split_name}"
+                )
+    return data
+
+
 def prepare_inference_frame(
     features: pd.DataFrame,
     feature_names: tuple[str, ...],
@@ -225,3 +316,49 @@ def prepare_inference_frame(
         )
     ordered = features.reindex(columns=feature_names)
     return _model_frame(ordered, feature_names, assessment_type_columns)[0]
+
+
+def prepare_previous_marks_inference_frame(
+    features: pd.DataFrame,
+    feature_names: tuple[str, ...],
+    assessment_type_columns: tuple[str, ...],
+) -> pd.DataFrame:
+    """Validate Model B features while allowing its explicit score lags."""
+    _validate_previous_marks_schema(feature_names, assessment_type_columns)
+    expected_score_names = tuple(
+        f"previous_assessment_score_lag_{lag}" for lag in range(1, 6)
+    )
+    if not isinstance(features, pd.DataFrame):
+        raise TypeError("Inference features must be a pandas DataFrame")
+    forbidden = set(IDENTIFIER_COLUMNS) | {TARGET_COLUMN}
+    if forbidden.intersection(features.columns):
+        raise DatasetSchemaError("Inference batch contains identifiers or target")
+    missing = sorted(set(feature_names) - set(features.columns))
+    extra = sorted(set(features.columns) - set(feature_names))
+    if missing or extra:
+        raise DatasetSchemaError(
+            f"Inference feature schema mismatch; missing={missing}, extra={extra}"
+        )
+    ordered = features.reindex(columns=feature_names)
+    frame, _ = _model_frame(
+        ordered,
+        feature_names,
+        assessment_type_columns,
+        allow_previous_scores=True,
+    )
+    for score_name in expected_score_names:
+        available_name = f"{score_name}_available"
+        available = frame[available_name]
+        if available.isna().any() or not available.isin([0, 1]).all():
+            raise DatasetSchemaError(
+                f"Invalid availability indicator values in {available_name}"
+            )
+        score = frame[score_name]
+        inconsistent = ((available == 1) & score.isna()) | (
+            (available == 0) & score.notna()
+        )
+        if inconsistent.any():
+            raise DatasetSchemaError(
+                f"Score values and availability disagree for {score_name}"
+            )
+    return frame

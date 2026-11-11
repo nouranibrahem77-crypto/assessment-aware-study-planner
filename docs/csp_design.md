@@ -2,14 +2,16 @@
 
 ## Scope and source status
 
-This is a design document only. It does not implement CSP or change Search, NN,
-data, or model artifacts. Repository inspection found no standalone uploaded
+This document records requirements, design decisions, unresolved inputs, the
+generic CSP foundation, and baseline Backtracking implementation. Forward
+Checking and AC-3 are not implemented here. Search, NN, data, and model
+artifacts are outside CSP implementation scope. Repository inspection found no standalone uploaded
 assignment brief. The official requirements below are the P1 requirements
 provided in the project instructions and recorded in the existing Search and
 integration design documents. They are kept separate from proposed design
 choices. The named PDF was not present in the workspace or a connected document
-session during this revision; the official P1 facts below follow the relevant
-requirements and example explicitly supplied with this request.
+session during this revision; official facts follow the requirements and
+example explicitly supplied with the request.
 
 ## Official assignment requirements
 
@@ -42,6 +44,56 @@ These example values are not global defaults. The required capacity experiment
 uses 2, 3, and 4 available slots per week.
 
 ## Proposed CSP formulation
+
+### Implemented generic foundation and baseline BT
+
+The current foundation represents one CSP problem for a complete
+WholePlanManifest. The manifest binds the student, course, common mapping
+scenario, and exactly three distinct assignment entries. Each immutable
+AssignmentCandidateIdentity includes student, course, assignment, allocation,
+base-feature-context, and mapping-scenario identities and has its own stable
+digest. The manifest checks that each candidate agrees with the whole-plan
+student, course, assignment, and scenario. Every entry remains present,
+including allocations of zero sessions. Its canonical identity is a stable
+digest of the canonicalized manifest fields. Session variables and domains
+must match this manifest exactly.
+
+The problem also has a separate deterministic problem identity that includes
+the whole-plan identity, weekly capacity, domains, the finite ordering-policy
+snapshot, and each constraint's configuration identity. Evaluations and solver
+outcomes are bound to both identities so a result cannot be reused with a
+different capacity, domain catalog, or declared constraint configuration.
+
+At problem construction, the policy's required session pairs and its boolean
+slot-order relation over the finite union of domain slots are captured in an
+immutable `OrderingPolicySnapshot`. Ordering constraints are rebound to this
+snapshot, so later mutation of the caller's policy cannot change problem
+behavior without changing its already-computed identity. Opaque policies that
+cannot provide stable identity, immutable session pairs, or boolean results
+over the problem's finite slot set are rejected. This captures only the
+explicitly supplied relation; it does not choose temporal ordering semantics.
+
+CspEvaluation carries both the whole-plan identity and CSP problem identity
+and is an intermediate local validator record. It can report
+BRANCH_REJECTED, INCOMPLETE, or FEASIBLE. A rejected partial branch means only
+that branch cannot be extended. A valid partial assignment is incomplete; a
+complete valid assignment is locally feasible. The validator never reports
+whole-plan infeasibility. Only a solver boundary may issue
+CspSolverOutcome.INFEASIBLE, and it must attest exhaustive search. A resource
+limit, cancellation, or other early stop is INCOMPLETE. The validator factory
+requires exact coverage of the problem variables, values in their domains,
+passing constraints, and the matching whole-plan and problem identities before
+creating FEASIBLE. The solver factory independently repeats those checks for
+an attached feasible evaluation. Partial, out-of-domain, or constraint-violating
+assignments cannot become FEASIBLE through these APIs. The private factories
+are application-level conventions, not security boundaries against deliberate
+Python object fabrication.
+
+This contract is not the final WholePlanVerificationResult used by the NN
+adapter. That future result still needs the complete schedule identity,
+verification identity, policy version, per-constraint check evidence, and
+whole-plan identity. No assignment-level final NN evaluation may consume a
+local CspEvaluation.
 
 ### Variables
 
@@ -78,13 +130,14 @@ candidate cannot be scheduled.
 | Deadline | Every session occurs before its assignment deadline. | Remove deadline-ineligible slots from each session domain and validate again on complete assignments. Exact week conversion and boundary remain unresolved. |
 | Unique slot | Only one session may use a slot. | Each slot value can be assigned to at most one session variable across the whole plan. |
 | Same-assignment ordering | Sessions belonging to one assignment are ordered. | Apply the official ordering relation after its temporal meaning is specified; do not infer that it means distinct or strictly increasing weeks. |
-| Weekly capacity | Experiment with 2, 3, and 4 available slots/week. | Supply the corresponding number of weekly slot values. Unique-slot assignment enforces this slot-count capacity; do not add a separate capacity model absent an official rule. |
+| Weekly capacity | Experiment with 2, 3, and 4 available slots/week. | Provide capacity as a configurable problem input and check placements across the whole plan. Slot domains must also be built from the selected capacity configuration. |
 | Other P1 hard constraints | No additional scheduling constraints are explicitly established in the available brief. | Do not add study-day spacing, session duration, workload balance, or assignment-specific preferences without an approved requirement. |
 
-For the required experiment, capacity means the configured number of available
-slot values in each week. Whether an implementation needs another capacity
-constraint beyond those slot domains and unique assignment is unresolved and
-must not be assumed.
+The implementation foundation also carries a configurable weekly-capacity
+constraint. It is checked across sessions belonging to every assignment in
+the whole-plan manifest. The selected capacity is an input, never a hardcoded
+example value. The slot catalog and capacity must agree with the selected
+experiment configuration; how that catalog is generated remains unresolved.
 
 ### Constraint propagation
 
@@ -95,37 +148,90 @@ changes exactly when returning from recursion. Additional forward propagation
 for deadlines or ordering depends on the resolved input semantics and must be
 recorded as part of the chosen method.
 
-**AC-3.** Maintain directed arcs for the CSP's binary constraints. Revise a
-session variable's weekly-slot domain by removing values that have no
-supporting value in a neighboring variable's domain; enqueue adjacent arcs
-when a domain changes. This reduces impossible slot domains before or during
-backtracking. The precise arcs depend on the official ordering relation and
-slot representation, which remain unresolved.
+**AC-3.** The generic binary-constraint interface exposes variable scope,
+pair compatibility, support checks, and domain revision directly. A future
+solver can revise a session variable's weekly-slot domain without constructing
+artificial full assignments, then enqueue adjacent arcs when a domain changes.
+The foundation provides binary relations for unique-slot and policy-derived
+same-assignment ordering checks. Deadline eligibility is unary; weekly
+capacity is a whole-plan constraint. The precise ordering arcs and slot
+catalog still depend on unresolved project inputs.
 
-AC-3 is applied to binary constraints in the selected CSP representation. The
-required capacity experiment is represented by the weekly slot domains and
-unique-slot condition; no additional global capacity constraint is introduced
-without an official requirement for one.
+AC-3 applies to binary constraints only. Weekly capacity is checked as a
+separate whole-plan constraint; no claim is made that AC-3 alone enforces this
+global constraint.
+
+**Ordering coverage.** The manifest determines each assignment's declared
+session variables. An explicit approved ordering policy derives the required
+session pairs and supplies the slot relation. The foundation rejects missing,
+duplicate, reversed, or cross-assignment pairs and requires every session in
+an assignment with multiple sessions to participate in a relationship. The
+session index supplies canonical pair direction only; it does not define how
+slots must be ordered. No week-level or within-week ordering rule is selected
+by the foundation.
 
 ### Backtracking and deterministic ordering
 
 Use recursive depth-first backtracking to place each session variable in an
-available weekly slot. Variable and value ordering are implementation choices
-because the official requirements supplied here specify no heuristic. A
-proposed deterministic choice, to be evaluated consistently, is:
+available weekly slot. BT validates each partial assignment through the
+existing validator and keeps mutable recursion state separate from the
+immutable problem and its domains. A rejected partial branch is abandoned;
+only complete assignments passing the validator return FEASIBLE. The first
+solution API returns one result; the lazy enumerator can continue through
+subsequent feasible schedules.
+
+The implemented deterministic ordering is configurable. Its default is:
 
 1. Choose the unassigned variable with the smallest current domain (MRV).
 2. Break MRV ties by highest number of constraints with other unassigned
    variables (degree heuristic).
 3. Break remaining ties by canonical `(assignment_id, session_index)` order.
-4. Try domain values in least-constraining-value order, with canonical slot
-   identity as the deterministic tie-break.
+4. Rank domain values by a pairwise least-constraining-value (LCV) probe against
+   each unassigned neighbor, with canonical slot identity as the deterministic
+   tie-break. For n-ary constraints this is a heuristic ordering measure, not
+   full n-ary lookahead. Probes only order values; they do not remove values or
+   prune branches. `canonical` variable/value policies are also available for
+   controlled comparisons.
 
-These are proposed engineering choices, not assignment requirements. A
-complete assignment succeeds only after a final validation of every hard
-constraint. Exhaustive backtracking with no configured cutoff proves
-infeasibility. A resource limit, cancellation, or runtime failure returns an
-incomplete result and must not be reported as unsatisfiable.
+Variable ordering uses dynamic MRV without changing domains: for each
+unassigned variable, test each original-domain value against the current
+partial assignment and count values that remain consistent. Select the lowest
+count, then highest degree among unassigned variables, then canonical variable
+identity. These probes are observational checks only; they do not filter the
+domain or establish FC.
+
+No Forward Checking or AC-3 propagation is performed. With no node limit,
+search reports INFEASIBLE only after all values at every reachable partial
+assignment have been rejected or exhausted. `max_nodes` limits entered
+recursive states; reaching it returns INCOMPLETE, including when the limit is
+zero. It never converts an interrupted search to infeasibility.
+
+The lazy `BacktrackingEnumerator` retains its traversal between requests and
+returns one distinct schedule at a time in deterministic order. After the last
+schedule it returns EXHAUSTED only after traversal finishes. A cumulative node
+limit returns INCOMPLETE, even if earlier calls returned schedules; it never
+establishes that no further schedule exists. INCOMPLETE is terminal for that
+enumerator: repeated calls return the cached terminal result, and the same
+instance cannot resume. Creating a new enumerator restarts from the first
+solution. The first-solution helper wraps one enumerator request. A failed NN
+evaluation can call `next_solution()` on the same non-incomplete enumerator to
+continue without restarting.
+
+BT statistics have these definitions: `nodes_visited` counts entered partial
+assignment states, including root and rejected states; `assignments_attempted`
+counts variable/slot extensions before recursion; `backtracks` counts attempted
+extensions whose subtrees were proven solution-free; `constraint_checks` counts
+every actual call to a constraint's `is_satisfied` predicate, including node
+validation, dynamic-MRV probes, pairwise LCV probes, and independent final
+solver-outcome validation. Validator evidence is reused when constructing its
+evaluation to avoid repeating the same predicate pass; solver-boundary
+validation remains an independent pass and is counted. `maximum_depth` is the
+greatest number of assigned variables in an entered state.
+`solver_time_seconds` is cumulative active time spent advancing search and
+performing solver-boundary validation. `wall_time_seconds` is elapsed time
+since enumerator creation and can include caller pauses or external NN work. A
+node-limit attempt stopped before entering a state contributes an assignment
+attempt but not a visited node.
 
 ## Search, NN, and CSP integration
 
@@ -225,6 +331,13 @@ final result.
 The solver factory remains an application-level provenance convention, not a
 security boundary against deliberate Python object fabrication.
 
+The implemented generic CspProblem and CspEvaluation are whole-plan scoped,
+but CspEvaluation is only a local assignment validator. CspSolverOutcome
+separates solver termination from branch validation and permits INFEASIBLE
+only when its solver boundary marks the run exhaustive. These records do not
+replace WholePlanVerificationResult and cannot yet authorize final NN
+evaluation.
+
 ## Failure handling and termination
 
 - Reject malformed input before solving: missing/duplicate assignment IDs,
@@ -307,4 +420,6 @@ predicted-score target was met.
   the current strict NN schema, which excludes prior scores. CSP must not add
   such features.
 
-No source code, dataset, or model artifact was changed for this design phase.
+The generic CSP contracts are implemented separately from the solver. No
+Backtracking, Forward Checking, or AC-3 algorithm is implemented. No Search,
+NN, dataset, or model artifact was changed.

@@ -44,6 +44,20 @@ writes its model artifacts to `data/processed/nn_experiment/` plus
 `reports/nn_training.md`. It uses the fixed chronological splits and does not
 train on the proxy prior-score feature set.
 
+For the separate Previous Marks sensitivity experiment, generate proxy features
+and train Model B with:
+
+```bash
+make-fff-features --score-mode proxy --output-dir data/processed/proxy \
+  --report reports/feature_engineering_proxy.md
+train-previous-marks-nn
+```
+
+Model B artifacts are written under
+`data/processed/nn_experiment_previous_marks/`. OULAD contains no grade-release
+timestamps, so these features use an unverified submission-based availability
+proxy; the experiment does not establish leakage-free or student-visible marks.
+
 The development tools are pinned in `pyproject.toml` for repeatable installs.
 To run the checks:
 
