@@ -14,6 +14,10 @@ and artifacts. It does not add code or claim session effects are causal.
 - Documented rules generate session click increments, slot capacity, and
   target marks. Search proposes; NN predicts; CSP verifies schedules; rejected
   candidates return to Search.
+- The official example uses three assignments, target 55, three free slots per
+  week, and a 4/5/3 session allocation. These are example values, not defaults.
+- Required CSP experiment: compare BT, BT+FC, and BT+FC+AC-3 at 2, 3, and 4
+  available slots per week.
 - Sessions must precede their assignment deadlines, use unique weekly slots,
   and respect the same-assignment ordering constraint.
 - Monotonicity is tested over increasing allocations and violations reported.
@@ -28,9 +32,63 @@ These are design contracts, not implemented Python APIs.
 | Search | Problem bounds, initial zero-session allocation, shared evaluator callbacks | Candidate allocation plus stable allocation key. UCS orders by path cost; Greedy orders by heuristic. Search continues after rejected candidates. |
 | Provisional mapping | Immutable observed strict feature row, allocation, provisional-week rule, click scenario/config version | Copied feature row matching the strict schema; provenance and support flags. Only configured click columns may change. |
 | NN inference | One or more strict-schema feature rows | Clipped score prediction(s) in `[0, 100]`, via existing `RegressionPredictor.predict`. |
-| CSP scheduler | Candidate allocation, deadlines, slot domains, ordering rule | Ordered iterable of distinct feasible schedules, or an exhaustion result with rejection reasons. One-schedule-at-a-time iteration is preferred so final NN checks can stop on success. |
-| Final mapping | Immutable observed strict row, allocation, one actual CSP schedule, click scenario/config version | Copied strict-schema row with click features determined by actual scheduled weeks, plus provenance/support flags. |
+| CSP scheduler | Whole-plan allocation for all three assignments, deadlines, weekly slot domains for the selected capacity, ordering policy | Lazy deterministic sequence of per-schedule `WholePlanVerificationResult` values, followed by a `WholePlanSearchOutcome` distinguishing exhaustive enumeration, no feasible schedule, limits, cancellation, and errors. |
+| Final mapping | Feasible whole-plan verification result, expected whole-plan identity, one assignment projection, immutable observed strict row | Copied strict-schema row with click features from that assignment's actual scheduled windows and whole-plan verification provenance. |
 | Result/audit recorder | Allocation/schedule keys, both predictions, CSP status, support and monotonicity records | Separate provisional/final prediction records, CSP rejection records, final-target failures, and terminal status. |
+
+### Typed adapter and CSP verification boundary
+
+`WholePlanIdentity` binds the student and course, all three assignment
+allocations in canonical assignment-ID order, each assignment's base feature
+context fingerprint, and the mapping-scenario identity. Each assignment entry
+projects to the current `CandidateIdentity` fields (student, assignment,
+allocation, base-row fingerprint, scenario). The full identity remains the
+authority for CSP matching; matching one assignment projection alone does not
+prove that cross-assignment constraints were checked.
+
+`ScheduleData` contains data only and is never sufficient for final prediction.
+The future CSP contract returns a `WholePlanVerificationResult` for each
+complete three-assignment schedule checked. It binds `WholePlanIdentity`, full
+assignment-partitioned schedule details, schedule identity, verification
+identity, `verification_policy_version`, feasible/rejected status for that
+schedule, and immutable records for every applied constraint check. Required
+check IDs are
+`deadline_before_cutoff`, `weekly_slot_unique`, `same_assignment_order`, and
+`weekly_capacity`; all must be checked and passed for a feasible status.
+Additional hard constraints must also appear in the check records. The policy
+version identifies deadline and ordering semantics, slot catalog/source,
+capacity configuration/source identity, and slot-identity semantics.
+
+A rejected schedule is not proof that its whole-plan allocation has no feasible
+schedule. The enumerator returns a separate `WholePlanSearchOutcome` to report
+whether it exhausted all schedules (with none or some feasible), stopped at a
+limit/cancellation, or encountered an operational error. Only an exhaustive
+outcome can establish that no feasible schedule exists for the allocation.
+
+The NN adapter's current `evaluate_final` method and
+`CspVerificationResult._from_solver` are still assignment-scoped. The proposed
+future adapter contract takes a feasible whole-plan schedule result and the expected
+whole-plan identity, verifies exact identity equality, projects the requested
+assignment's `CandidateIdentity`, and obtains that assignment's schedule
+projection. It rejects raw schedules, incomplete/infeasible results, and
+identity/count mismatches. No assignment-level final NN evaluation may occur
+before whole-plan feasibility is established. Assignment-level final results
+remain bound to the same whole-plan, schedule, and verification identities;
+the plan is eligible for acceptance only after every required assignment has
+a successful final prediction under the target rule.
+
+The solver factory remains an application-level provenance convention, not a
+security boundary against malicious Python code or deliberate object
+fabrication.
+
+Prediction results retain an immutable scalar snapshot of the exact mapped
+feature row and immutable support diagnostics; any DataFrame view is freshly
+materialized for the caller. Monotonicity comparison context is keyed by
+student, assignment, base feature context, and mapping scenario. Each
+observation separately retains its allocation and actual schedule identity,
+so comparable increasing allocations can use different schedules while
+unrelated contexts remain separate. These comparisons describe model behavior
+under the simulation inputs and do not establish causal effects.
 
 The Session-to-Clicks Mapping must be deterministic for a fixed configuration
 and input. The existing weekly columns are `click_<group>_week_<1..4>` for
@@ -58,39 +116,45 @@ sequenceDiagram
     S->>N: Predict provisional marks
     N-->>S: provisional prediction
     S->>R: Record provisional prediction separately
-    S->>C: Request feasible schedules for allocation
-    alt No feasible schedule
-        C-->>S: Exhausted + rejection reasons
+    alt Provisional goal not met
+        S->>S: Continue Search
+    else Provisional goal met
+    S->>C: Verify complete three-assignment plan
+    alt No feasible whole-plan schedule
+        C-->>S: Exhaustive infeasible result + constraint checks
         S->>R: Record CSP rejections
         S->>S: Reject allocation; continue Search
-    else Feasible schedule returned
-        loop Each distinct feasible schedule until success or exhaustion
-            C-->>S: Schedule + schedule key
-            S->>M: allocation + actual schedule + observed row
-            M-->>S: final strict-schema features + support flags
-            S->>N: Predict final marks
-            N-->>S: final prediction
-            S->>R: Record final prediction separately
-            alt Final target met and support policy permits acceptance
+    else Feasible whole-plan schedule returned
+        loop Each distinct whole-plan schedule until success or exhaustion
+            C-->>S: WholePlanVerificationResult + full schedule key
+            loop Each required assignment
+                S->>M: verified plan + identity + assignment projection + base row
+                M-->>S: final strict-schema features + support flags
+                S->>N: Predict assignment final mark
+                N-->>S: final prediction
+                S->>R: Record assignment result with whole-plan provenance
+            end
+            alt All required final marks meet the target rule
                 S->>R: Record accepted plan
                 S-->>S: Terminate with allocation and schedule
-            else Final target fails
+            else A required final mark fails
                 S->>R: Record final-prediction failure
-                S->>C: Request next distinct schedule
+                S->>C: Request next distinct whole-plan schedule
             end
         end
         S->>S: If schedules exhausted, reject allocation; continue Search
     end
+    end
 ```
 
-The provisional prediction is a screening/planning value only. It never
-constitutes acceptance. CSP must be invoked for each allocation under this
-contract; provisional success is not proof of schedule feasibility, and
-provisional failure does not prove that every actual schedule would fail.
-Therefore the implementation must not prune an allocation solely because its
-provisional prediction misses target unless the official search semantics
-explicitly authorize that pruning. The safe default is to schedule it and
-perform final predictions, or document a sound bound that proves pruning safe.
+Every Search proposal receives its provisional NN prediction before CSP,
+preserving the specified Search → NN → CSP order. Under the proposed goal-test
+interpretation, a proposal that does not meet the provisional target returns to
+Search; a target-reaching proposal is passed to CSP for whole-plan feasibility
+verification. This provisional result never accepts a plan. Since the
+provisional weekly distribution may differ from feasible schedules, whether a
+provisional miss may definitively prune a candidate remains an unresolved
+Search-semantic decision.
 
 ## Detailed allocation lifecycle
 
@@ -104,20 +168,25 @@ perform final predictions, or document a sound bound that proves pruning safe.
 3. Strict NN inference produces provisional marks. Store these separately from
    all final predictions, keyed by allocation, context, and mapping/model
    versions.
-4. CSP enumerates feasible schedules for this allocation. A schedule must
-   satisfy deadlines, unique weekly slots, and same-assignment ordering. If
-   none exist, store each rejection reason and continue Search.
-5. For each distinct feasible schedule, the final mapping derives relative
-   NN windows from the schedule's actual weeks and creates a fresh copied row
-   from the same immutable observed base. It must not apply increments on top
-   of the provisional row, which would double count sessions.
-6. Run the existing NN on final features and record a final prediction.
-   Evaluate target satisfaction on this prediction only. If it misses target,
-   request another feasible schedule for the same allocation. If schedules
-   exhaust, record `final_target_failed` and resume Search.
-7. Accept only when the actual schedule is feasible and its final
-   schedule-specific prediction meets the target under the documented target
-   rule and support policy.
+4. For provisional target-reaching proposals, CSP verifies each complete
+   schedule across all three assignments. It records
+   checks for deadlines, unique weekly slots, same-assignment ordering, and
+   weekly capacity under a versioned policy. If exhaustive CSP proves there is
+   no feasible schedule, store its whole-plan rejection evidence and continue
+   Search. An incomplete CSP result is not infeasibility.
+5. Only after a feasible `WholePlanVerificationResult` exists may final NN
+   evaluation begin. The adapter checks its whole-plan identity against the
+   expected candidate, projects each assignment's `CandidateIdentity`, and
+   obtains that assignment's verified schedule. It rebuilds final features
+   from the immutable base row and actual scheduled windows; provisional
+   increments are never reused.
+6. Evaluate final predictions for all required assignments and bind every
+   result to the same whole-plan identity, schedule identity, and verification
+   identity. If the complete plan misses target, request the next distinct
+   feasible whole-plan schedule. If schedules exhaust, record
+   `final_target_failed` and resume Search.
+7. Accept only when whole-plan feasibility is established and all required
+   final predictions meet the documented target rule and support policy.
 
 The final feature vector must reflect the *same allocation* as the schedule.
 The provisional and final records remain distinct even if their vectors or
@@ -176,8 +245,12 @@ Use stable keys and separate caches:
 - `schedule_key`: allocation key plus canonical ordered assignment-to-slot
   mapping. Two enumerations of the same schedule share a key; distinct
   schedules must still be evaluated because their click windows may differ.
-- Final prediction cache key: schedule key plus base-row/context identity,
-  mapping/scenario/support versions, and NN artifact/schema identity.
+- Whole-plan verification cache key: whole-plan allocation identity, complete
+  schedule identity, CSP policy/catalog/capacity versions, and CSP problem
+  identity.
+- Final prediction cache key: whole-plan verification identity plus selected
+  assignment identity, base-row/context identity, mapping/scenario/support
+  versions, and NN artifact/schema identity.
 - CSP rejection key: allocation key plus CSP problem/configuration identity;
   retain structured reasons. A schedule-specific failure must not be confused
   with allocation infeasibility unless CSP has exhausted all schedules.
@@ -216,6 +289,8 @@ counts and prediction target failures must remain separate in summaries.
 
 ## Testable acceptance criteria
 
+- CSP evaluation covers all nine required combinations: BT, BT+FC, and
+  BT+FC+AC-3 at weekly capacities 2, 3, and 4.
 - Starting from zero, every generated successor adds exactly one session and
   has the expected unit path-cost increment.
 - UCS candidate allocations are processed in nondecreasing session cost;
@@ -232,7 +307,13 @@ counts and prediction target failures must remain separate in summaries.
 - Provisional target success never bypasses CSP or final NN prediction.
 - If a final prediction misses target, another schedule for the same allocation
   is tried before that allocation is rejected; schedule exhaustion resumes
-  Search exactly once.
+  Search exactly once. Enumeration is lazy and may stop after a plan passes.
+- No assignment-level final NN evaluation occurs before a feasible
+  whole-plan-verification result exists. Every assignment result for an
+  accepted plan matches the same whole-plan, schedule, and verification IDs.
+- A feasible whole-plan CSP result records the versioned policy and every
+  required/applied constraint check, with all required checks passed; an
+  incomplete result is never treated as infeasible or feasible.
 - CSP infeasibility records structured constraint reasons and is not recorded
   as a prediction failure. Final target failure is not recorded as CSP failure.
 - Duplicate allocation/schedule enumeration does not repeat the corresponding
@@ -251,9 +332,25 @@ counts and prediction target failures must remain separate in summaries.
 
 - What deterministic provisional weekly distribution is approved, and how is
   it derived from an allocation with no selected weeks?
-- Does CSP enumerate all feasible schedules, or return one canonical schedule?
-  If it enumerates, what is its deterministic ordering and completeness proof?
-- What target rule, generated capacity rule, and out-of-support policy govern
+- What is the authoritative source and generator for weekly slot domains? The
+  required capacity cases specify 2, 3, and 4 available slot values per week;
+  whether that setting is uniform across weeks is not stated; exact slot
+  identities, dates, and durations are not specified.
+- How do day-offset deadlines map to weekly slot dates, and what exact
+  before-deadline boundary applies? The four NN click windows do not define
+  this scheduling rule.
+- Does “sessions ordered” mean strictly increasing weeks, chronological slot
+  order (possibly within a week), or another relation?
+- The integration contract requires trying another feasible schedule when a
+  final prediction misses target. Proposed behavior is deterministic lazy
+  enumeration until acceptance or exhaustive schedule exhaustion; the official
+  materials do not set the schedule ordering or resource-limit policy.
+- Whether a provisional NN miss may definitively prune a Search proposal,
+  given that final scheduled weeks can produce different features and marks.
+- What whole-plan identity fields are available for course and base feature
+  contexts in application inputs, and how will Search construct all three
+  assignment projections before invoking CSP?
+- What target rule and out-of-support policy govern
   final acceptance and best-achievable reporting?
 - What is the monotonicity comparison tolerance and required population of
   contexts/schedules?
