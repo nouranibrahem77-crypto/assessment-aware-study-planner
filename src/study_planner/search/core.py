@@ -2,12 +2,48 @@
 
 from __future__ import annotations
 
+import math
 from collections.abc import Hashable, Iterable
 from dataclasses import dataclass
+from numbers import Real
 from typing import Generic, Protocol, TypeVar
 
 StateT = TypeVar("StateT", bound=Hashable)
 ActionT = TypeVar("ActionT")
+
+
+def _validate_cost(value: Real) -> float:
+    """Convert one action cost to float and reject unsupported costs."""
+    if isinstance(value, bool) or not isinstance(value, Real):
+        raise ValueError("Action costs must be finite, non-negative real numbers")
+    try:
+        cost = float(value)
+    except (OverflowError, ValueError) as error:
+        raise ValueError(
+            "Action costs must be finite, non-negative real numbers"
+        ) from error
+    if not math.isfinite(cost) or cost < 0:
+        raise ValueError("Action costs must be finite and non-negative")
+    return cost
+
+
+def _reconstruct_path(
+    initial_state: StateT,
+    goal_state: StateT,
+    parents: dict[StateT, tuple[StateT, ActionT]],
+) -> tuple[tuple[StateT, ...], tuple[ActionT, ...]]:
+    """Reconstruct states and actions from a predecessor map."""
+    states = [goal_state]
+    actions: list[ActionT] = []
+    current = goal_state
+    while current != initial_state:
+        previous, action = parents[current]
+        states.append(previous)
+        actions.append(action)
+        current = previous
+    states.reverse()
+    actions.reverse()
+    return tuple(states), tuple(actions)
 
 
 class SearchProblem(Protocol[StateT, ActionT]):

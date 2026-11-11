@@ -6,6 +6,7 @@ from dataclasses import dataclass
 
 import pytest
 
+from study_planner.search.greedy import greedy_best_first_search
 from study_planner.search.ucs import uniform_cost_search
 
 
@@ -189,3 +190,140 @@ def test_statistics_count_generated_successors_before_duplicate_filtering() -> N
     result = uniform_cost_search(problem)
 
     assert result.statistics.nodes_generated == 3
+
+
+def test_greedy_follows_low_heuristic_path_and_reconstructs_solution() -> None:
+    problem = GraphProblem(
+        start="start",
+        goals=frozenset({"goal"}),
+        graph={
+            "start": (
+                Edge("to-a", "a", 4),
+                Edge("to-b", "b", 1),
+            ),
+            "a": (Edge("finish-a", "goal", 1),),
+            "b": (Edge("finish-b", "goal", 1),),
+        },
+    )
+    heuristic_values = {"start": 5, "a": 3, "b": 1, "goal": 0}
+
+    result = greedy_best_first_search(problem, heuristic_values.__getitem__)
+
+    assert result.state_path == ("start", "b", "goal")
+    assert tuple(edge.action for edge in result.action_path) == ("to-b", "finish-b")
+    assert result.solution_cost == 2
+
+
+def test_greedy_can_return_a_higher_cost_solution_than_ucs() -> None:
+    problem = GraphProblem(
+        start="start",
+        goals=frozenset({"goal"}),
+        graph={
+            "start": (
+                Edge("toward-expensive", "expensive", 10),
+                Edge("toward-cheap", "cheap", 1),
+            ),
+            "expensive": (Edge("expensive-finish", "goal", 10),),
+            "cheap": (Edge("cheap-finish", "goal", 1),),
+        },
+    )
+    heuristic_values = {"start": 5, "expensive": 1, "cheap": 2, "goal": 0}
+
+    greedy_result = greedy_best_first_search(
+        problem, heuristic_values.__getitem__
+    )
+    ucs_result = uniform_cost_search(problem)
+
+    assert greedy_result.state_path == ("start", "expensive", "goal")
+    assert greedy_result.solution_cost == 20
+    assert ucs_result.solution_cost == 2
+
+
+def test_greedy_ignores_duplicate_states_after_first_discovery() -> None:
+    problem = GraphProblem(
+        start="start",
+        goals=frozenset({"goal"}),
+        graph={
+            "start": (
+                Edge("to-a", "a", 1),
+                Edge("to-b", "b", 1),
+            ),
+            "a": (Edge("a-to-shared", "shared", 1),),
+            "b": (Edge("b-to-shared", "shared", 1),),
+            "shared": (Edge("finish", "goal", 1),),
+        },
+    )
+    heuristic_values = {
+        "start": 0,
+        "a": 1,
+        "b": 2,
+        "shared": 3,
+        "goal": 0,
+    }
+
+    result = greedy_best_first_search(problem, heuristic_values.__getitem__)
+
+    assert result.state_path == ("start", "a", "shared", "goal")
+    assert result.statistics.nodes_expanded == 4
+    assert result.statistics.nodes_generated == 5
+
+
+def test_greedy_equal_heuristics_follow_deterministic_insertion_order() -> None:
+    problem = GraphProblem(
+        start="start",
+        goals=frozenset({"first-goal", "second-goal"}),
+        graph={
+            "start": (
+                Edge("first", "first-goal", 1),
+                Edge("second", "second-goal", 1),
+            )
+        },
+    )
+    heuristic_values = {"start": 1, "first-goal": 0, "second-goal": 0}
+
+    first = greedy_best_first_search(problem, heuristic_values.__getitem__)
+    second = greedy_best_first_search(problem, heuristic_values.__getitem__)
+
+    assert first.state_path == second.state_path == ("start", "first-goal")
+
+
+def test_greedy_returns_no_solution_when_frontier_is_exhausted() -> None:
+    problem = GraphProblem(
+        start="start",
+        goals=frozenset({"missing"}),
+        graph={"start": (Edge("dead-end", "dead", 1),)},
+    )
+
+    result = greedy_best_first_search(problem, lambda _: 0)
+
+    assert not result.found
+    assert result.state_path == ()
+    assert result.action_path == ()
+    assert result.solution_cost is None
+    assert result.statistics.nodes_expanded == 2
+    assert result.statistics.nodes_generated == 1
+    assert result.statistics.execution_time_seconds >= 0
+
+
+def test_greedy_initial_goal_does_not_need_heuristic_evaluation() -> None:
+    problem = GraphProblem(start="goal", goals=frozenset({"goal"}), graph={})
+
+    def fail_if_called(_: str) -> float:
+        raise AssertionError("An initial goal does not need a heuristic")
+
+    result = greedy_best_first_search(problem, fail_if_called)
+
+    assert result.found
+    assert result.state_path == ("goal",)
+    assert result.action_path == ()
+    assert result.solution_cost == 0
+    assert result.statistics.nodes_expanded == 0
+    assert result.statistics.nodes_generated == 0
+
+
+@pytest.mark.parametrize("value", [-1, float("nan"), float("inf")])
+def test_greedy_rejects_invalid_heuristic_values(value: float) -> None:
+    problem = GraphProblem(start="start", goals=frozenset(), graph={})
+
+    with pytest.raises(ValueError, match="(?i)heuristic"):
+        greedy_best_first_search(problem, lambda _: value)
