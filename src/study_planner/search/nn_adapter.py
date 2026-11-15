@@ -3,13 +3,27 @@
 from __future__ import annotations
 
 import hashlib
-from dataclasses import dataclass, field
+import json
+import re
+import weakref
+from collections.abc import Mapping
+from dataclasses import dataclass, field, replace
 from enum import Enum
 from typing import Protocol
 
 import numpy as np
 import pandas as pd
 
+from study_planner.csp.verification import (
+    WholePlanVerificationResult,
+    WholePlanVerificationStatus,
+    validate_whole_plan_verification_result,
+)
+from study_planner.nn.inference import (
+    _TrustedArtifactProvenance,
+    trusted_artifact_provenance,
+    verify_trusted_artifact_integrity,
+)
 from study_planner.search.session_mapping import (
     STRICT_FFF_FEATURE_NAMES,
     ClickScenario,
@@ -43,6 +57,13 @@ class EvaluationStatus(str, Enum):
 
     PREDICTED = "predicted"
     INFERENCE_FAILED = "inference_failed"
+
+
+class NNModelMode(str, Enum):
+    """Supported model schemas, retained as separate inference modes."""
+
+    MODEL_A_STRICT = "model_a_strict"
+    MODEL_B_PREVIOUS_MARKS = "model_b_previous_marks_proxy"
 
 
 class CspVerificationStatus(str, Enum):
@@ -307,6 +328,7 @@ class StrictPredictor(Protocol):
 
     feature_names: tuple[str, ...]
     assessment_type_columns: tuple[str, ...]
+    artifact_digest: str | None
 
     def predict(self, features: pd.DataFrame) -> np.ndarray:
         """Predict marks from a strict-schema feature batch."""
@@ -326,6 +348,18 @@ class CandidatePredictionResult:
     monotonicity_report: MonotonicityReport | None
     error_type: str | None = None
     error_message: str | None = None
+    whole_plan_identity: str | None = None
+    problem_identity: str | None = None
+    verification_policy_identity: str | None = None
+    verification_policy_version: str | None = None
+    fitted_artifact_digest: str | None = None
+    model_provenance_identity: str | None = None
+    model_mode: NNModelMode | None = None
+    feature_schema_identity: str | None = None
+    prediction_identity: str | None = None
+    _predictor_reference: weakref.ReferenceType[object] | None = field(
+        default=None, repr=False, compare=False
+    )
 
     def assert_candidate(self, identity: CandidateIdentity) -> None:
         """Reject result reuse for a different candidate or mapping scenario."""
@@ -339,9 +373,26 @@ class CandidatePredictionResult:
         identity: CandidateIdentity,
         schedule_identity: tuple[tuple[str, int], ...] | None = None,
         csp_verification_identity: str | None = None,
+        whole_plan_identity: str | None = None,
+        problem_identity: str | None = None,
+        model_provenance_identity: str | None = None,
+        fitted_artifact_digest: str | None = None,
+        model_mode: NNModelMode | None = None,
+        feature_schema_identity: str | None = None,
     ) -> bool:
         """Check candidate, schedule, and verification identities before use."""
         self.assert_candidate(identity)
+        predictor = (
+            None
+            if self._predictor_reference is None
+            else self._predictor_reference()
+        )
+        if predictor is None:
+            return False
+        try:
+            provenance = verify_trusted_artifact_integrity(predictor)
+        except (TypeError, ValueError, RuntimeError):
+            return False
         return (
             self.phase is EvaluationPhase.FINAL_SCHEDULED
             and self.status is EvaluationStatus.PREDICTED
@@ -349,6 +400,20 @@ class CandidatePredictionResult:
             and schedule_identity == self.schedule_identity
             and csp_verification_identity is not None
             and csp_verification_identity == self.csp_verification_identity
+            and whole_plan_identity is not None
+            and whole_plan_identity == self.whole_plan_identity
+            and problem_identity is not None
+            and problem_identity == self.problem_identity
+            and model_provenance_identity is not None
+            and model_provenance_identity == self.model_provenance_identity
+            and fitted_artifact_digest is not None
+            and fitted_artifact_digest == self.fitted_artifact_digest
+            and model_mode is not None
+            and model_mode is self.model_mode
+            and feature_schema_identity is not None
+            and feature_schema_identity == self.feature_schema_identity
+            and provenance.digest == self.fitted_artifact_digest
+            and self.prediction_identity == _prediction_identity_for_result(self)
         )
 
 
@@ -365,10 +430,17 @@ class CandidateEvaluator(Protocol):
     def evaluate_final(
         self,
         allocation: CandidateSessionAllocation,
-        verification: CspVerificationResult,
+        verification: WholePlanVerificationResult,
         context: CandidateFeatureContext,
+        *,
+        expected_whole_plan_identity: str,
+        expected_problem_identity: str,
+        expected_policy_identity: str,
+        expected_policy_version: str,
+        expected_model_provenance_identity: str,
+        slot_relative_windows: Mapping[str, int],
     ) -> CandidatePredictionResult:
-        """Predict only after a feasible, candidate-matched CSP result."""
+        """Predict only after matching whole-plan verification provenance."""
 
 
 def _validate_counts(counts: tuple[int, ...]) -> None:
@@ -385,12 +457,75 @@ def _validate_counts(counts: tuple[int, ...]) -> None:
         )
 
 
-@dataclass
+def _is_previous_marks_schema(feature_names: tuple[str, ...]) -> bool:
+    type_columns = STRICT_FFF_FEATURE_NAMES[:3]
+    metadata = STRICT_FFF_FEATURE_NAMES[3:7]
+    previous_marks = tuple(
+        name
+        for lag in range(1, 6)
+        for name in (
+            f"previous_assessment_score_lag_{lag}",
+            f"previous_assessment_score_lag_{lag}_available",
+        )
+    )
+    expected = (
+        *type_columns,
+        *metadata,
+        *previous_marks,
+        *STRICT_FFF_FEATURE_NAMES[7:],
+    )
+    return feature_names == expected
+
+
+def _prediction_identity_for_result(result: CandidatePredictionResult) -> str:
+    """Hash all immutable inputs and output that define a prediction record."""
+    payload = {
+        "candidate": {
+            "student": result.identity.student_identity,
+            "assignment": result.identity.assignment_identity,
+            "allocation": result.identity.canonical_allocation_identity,
+            "base_context": result.identity.base_feature_context_identity,
+            "mapping_scenario": result.identity.mapping_scenario_identity,
+        },
+        "phase": result.phase.value,
+        "schedule_identity": result.schedule_identity,
+        "verification_identity": result.csp_verification_identity,
+        "whole_plan_identity": result.whole_plan_identity,
+        "problem_identity": result.problem_identity,
+        "policy_identity": result.verification_policy_identity,
+        "policy_version": result.verification_policy_version,
+        "artifact_digest": result.fitted_artifact_digest,
+        "model_provenance_identity": result.model_provenance_identity,
+        "model_mode": None if result.model_mode is None else result.model_mode.value,
+        "feature_schema_identity": result.feature_schema_identity,
+        "status": result.status.value,
+        "prediction": result.prediction,
+        "error_type": result.error_type,
+        "error_message": result.error_message,
+    }
+    encoded = json.dumps(
+        payload, sort_keys=True, separators=(",", ":"), allow_nan=False
+    ).encode()
+    return hashlib.sha256(encoded).hexdigest()
+
+
+@dataclass(frozen=True)
 class SessionNNAdapter:
-    """Map Search candidates and invoke the existing fitted NN predictor."""
+    """Map candidates through an explicitly identified fitted NN artifact.
+
+    The loader-supplied artifact digest binds the exact persisted prediction
+    inputs; schema and predictor class are not sufficient to identify weights.
+    """
 
     predictor: StrictPredictor
     mapping_config: SessionClickMappingConfig
+    model_mode: NNModelMode = field(init=False)
+    fitted_artifact_digest: str = field(init=False)
+    feature_schema_identity: str = field(init=False)
+    model_provenance_identity: str = field(init=False)
+    _artifact_provenance: _TrustedArtifactProvenance = field(
+        init=False, repr=False
+    )
     _monotonicity_observations: dict[
         MonotonicityContext,
         dict[
@@ -400,9 +535,14 @@ class SessionNNAdapter:
     ] = field(default_factory=dict, init=False, repr=False)
 
     def __post_init__(self) -> None:
-        if tuple(self.predictor.feature_names) != STRICT_FFF_FEATURE_NAMES:
+        feature_names = tuple(self.predictor.feature_names)
+        if feature_names == STRICT_FFF_FEATURE_NAMES:
+            object.__setattr__(self, "model_mode", NNModelMode.MODEL_A_STRICT)
+        elif _is_previous_marks_schema(feature_names):
+            object.__setattr__(self, "model_mode", NNModelMode.MODEL_B_PREVIOUS_MARKS)
+        else:
             raise CandidateEvaluationError(
-                "predictor feature schema/order differs from strict FFF mapping schema"
+                "predictor schema/order differs from Model A and Model B schemas"
             )
         if (
             tuple(self.predictor.assessment_type_columns)
@@ -411,6 +551,53 @@ class SessionNNAdapter:
             raise CandidateEvaluationError(
                 "predictor assessment type columns differ from strict FFF schema"
             )
+        artifact_provenance = trusted_artifact_provenance(self.predictor)
+        if artifact_provenance is None:
+            raise CandidateEvaluationError(
+                "predictor was not created by the verified artifact loader"
+            )
+        try:
+            verify_trusted_artifact_integrity(self.predictor, artifact_provenance)
+        except ValueError as error:
+            raise CandidateEvaluationError(str(error)) from error
+        expected_mode = (
+            "strict"
+            if self.model_mode is NNModelMode.MODEL_A_STRICT
+            else "proxy"
+        )
+        if artifact_provenance.mode != expected_mode:
+            raise CandidateEvaluationError("artifact mode and predictor schema differ")
+        artifact_digest = artifact_provenance.digest
+        if not isinstance(artifact_digest, str) or not re.fullmatch(
+            r"[0-9a-f]{64}", artifact_digest
+        ):
+            raise CandidateEvaluationError("trusted artifact digest is malformed")
+        schema_payload = {
+            "feature_names": feature_names,
+            "assessment_type_columns": tuple(self.predictor.assessment_type_columns),
+        }
+        schema_identity = hashlib.sha256(
+            json.dumps(schema_payload, sort_keys=True, separators=(",", ":")).encode()
+        ).hexdigest()
+        provenance_payload = {
+            "artifact_digest": artifact_digest,
+            "feature_schema_identity": schema_identity,
+            "mode": self.model_mode.value,
+        }
+        provenance_identity = hashlib.sha256(
+            json.dumps(
+                provenance_payload, sort_keys=True, separators=(",", ":")
+            ).encode()
+        ).hexdigest()
+        object.__setattr__(self, "fitted_artifact_digest", artifact_digest)
+        object.__setattr__(self, "feature_schema_identity", schema_identity)
+        object.__setattr__(self, "model_provenance_identity", provenance_identity)
+        object.__setattr__(self, "_artifact_provenance", artifact_provenance)
+
+    @property
+    def model_identity(self) -> str:
+        """Compatibility alias for the complete model provenance identity."""
+        return self.model_provenance_identity
 
     @property
     def mapping_scenario_identity(self) -> str:
@@ -461,29 +648,90 @@ class SessionNNAdapter:
     def evaluate_final(
         self,
         allocation: CandidateSessionAllocation,
-        verification: CspVerificationResult,
+        verification: WholePlanVerificationResult,
         context: CandidateFeatureContext,
+        *,
+        expected_whole_plan_identity: str,
+        expected_problem_identity: str,
+        expected_policy_identity: str,
+        expected_policy_version: str,
+        expected_model_provenance_identity: str,
+        slot_relative_windows: Mapping[str, int],
     ) -> CandidatePredictionResult:
-        """Evaluate only a feasible CSP schedule bound to this candidate."""
+        """Evaluate only a complete, matching, feasible whole-plan schedule."""
+        if expected_model_provenance_identity != self.model_provenance_identity:
+            raise CandidateEvaluationError("model provenance identity mismatch")
+        try:
+            verify_trusted_artifact_integrity(
+                self.predictor, self._artifact_provenance
+            )
+        except ValueError as error:
+            raise CandidateEvaluationError(str(error)) from error
         expected_identity = self.candidate_identity(allocation, context)
-        if not isinstance(verification, CspVerificationResult):
+        if not isinstance(verification, WholePlanVerificationResult):
             raise CandidateEvaluationError(
-                "final evaluation requires a typed CSP verification result"
+                "final evaluation requires a WholePlanVerificationResult"
             )
-        if verification.candidate_identity != expected_identity:
-            raise CandidateEvaluationError(
-                "CSP verification candidate identity mismatch"
-            )
-        if verification.status is not CspVerificationStatus.FEASIBLE:
+        if verification.status is not WholePlanVerificationStatus.FEASIBLE:
             raise CandidateEvaluationError(
                 "CSP verification did not establish feasibility"
             )
-        schedule = verification.schedule
-        if schedule is None:
-            raise CandidateEvaluationError("feasible CSP result has no schedule")
-        if sum(schedule.weekly_sessions) != sum(allocation.weekly_sessions):
+        try:
+            validate_whole_plan_verification_result(
+                verification,
+                expected_whole_plan_identity=expected_whole_plan_identity,
+                expected_problem_identity=expected_problem_identity,
+                expected_policy_identity=expected_policy_identity,
+                expected_policy_version=expected_policy_version,
+            )
+        except ValueError as error:
+            raise CandidateEvaluationError(str(error)) from error
+        manifest = verification.whole_plan_manifest
+        if (
+            manifest.mapping_scenario_identity
+            != expected_identity.mapping_scenario_identity
+        ):
+            raise CandidateEvaluationError("whole-plan mapping scenario mismatch")
+        plan = manifest.assignment(context.assignment_identity)
+        candidate = plan.candidate_identity
+        if (
+            candidate.student_identity != expected_identity.student_identity
+            or candidate.assignment_identity != expected_identity.assignment_identity
+            or candidate.canonical_allocation_identity
+            != expected_identity.canonical_allocation_identity
+            or candidate.base_feature_context_identity
+            != expected_identity.base_feature_context_identity
+            or candidate.mapping_scenario_identity
+            != expected_identity.mapping_scenario_identity
+        ):
+            raise CandidateEvaluationError("whole-plan candidate identity mismatch")
+        if not isinstance(slot_relative_windows, Mapping):
+            raise CandidateEvaluationError("slot relative-window mapping is required")
+        selected = next(
+            item
+            for item in verification.schedule
+            if item.assignment_identity == context.assignment_identity
+        )
+        if len(selected.sessions) != sum(allocation.weekly_sessions):
             raise CandidateEvaluationError(
                 "CSP schedule session count differs from candidate allocation"
+            )
+        try:
+            schedule = ScheduleData(
+                tuple(
+                    ScheduledSession(
+                        session.slot_id, slot_relative_windows[session.slot_id]
+                    )
+                    for session in selected.sessions
+                )
+            )
+        except (KeyError, TypeError, ValueError) as error:
+            raise CandidateEvaluationError(
+                "verified schedule lacks a valid relative-window mapping"
+            ) from error
+        if sum(schedule.weekly_sessions) != sum(allocation.weekly_sessions):
+            raise CandidateEvaluationError(
+                "verified schedule window counts differ from candidate allocation"
             )
 
         mapping = self._map(schedule.weekly_sessions, context)
@@ -504,6 +752,10 @@ class SessionNNAdapter:
             schedule_identity=schedule.schedule_identity,
             csp_verification_identity=verification.verification_identity,
             monotonicity_report=None,
+            whole_plan_identity=verification.whole_plan_identity,
+            problem_identity=verification.problem_identity,
+            verification_policy_identity=verification.verification_policy_identity,
+            verification_policy_version=verification.verification_policy_version,
         )
         if (
             result.status is EvaluationStatus.PREDICTED
@@ -522,16 +774,7 @@ class SessionNNAdapter:
                     if np.isfinite(mark)
                 )
             )
-            result = CandidatePredictionResult(
-                identity=result.identity,
-                phase=result.phase,
-                status=result.status,
-                mapping=result.mapping,
-                prediction=result.prediction,
-                schedule_identity=result.schedule_identity,
-                csp_verification_identity=result.csp_verification_identity,
-                monotonicity_report=report,
-            )
+            result = replace(result, monotonicity_report=report)
         return result
 
     def _map(
@@ -558,8 +801,24 @@ class SessionNNAdapter:
         schedule_identity: tuple[tuple[str, int], ...] | None,
         csp_verification_identity: str | None,
         monotonicity_report: MonotonicityReport | None,
+        whole_plan_identity: str | None = None,
+        problem_identity: str | None = None,
+        verification_policy_identity: str | None = None,
+        verification_policy_version: str | None = None,
     ) -> CandidatePredictionResult:
+        try:
+            verify_trusted_artifact_integrity(
+                self.predictor, self._artifact_provenance
+            )
+        except ValueError as error:
+            raise CandidateEvaluationError(str(error)) from error
         snapshot = MappingEvaluationSnapshot.from_mapping(mapping)
+        provenance = {
+            "fitted_artifact_digest": self.fitted_artifact_digest,
+            "model_provenance_identity": self.model_provenance_identity,
+            "model_mode": self.model_mode,
+            "feature_schema_identity": self.feature_schema_identity,
+        }
         try:
             output = np.asarray(
                 self.predictor.predict(snapshot.candidate_features.copy(deep=True))
@@ -570,7 +829,7 @@ class SessionNNAdapter:
             if not np.isfinite(prediction) or not 0 <= prediction <= 100:
                 raise ValueError("predictor returned a mark outside finite [0, 100]")
         except Exception as error:
-            return CandidatePredictionResult(
+            result = CandidatePredictionResult(
                 identity=identity,
                 phase=phase,
                 status=EvaluationStatus.INFERENCE_FAILED,
@@ -581,8 +840,18 @@ class SessionNNAdapter:
                 monotonicity_report=None,
                 error_type=type(error).__name__,
                 error_message=str(error),
+                whole_plan_identity=whole_plan_identity,
+                problem_identity=problem_identity,
+                verification_policy_identity=verification_policy_identity,
+                verification_policy_version=verification_policy_version,
+                **provenance,
+                _predictor_reference=weakref.ref(self.predictor),
             )
-        return CandidatePredictionResult(
+            return replace(
+                result,
+                prediction_identity=_prediction_identity_for_result(result),
+            )
+        result = CandidatePredictionResult(
             identity=identity,
             phase=phase,
             status=EvaluationStatus.PREDICTED,
@@ -591,4 +860,19 @@ class SessionNNAdapter:
             schedule_identity=schedule_identity,
             csp_verification_identity=csp_verification_identity,
             monotonicity_report=monotonicity_report,
+            whole_plan_identity=whole_plan_identity,
+            problem_identity=problem_identity,
+            verification_policy_identity=verification_policy_identity,
+            verification_policy_version=verification_policy_version,
+            **provenance,
+            _predictor_reference=weakref.ref(self.predictor),
+        )
+        try:
+            verify_trusted_artifact_integrity(
+                self.predictor, self._artifact_provenance
+            )
+        except ValueError as error:
+            raise CandidateEvaluationError(str(error)) from error
+        return replace(
+            result, prediction_identity=_prediction_identity_for_result(result)
         )

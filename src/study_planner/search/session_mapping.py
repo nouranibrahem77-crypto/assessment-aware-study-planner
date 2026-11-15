@@ -22,6 +22,10 @@ from study_planner.data.feature_engineering.constants import (
     TARGET_COLUMN,
     click_feature_name,
 )
+from study_planner.nn.dataset import (
+    DatasetSchemaError,
+    prepare_previous_marks_inference_frame,
+)
 
 
 class ClickScenario(str, Enum):
@@ -266,19 +270,24 @@ def _validate_feature_row(
     if len(features) != 1:
         raise MappingValidationError("features must contain exactly one row")
     expected = tuple(feature_names)
-    if expected != STRICT_FFF_FEATURE_NAMES:
-        raise MappingValidationError(
-            "feature_names must match the current strict FFF schema/order"
-        )
     if tuple(features.columns) != expected:
         raise MappingValidationError(
             "feature columns/order must exactly match the supplied strict schema"
         )
     forbidden = set(IDENTIFIER_COLUMNS) | {TARGET_COLUMN}
-    if forbidden.intersection(expected) or any(
-        name.startswith("previous_assessment_score") for name in expected
-    ):
-        raise MappingValidationError("only strict feature inputs are accepted")
+    if forbidden.intersection(expected):
+        raise MappingValidationError(
+            "model inputs cannot contain identifiers or target"
+        )
+    if expected != STRICT_FFF_FEATURE_NAMES:
+        try:
+            prepare_previous_marks_inference_frame(
+                features, expected, STRICT_FFF_FEATURE_NAMES[:3]
+            )
+        except (DatasetSchemaError, TypeError, ValueError) as error:
+            raise MappingValidationError(
+                "feature_names must match Model A strict or Model B proxy schema"
+            ) from error
 
     type_columns = (
         "assessment_type_cma",

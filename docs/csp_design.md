@@ -3,9 +3,9 @@
 ## Scope and source status
 
 This document records requirements, design decisions, unresolved inputs, the
-generic CSP foundation, and baseline Backtracking implementation. Forward
-Checking and AC-3 are not implemented here. Search, NN, data, and model
-artifacts are outside CSP implementation scope. Repository inspection found no standalone uploaded
+generic CSP foundation, and the Backtracking, Forward Checking, and AC-3
+implementations. Search, NN, data, and model artifacts are outside CSP
+implementation scope. Repository inspection found no standalone uploaded
 assignment brief. The official requirements below are the P1 requirements
 provided in the project instructions and recorded in the existing Search and
 integration design documents. They are kept separate from proposed design
@@ -45,7 +45,7 @@ uses 2, 3, and 4 available slots per week.
 
 ## Proposed CSP formulation
 
-### Implemented generic foundation and baseline BT
+### Implemented generic foundation, BT, and FC
 
 The current foundation represents one CSP problem for a complete
 WholePlanManifest. The manifest binds the student, course, common mapping
@@ -89,11 +89,35 @@ assignments cannot become FEASIBLE through these APIs. The private factories
 are application-level conventions, not security boundaries against deliberate
 Python object fabrication.
 
-This contract is not the final WholePlanVerificationResult used by the NN
-adapter. That future result still needs the complete schedule identity,
-verification identity, policy version, per-constraint check evidence, and
-whole-plan identity. No assignment-level final NN evaluation may consume a
-local CspEvaluation.
+`WholePlanVerificationResult` is implemented in `csp.verification`. It is
+created only by `verify_whole_plan` from a typed `CspProblem`, a complete
+`CspAssignment`, and an explicit `WholePlanVerificationPolicy`; a
+`CspEvaluation` cannot be used as final verification provenance. The result
+binds the actual complete manifest, its whole-plan identity, the CSP problem
+identity, a canonical schedule partitioned over all three manifest entries,
+the schedule identity, and the verification identity, policy identity, and
+version. Zero-session assignments are represented by empty schedule entries.
+
+The verifier records immutable evidence for assignment coverage and domain
+membership and for every constraint in the problem. A check is passed or
+failed only when all of its scoped variables have values that belong to their
+problem domains; otherwise it is explicitly marked not run. The standard
+problem constraints therefore provide evidence for deadline eligibility,
+unique slots, same-assignment ordering, and weekly capacity. A feasible result
+is issued only when the assignment is complete, policy and optional expected
+identities match, and every recorded check passes. `INFEASIBLE` means this
+complete schedule failed; it does not imply exhaustive whole-plan
+infeasibility. Missing schedule content or identity/policy mismatch is
+`INCOMPLETE`.
+
+The verifier evaluates the constraints declared by the supplied CSP problem;
+policy identity fields for deadline convention, slot catalog, capacity source,
+and slot identity semantics are caller-supplied provenance labels. They are
+bound into the policy digest, but this module cannot independently validate
+external data sources or determine whether those labels describe them
+truthfully. The verifier does not enumerate alternatives or issue a separate
+whole-plan search outcome. No assignment-level final NN evaluation may consume
+a local `CspEvaluation`.
 
 ### Variables
 
@@ -141,25 +165,43 @@ experiment configuration; how that catalog is generated remains unresolved.
 
 ### Constraint propagation
 
-**Forward Checking (FC).** After placing a session in a slot, remove that used
-slot from the domains of all unassigned session variables. If any unassigned
-variable has an empty domain, undo the placement and backtrack. Restore domain
-changes exactly when returning from recursion. Additional forward propagation
-for deadlines or ordering depends on the resolved input semantics and must be
-recorded as part of the chosen method.
+**Forward Checking (FC).** `forward_checking_search` and
+`forward_checking_enumerator` maintain private mutable copies of each immutable
+problem domain. After an assignment, each constraint involving a remaining
+variable is checked for each candidate value when every other variable in that
+constraint's scope is assigned. Rejected candidates are removed; an empty
+domain immediately fails that branch. Removed values are restored on every
+normal and node-limit unwind. Unary deadline constraints and binary constraints
+whose other endpoint has been assigned therefore propagate. Generic n-ary
+constraints are checked only when they have one remaining scoped variable;
+constraints with multiple unassigned scoped variables are deferred. This is
+forward checking over the existing `is_satisfied(partial_assignment)` contract,
+not generalized n-ary consistency and not AC-3. Statistics count each actual
+constraint predicate invocation, each removed domain value, and search time
+using the same node and elapsed-time conventions as BT.
 
-**AC-3.** The generic binary-constraint interface exposes variable scope,
-pair compatibility, support checks, and domain revision directly. A future
-solver can revise a session variable's weekly-slot domain without constructing
-artificial full assignments, then enqueue adjacent arcs when a domain changes.
-The foundation provides binary relations for unique-slot and policy-derived
-same-assignment ordering checks. Deadline eligibility is unary; weekly
-capacity is a whole-plan constraint. The precise ordering arcs and slot
-catalog still depend on unresolved project inputs.
+**AC-3.** `ac3_propagate` and the `ac3_search` / `ac3_enumerator` solver use
+the existing `BinaryConstraint` compatibility, support, and revision methods.
+AC-3 initializes a deterministic FIFO queue with both directed arcs for every
+binary constraint. Revising `Xi` retains values with support in `Xj`; if
+`Xi` changes, incoming arcs for every binary neighbor are enqueued again. An
+empty domain terminates propagation immediately. Search runs AC-3 over all
+binary arcs at the root and after each branch's FC pass. AC-3 uses private
+working domains, and restores branch-local prunings when it backtracks.
 
-AC-3 applies to binary constraints only. Weekly capacity is checked as a
-separate whole-plan constraint; no claim is made that AC-3 alone enforces this
-global constraint.
+AC-3 is limited to binary relations. It does not establish arc consistency for
+the n-ary weekly-capacity constraint or arbitrary n-ary constraints. These
+continue to be checked by partial-assignment validation and the solver's FC
+pass when only one scoped variable remains unassigned. Unary deadlines are
+checked by FC/validation. AC-3 alone does not enforce those non-binary
+constraints.
+
+Three solver configurations are independently available: `backtracking_*`
+for BT, `forward_checking_*` for BT+FC, and `ac3_*` for BT+FC+AC-3. Each offers
+a first-solution search and a lazy distinct-schedule enumerator. AC-3 defaults
+to dynamic MRV with canonical variable tie-breaking and sorted domain values;
+canonical variable order is selectable. All configurations retain the common
+problem, evaluation, and solver-outcome contracts.
 
 **Ordering coverage.** The manifest determines each assignment's declared
 session variables. An explicit approved ordering policy derives the required
@@ -200,9 +242,8 @@ count, then highest degree among unassigned variables, then canonical variable
 identity. These probes are observational checks only; they do not filter the
 domain or establish FC.
 
-No Forward Checking or AC-3 propagation is performed. With no node limit,
-search reports INFEASIBLE only after all values at every reachable partial
-assignment have been rejected or exhausted. `max_nodes` limits entered
+With no node limit, a solver reports INFEASIBLE only after all values at every
+reachable partial assignment have been rejected or exhausted. `max_nodes` limits entered
 recursive states; reaching it returns INCOMPLETE, including when the limit is
 zero. It never converts an interrupted search to infeasibility.
 
@@ -232,6 +273,15 @@ performing solver-boundary validation. `wall_time_seconds` is elapsed time
 since enumerator creation and can include caller pauses or external NN work. A
 node-limit attempt stopped before entering a state contributes an assignment
 attempt but not a visited node.
+
+FC adds `domain_prunings`, counting each value removed by its forward checks.
+AC-3 reports the same search counters and `domain_prunings`, plus
+`compatibility_checks`, `arc_revisions`, and `arcs_enqueued`. For AC-3,
+`constraint_checks` counts both `is_satisfied` and `is_compatible` calls;
+`compatibility_checks` is the `is_compatible` subset. An arc revision counts a
+dequeued directed relation arc, and enqueued arcs include initial and
+re-enqueued work. AC-3 solver timing includes propagation, search advancement,
+and independent feasible-outcome validation; wall time includes caller pauses.
 
 ## Search, NN, and CSP integration
 
@@ -278,41 +328,15 @@ identity, not just the selected assignment projection. This preserves the
 current per-assignment NN feature row while ensuring all three assignment
 allocations are part of CSP's feasibility claim.
 
-**Proposed `WholePlanVerificationResult`.** Replace the assignment-scoped
-verification evidence used for final evaluation with one immutable record per
-complete whole-plan schedule checked. It contains:
-
-- `whole_plan_identity`;
-- `status`: feasible or rejected for this complete schedule;
-- a canonical `schedule_identity` and the complete schedule partitioned by
-  assignment, retaining each session's canonical slot identity and week;
-- a stable `verification_identity` and `verification_policy_version`;
-- immutable `constraint_checks` for every applied constraint instance, each
-  recording constraint ID, scope (for example, assignment/session, week, or
-  slot), checked/passed/not-run outcome, and failure reason/details;
-- structured rejection reasons when any required check fails.
-
-At minimum the policy records checks for `deadline_before_cutoff`,
-`weekly_slot_unique`, `same_assignment_order`, and `weekly_capacity`. Any
-additional implemented hard constraint must also be named and recorded; no
-unnamed constraint may silently affect feasibility. Policy version identifies
-the deadline convention, ordering semantics, slot catalog/source version,
-capacity configuration, and slot-identity semantics. For a `feasible` result,
-every required check must be present and passed. A rejected schedule is not
-proof that the whole plan has no feasible schedule.
-
-The lazy schedule enumerator also returns a separate immutable
-`WholePlanSearchOutcome` when it stops. Its status distinguishes exhaustive
-enumeration with no feasible schedule, exhaustive enumeration after one or
-more feasible schedules, a resource-limited/cancelled run, and an operational
-error. It records the whole-plan identity, count and identities of yielded
-schedules, and structured rejection details. A limit or error proves neither
-feasibility nor infeasibility. Final-target failure across all yielded
-schedules is distinct from CSP infeasibility.
+The verifier currently returns one immutable result for each concrete
+assignment supplied to `verify_whole_plan`. It does not wrap the BT, FC, or
+AC-3 enumerators and does not produce the separate `WholePlanSearchOutcome`
+described by the larger integration proposal. Thus it verifies a schedule but
+does not establish that all schedules have been tried.
 
 The existing `CspVerificationResult._from_solver` and
-`SessionNNAdapter.evaluate_final` are assignment-scoped contracts. They do not
-yet implement this whole-plan result. The proposed adapter interface accepts a
+`SessionNNAdapter.evaluate_final` are assignment-scoped contracts and remain
+unchanged. They do not yet consume this whole-plan result. The proposed adapter interface accepts a
 `WholePlanVerificationResult`, expected `WholePlanIdentity`, the assignment
 allocation, and its feature context. It rejects a non-feasible result or a
 whole-plan identity mismatch, projects and compares the selected
@@ -334,9 +358,9 @@ security boundary against deliberate Python object fabrication.
 The implemented generic CspProblem and CspEvaluation are whole-plan scoped,
 but CspEvaluation is only a local assignment validator. CspSolverOutcome
 separates solver termination from branch validation and permits INFEASIBLE
-only when its solver boundary marks the run exhaustive. These records do not
-replace WholePlanVerificationResult and cannot yet authorize final NN
-evaluation.
+only when its solver boundary marks the run exhaustive. Whole-plan schedule
+verification is available through `verify_whole_plan`; neither this function
+nor the solver outcomes are currently wired into final NN evaluation.
 
 ## Failure handling and termination
 
@@ -420,6 +444,5 @@ predicted-score target was met.
   the current strict NN schema, which excludes prior scores. CSP must not add
   such features.
 
-The generic CSP contracts are implemented separately from the solver. No
-Backtracking, Forward Checking, or AC-3 algorithm is implemented. No Search,
-NN, dataset, or model artifact was changed.
+The generic CSP contracts are implemented separately from the three solver
+configurations. No Search, NN, dataset, or model artifact was changed.

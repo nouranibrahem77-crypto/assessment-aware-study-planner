@@ -6,8 +6,11 @@ import hashlib
 import json
 from abc import ABC, abstractmethod
 from collections.abc import Callable
+from contextlib import contextmanager
+from contextvars import ContextVar
 from dataclasses import dataclass, field
 from enum import Enum
+from functools import wraps
 from typing import Protocol
 
 
@@ -496,8 +499,41 @@ class CspConstraint(Protocol):
         """Check assigned scope values, allowing unassigned future variables."""
 
 
+_compatibility_call_counter: ContextVar[Callable[[], None] | None] = ContextVar(
+    "csp_compatibility_call_counter", default=None
+)
+
+
+@contextmanager
+def _track_binary_compatibility_calls(callback: Callable[[], None]):
+    """Temporarily observe calls to binary compatibility predicates."""
+    token = _compatibility_call_counter.set(callback)
+    try:
+        yield
+    finally:
+        _compatibility_call_counter.reset(token)
+
+
 class BinaryConstraint(ABC):
     """Binary constraint with direct AC-3 support and domain revision methods."""
+
+    def __init_subclass__(cls, **kwargs: object) -> None:
+        super().__init_subclass__(**kwargs)
+        implementation = cls.__dict__.get("is_compatible")
+        if implementation is None or getattr(
+            implementation, "_csp_compatibility_tracked", False
+        ):
+            return
+
+        @wraps(implementation)
+        def tracked(self, *args: object, **named_args: object) -> bool:
+            callback = _compatibility_call_counter.get()
+            if callback is not None:
+                callback()
+            return implementation(self, *args, **named_args)
+
+        tracked._csp_compatibility_tracked = True
+        cls.is_compatible = tracked
 
     @property
     @abstractmethod
@@ -1012,7 +1048,7 @@ class CspProblem:
 
     @property
     def binary_constraints(self) -> tuple[BinaryConstraint, ...]:
-        """Return relations available to a future AC-3 implementation."""
+        """Return binary relations available to AC-3 propagation."""
         return tuple(
             item for item in self.constraints if isinstance(item, BinaryConstraint)
         )

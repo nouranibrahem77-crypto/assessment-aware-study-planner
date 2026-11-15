@@ -1,0 +1,207 @@
+{
+  "configuration_status": "INCOMPLETE_TEMPLATE_REQUIRED_FIELDS_MUST_BE_APPROVED",
+  "configuration_identity": "REQUIRED",
+  "configuration_version": "REQUIRED",
+  "verified_data": {
+    "course_identity": "FFF",
+    "training_presentations": ["2013B", "2013J"],
+    "validation_presentation": "2014B",
+    "testing_presentation": "2014J",
+    "strict_feature_directory": "data/processed/strict",
+    "proxy_feature_directory": "data/processed/proxy",
+    "strict_manifest_sha256": "54a1e13b4d8fd011a7f936665d7aaa62db53b56423eb61a2f73093c69878d5ef",
+    "proxy_manifest_sha256": "49d74a143724141dd7d0606395e366b5b44c12cc64493ce49f2709d62128f724",
+    "source_dataset_sha256": {
+      "assessments.csv": "9ce92381e4a0ac457f8e251b2eb2c179ed51e023ab30d1d671a0268bd62316ba",
+      "courses.csv": "4f16eee7454b15e109b0a21a0e43be820e6846ed6f9301bb7feb5ab5ad737a75",
+      "studentAssessment.csv": "b1839e17618a5de36b6d189a242d3123f7939a56c8c9ccef0c17b9199c614a6b",
+      "studentVle.csv": "52668253d876c5becbcb72185977152700cecab2942aca807fecc3dd54b937f0",
+      "vle.csv": "d7a146497edd0e47ef536144b58796c07b554002d3753e848b8e4cd8a56f4c38"
+    },
+    "test_rows": 14241,
+    "test_students": 1729,
+    "test_assessments": 12
+  },
+  "assessment_set_candidate_pending_approval": {
+    "selection_basis": "Earliest three TMA deadlines in FFF 2014J; data-derived candidate set, not an approved business selection.",
+    "assignments": [
+      {
+        "assignment_identity": "REQUIRED_APPROVED_ASSIGNMENT_ID",
+        "assessment_id": "34899",
+        "assessment_type": "TMA",
+        "deadline_day": 24,
+        "target_mark": "REQUIRED",
+        "eligible_slot_ids": "REQUIRED",
+        "allocation_bounds": {
+          "minimum_sessions": "REQUIRED",
+          "maximum_sessions": "REQUIRED"
+        }
+      },
+      {
+        "assignment_identity": "REQUIRED_APPROVED_ASSIGNMENT_ID",
+        "assessment_id": "34900",
+        "assessment_type": "TMA",
+        "deadline_day": 52,
+        "target_mark": "REQUIRED",
+        "eligible_slot_ids": "REQUIRED",
+        "allocation_bounds": {
+          "minimum_sessions": "REQUIRED",
+          "maximum_sessions": "REQUIRED"
+        }
+      },
+      {
+        "assignment_identity": "REQUIRED_APPROVED_ASSIGNMENT_ID",
+        "assessment_id": "34901",
+        "assessment_type": "TMA",
+        "deadline_day": 94,
+        "target_mark": "REQUIRED",
+        "eligible_slot_ids": "REQUIRED",
+        "allocation_bounds": {
+          "minimum_sessions": "REQUIRED",
+          "maximum_sessions": "REQUIRED"
+        }
+      }
+    ],
+    "selection_approval": "REQUIRED"
+  },
+  "target_rule": {
+    "identity": "REQUIRED",
+    "version": "REQUIRED",
+    "aggregation_rule": "REQUIRED_IF_TARGET_IS_NOT_PER_ASSIGNMENT"
+  },
+  "deadline_policy": {
+    "identity": "REQUIRED",
+    "version": "REQUIRED",
+    "feature_weeks_conversion": "deadline_day / 7 (verified existing feature convention)",
+    "slot_eligibility_derivation_and_boundary": "REQUIRED_APPROVED_RULE; do not infer from clock fields"
+  },
+  "slot_catalog": {
+    "identity": "REQUIRED",
+    "version": "REQUIRED",
+    "source_or_approval_reference": "REQUIRED",
+    "weekly_capacity_for_demo": "REQUIRED",
+    "official_capacity_experiment_cases": [2, 3, 4],
+    "timezone_identity": "REQUIRED",
+    "slots": [
+      {
+        "slot_id": "REQUIRED",
+        "week_index": "REQUIRED",
+        "weekday_iso": "REQUIRED",
+        "start_minute_local": "REQUIRED",
+        "end_minute_local": "REQUIRED",
+        "timezone_identity": "REQUIRED",
+        "relative_click_window_by_assignment": {
+          "REQUIRED_ASSIGNMENT_ID_1": "REQUIRED_1_TO_4",
+          "REQUIRED_ASSIGNMENT_ID_2": "REQUIRED_1_TO_4",
+          "REQUIRED_ASSIGNMENT_ID_3": "REQUIRED_1_TO_4"
+        }
+      }
+    ],
+    "eligible_slot_ids_by_assignment": {
+      "REQUIRED_ASSIGNMENT_ID_1": ["REQUIRED"],
+      "REQUIRED_ASSIGNMENT_ID_2": ["REQUIRED"],
+      "REQUIRED_ASSIGNMENT_ID_3": ["REQUIRED"]
+    }
+  },
+  "ordering_policy": {
+    "identity": "REQUIRED",
+    "version": "REQUIRED",
+    "implementation_or_approved_relation": "REQUIRED",
+    "meaning_of_same_assignment_order": "REQUIRED"
+  },
+  "support_policy": {
+    "identity": "REQUIRED",
+    "version": "REQUIRED",
+    "reference_identity": "REQUIRED",
+    "reference_source": "docs/search_integration_readiness.md, strict training split only (documented basis)",
+    "out_of_support_action": "REQUIRED_REPORT_ONLY_OR_REJECT",
+    "joint_support_status": "unassessed"
+  },
+  "generated_click_mapping": {
+    "identity": "REQUIRED",
+    "version": "REQUIRED",
+    "activity_group": "REQUIRED_SELECT_ONE_DOCUMENTED_GROUP",
+    "selected_scenario": "REQUIRED_SELECT_LOW_CENTRAL_OR_HIGH",
+    "documented_training_anchored_scenarios_not_session_measurements": {
+      "low": 22,
+      "central": 62,
+      "high": 121
+    },
+    "scenario_source": "docs/search_integration_readiness.md and src/study_planner/search/session_mapping.py",
+    "provisional_session_window_distribution": "REQUIRED_APPROVED_RULE",
+    "mapping_reference": "Existing click columns are four assessment-relative windows [D-28,D-21), [D-21,D-14), [D-14,D-7), [D-7,D)."
+  },
+  "model_selection": {
+    "selected_mode": "REQUIRED_SELECT_MODEL_A_STRICT_OR_MODEL_B_PROXY",
+    "available_local_artifacts": [
+      {
+        "mode": "MODEL_A_STRICT",
+        "relative_path": "data/processed/nn_experiment_60ep",
+        "artifact_digest_sha256": "dc3af40e16645ce6c7e8d48cbb251bc6a218f9b1c6c02454ca1ef6973519b543",
+        "model_provenance_identity": "806dc19fc8906fd0705a2925ceedeaaa0d3e15c73ddbce64988d7de9c4c94479",
+        "feature_schema_identity": "776cc0b31d83a998b80de5ac8bcaa4d43fd2b1925f1bf4c66e1b2ab053fba705",
+        "seeds": [42, 123, 2025],
+        "includes_previous_assessment_marks": false
+      },
+      {
+        "mode": "MODEL_A_STRICT",
+        "relative_path": "data/processed/nn_experiment",
+        "artifact_digest_sha256": "4c438be2c568777265493029a66fbc97a049f099088df837870d163532c68c70",
+        "model_provenance_identity": "2631dbe48b67413f2487b48d4155d35ca992bcadae8351c4e5c6a6b32873cdc1",
+        "feature_schema_identity": "776cc0b31d83a998b80de5ac8bcaa4d43fd2b1925f1bf4c66e1b2ab053fba705",
+        "seeds": [42, 123, 2025],
+        "includes_previous_assessment_marks": false
+      },
+      {
+        "mode": "MODEL_B_PREVIOUS_MARKS_PROXY",
+        "relative_path": "data/processed/nn_experiment_previous_marks",
+        "artifact_digest_sha256": "679a7fdd3cabc8a2322b92d8a4bfb2f2aedfbda364f343d86f02e2adeef8e9a0",
+        "model_provenance_identity": "81b968f89870ffb3fb9b7a779c2088b0e4db5acde4292a8834d7411b438046dd",
+        "feature_schema_identity": "73b30f0bae14551c4c15c71d55c224d693473437ce3e3a748aab843bb19323f4",
+        "seeds": [42, 123, 2025],
+        "includes_previous_assessment_marks": true,
+        "availability_limitation": "Submission-based proxy; OULAD does not verify mark release. No prior mark is available for assessment 34899 in the candidate set."
+      }
+    ],
+    "feature_data_mode_directory": "REQUIRED_STRICT_OR_PROXY_MATCHING_SELECTED_MODEL",
+    "exact_artifact_digest_must_be_reverified_at_load": true
+  },
+  "demo_profiles": {
+    "selection_status": "DATA_VERIFIED_CANDIDATES_PENDING_DEMO_SELECTION",
+    "assessment_ids_used_for_intersection": ["34899", "34900", "34901"],
+    "candidate_count": 914,
+    "candidate_rule": "One row for each assessment in FFF 2014J; first 30 student IDs in numeric ascending order are listed below.",
+    "selected_demo_student_id": "REQUIRED",
+    "first_30_candidate_student_ids": [
+      "40878", "42552", "56637", "63112", "64427", "74165", "75107", "77692", "79610", "84604",
+      "102854", "105939", "107455", "119310", "119865", "129907", "135280", "139206", "142310", "143755",
+      "149178", "150282", "152524", "155938", "159906", "164148", "170874", "172493", "177492", "194163"
+    ],
+    "verified_feature_coverage": {
+      "strict_rows_for_three_assessments_per_candidate": 3,
+      "strict_source_feature_columns": 19,
+      "strict_missing_feature_cells_on_first_30_candidates": 0,
+      "strict_12_click_features_finite_on_all_three_rows": true,
+      "proxy_rows_for_three_assessments_per_candidate": 3,
+      "proxy_source_feature_columns": 29,
+      "proxy_missing_prior_score_cells_on_first_30_candidates": 360,
+      "proxy_12_click_features_finite_on_all_three_rows": true,
+      "proxy_score_availability_indicators_present": true,
+      "proxy_has_any_prior_mark_for_first_assessment_34899": false,
+      "first_30_proxy_rows_with_any_prior_mark": 60,
+      "first_30_proxy_rows_total": 90
+    }
+  },
+  "missing_production_inputs": [
+    "approval of the three-assessment candidate set and assignment identities",
+    "three target marks and target rule/version",
+    "deadline eligibility rule/version and eligible slot IDs for each assignment",
+    "allocation minimum and maximum for each assignment",
+    "authoritative slot catalog, actual time windows, timezone, catalog capacity, and source/version",
+    "same-assignment ordering relation and policy/version",
+    "support policy/reference/version and out-of-support action",
+    "generated click activity group, scenario increment, and provisional window rule",
+    "selection of one demo student ID and one exact model artifact/mode",
+    "approval of Model B's submission-based prior-mark availability assumption if Model B is selected"
+  ]
+}

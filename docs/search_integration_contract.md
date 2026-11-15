@@ -3,8 +3,12 @@
 ## Status and scope
 
 This document defines the proposed Search–NN–CSP control flow. The generic CSP
-contracts and baseline Backtracking solver now exist; Forward Checking,
-AC-3, schedule enumeration, and final NN/CSP orchestration are not implemented.
+contracts, Backtracking, Forward Checking, AC-3, lazy schedule enumeration,
+and Search–NN–CSP orchestration exist. The application-input adapter now builds
+a deterministic allocation state space and CSP candidate factory from explicit
+validated values. Production target, deadline eligibility, slot catalog,
+allocation-bound, support, and ordering values must still come from an approved
+application configuration.
 The contract preserves the existing strict NN schema, inference interface,
 architecture, and artifacts, and does not claim session effects are causal.
 
@@ -27,10 +31,26 @@ architecture, and artifacts, and does not claim session effects are causal.
 
 ## Proposed component interfaces
 
-The Search–NN–CSP integration contracts below remain design-level interfaces.
-The generic CSP foundation implements the whole-plan manifest, problem,
-constraint, intermediate evaluation, baseline BT, and lazy BT schedule
-enumeration contracts, but not the final verification result.
+The `study_planner.integration` package implements the bridge and orchestration
+contracts below. The generic CSP foundation implements the whole-plan manifest,
+problem, constraints, intermediate evaluation, BT, FC, AC-3, lazy enumeration,
+and whole-plan schedule verification.
+
+`SessionNNAdapter` requires a fitted-artifact SHA-256 digest produced by the
+Model A or Model B artifact loader. The digest covers the exact schema,
+experiment configuration, persisted preprocessor, and checkpoint bytes read
+for inference. The loader issues a private capability for the exact predictor
+instance only after loading the bytes it hashed. Adapters require that capability
+and verify it against a fingerprint of the loaded preprocessor, feature schema,
+model collection, and model tensor state before inference and final authorization.
+Replacing the collection or mutating learned state invalidates the capability;
+changing the public digest field cannot restore it. The complete model provenance
+identity then hashes the artifact digest with the model mode and feature-schema
+identity. Missing or malformed artifact digests are rejected; descriptive labels
+and predictor class/schema are not accepted as artifact proof. Prediction records
+bind their output to the candidate, schedule, verification, and model provenance
+identities, and recheck the predictor capability when used for a goal test. Model A
+strict and Model B previous-marks proxy remain separate schema/mode contracts.
 
 | Component | Input | Output |
 | --- | --- | --- |
@@ -40,6 +60,18 @@ enumeration contracts, but not the final verification result.
 | CSP scheduler | Whole-plan allocation for all three assignments, deadlines, weekly slot domains for the selected capacity, ordering policy | Lazy deterministic sequence of per-schedule `WholePlanVerificationResult` values, followed by a `WholePlanSearchOutcome` distinguishing exhaustive enumeration, no feasible schedule, limits, cancellation, and errors. |
 | Final mapping | Feasible whole-plan verification result, expected whole-plan identity, one assignment projection, immutable observed strict row | Copied strict-schema row with click features from that assignment's actual scheduled windows and whole-plan verification provenance. |
 | Result/audit recorder | Allocation/schedule keys, both predictions, CSP status, support and monotonicity records | Separate provisional/final prediction records, CSP rejection records, final-target failures, and terminal status. |
+
+`build_application_planning_problem` in `study_planner.integration` is the
+application adapter for these interfaces. Its Search state contains one
+four-window allocation for each of the three assignments. Each action adds a
+single session, costs one, and is available only below that assignment's
+configured maximum. Search evaluates a state only when every configured
+minimum/maximum bound is met. The candidate factory uses each assignment's
+explicit eligible slot IDs as its CSP domain, the catalog's weekly capacity,
+and its per-assignment slot-to-click-window mapping. It receives an explicit
+same-assignment ordering policy from the caller; no ordering or deadline
+conversion is inferred from the slot clock fields. The end-to-end tests label
+their sample values as TEST configuration and they are not production defaults.
 
 ### Typed adapter and CSP verification boundary
 
@@ -54,8 +86,9 @@ full identity remains the authority for CSP matching; matching one assignment
 projection alone does not prove that cross-assignment constraints were checked.
 
 `ScheduleData` contains data only and is never sufficient for final prediction.
-The future CSP contract returns a `WholePlanVerificationResult` for each
-complete three-assignment schedule checked. It binds `WholePlanIdentity`, full
+The standalone CSP verifier returns a `WholePlanVerificationResult` for each
+complete three-assignment schedule supplied to it. It binds the manifest's
+whole-plan identity, full
 assignment-partitioned schedule details, schedule identity, verification
 identity, `verification_policy_version`, feasible/rejected status for that
 schedule, and immutable records for every applied constraint check. Required
@@ -92,28 +125,40 @@ support, and revision operations for a future AC-3 solver without manufacturing
 full assignments. BT exposes a deterministic lazy enumerator; a failed final NN
 target evaluation can request the next distinct feasible schedule from the same
 traversal. INCOMPLETE enumeration does not establish allocation infeasibility.
-These contracts do not yet create the final WholePlanVerificationResult
-described above and are not usable by the NN adapter as feasibility provenance.
-Every feasible schedule yielded by the BT enumerator must pass through the
-future whole-plan verifier to create a `WholePlanVerificationResult` bound to
-the schedule and problem before final NN goal evaluation. `CspEvaluation` is a
-local validator record and must never be treated as that final verification
-provenance. If the final prediction misses its target, orchestration may ask the
-same non-incomplete enumerator for another schedule, then verify that schedule
-before evaluating it. An `INCOMPLETE` enumerator is terminal and cannot resume;
-restarting creates a new traversal from the first schedule.
+`WholePlanScheduleEnumerator` consumes the selected BT, BT+FC, or BT+FC+AC-3
+enumerator, verifies each yielded assignment, and reports an allocation-level
+terminal outcome only after exhaustive enumeration. `SessionNNAdapter` accepts
+only a complete feasible `WholePlanVerificationResult`; it validates expected
+manifest, problem, policy, schedule, and verification identities before
+projecting one assignment's actual slot weeks into its four feature windows.
+`CspEvaluation` remains an intermediate local validator record and must never
+be treated as final verification provenance. Integrated UCS and Greedy
+orchestration evaluate every allocation proposal, try each distinct verified
+schedule after final-target misses, continue after exhaustive allocation-level
+CSP rejection, and return `INCOMPLETE` when a configured candidate or CSP node
+limit prevents an exhaustive decision. An `INCOMPLETE` enumerator is terminal
+and cannot resume; restarting creates a new traversal from the first schedule.
+The integration wrapper memoizes each state's goal result because Greedy's
+generic search checks its initial state before queue insertion and checks it
+again when popped. This keeps side-effecting candidate evaluation, CSP
+enumeration, and counters at one invocation per state without changing Greedy's
+heuristic ordering. Planner statistics retain terminal CSP enumeration
+outcomes. Exhaustive empty CSP results, whole-plan verification rejection,
+verified schedules missing NN targets, and resource-limited runs receive
+separate deterministic failure reasons; an incomplete outcome is never
+reported as exhaustive infeasibility.
 
-The NN adapter's current `evaluate_final` method and
-`CspVerificationResult._from_solver` are still assignment-scoped. The proposed
-future adapter contract takes a feasible whole-plan schedule result and the expected
-whole-plan identity, verifies exact identity equality, projects the requested
-assignment's `CandidateIdentity`, and obtains that assignment's schedule
-projection. It rejects raw schedules, incomplete/infeasible results, and
-identity/count mismatches. No assignment-level final NN evaluation may occur
-before whole-plan feasibility is established. Assignment-level final results
-remain bound to the same whole-plan, schedule, and verification identities;
-the plan is eligible for acceptance only after every required assignment has
-a successful final prediction under the target rule.
+`SessionNNAdapter.evaluate_final` takes a feasible whole-plan schedule result
+and expected whole-plan, problem, policy, schedule, and verification
+provenance. It verifies the assignment's `CandidateIdentity` against the
+manifest and obtains that assignment's actual schedule projection. It rejects
+raw schedules, incomplete/infeasible results, and identity/count mismatches.
+No assignment-level final NN evaluation may occur before whole-plan feasibility
+is established. Assignment-level final results remain bound to the same
+whole-plan, schedule, and verification identities; the plan is eligible for
+acceptance only after every required assignment has a successful final
+prediction under the configured target rule. `CspVerificationResult` remains
+an intermediate CSP evaluation and cannot authorize final prediction.
 
 The solver factory remains an application-level provenance convention, not a
 security boundary against malicious Python code or deliberate object
