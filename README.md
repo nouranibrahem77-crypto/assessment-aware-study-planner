@@ -66,6 +66,27 @@ python -m pytest
 ruff check .
 ```
 
+## Integration demo
+
+With the local OULAD processed features and fitted artifacts available, run one
+explicitly TEST-configured Search–NN–CSP scenario from the repository root:
+
+```bash
+python run_demo.py NORMAL
+python run_demo.py EDGE
+python run_demo.py IMPOSSIBLE
+python run_demo.py NN_SUFFICIENT_CSP_REJECTED
+```
+
+The default uses the local Model A Strict artifact. To run against the separate
+Model B proxy artifact and feature schema, append `--model proxy` to any command.
+All scenarios use labeled TEST targets, slot rules, and ordering. The
+NN-sufficient/CSP-rejected case injects one deterministic rejection at the
+existing whole-plan verification boundary, then lets the real planner continue
+to the next schedule. It is a regression/demo scenario, not production evidence.
+Each run prints the planner status, three assignments, allocations, timetable,
+predicted marks when available, and the Search/CSP counters.
+
 ## Project layout
 
 ```text

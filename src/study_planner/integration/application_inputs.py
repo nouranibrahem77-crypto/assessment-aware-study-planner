@@ -715,7 +715,9 @@ def build_application_inputs(
                 "configured day"
             )
         if not math.isclose(
-            weeks, rule.weeks_since_course_start, rel_tol=0.0, abs_tol=1e-12
+            # Processed CSVs round the derived quotient; accept that serialization
+            # noise while still requiring the configured deadline convention.
+            weeks, rule.weeks_since_course_start, rel_tol=0.0, abs_tol=1e-9
         ):
             raise ApplicationInputError(
                 f"assessment {rule.assessment_id} weeks-since-start must equal "
@@ -885,7 +887,7 @@ def build_application_planning_problem(
                 "validated feature context deadline differs from configuration"
             )
         if not math.isclose(
-            weeks, rule.weeks_since_course_start, rel_tol=0.0, abs_tol=1e-12
+            weeks, rule.weeks_since_course_start, rel_tol=0.0, abs_tol=1e-9
         ):
             raise ApplicationInputError(
                 "validated feature context week conversion differs from configuration"
