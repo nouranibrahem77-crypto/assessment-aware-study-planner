@@ -217,6 +217,7 @@ class FinalPlannerResult:
     search_statistics: PlannerStatistics
     failure_reasons: tuple[str, ...]
     solution_cost: float | None
+    prediction_family: str = "neural_network"
 
 
 class _Controller(Generic[StateT, ActionT]):
@@ -526,6 +527,7 @@ class _Controller(Generic[StateT, ActionT]):
             ),
             tuple(sorted(set(self.failure_reasons))),
             None,
+            self.adapter.prediction_family,
         )
 
 

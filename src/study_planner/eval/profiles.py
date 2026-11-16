@@ -15,10 +15,9 @@ from typing import Any, Literal
 import pandas as pd
 
 from study_planner.data.feature_engineering.constants import (
-    ACTIVITY_GROUPS,
     IDENTIFIER_COLUMNS,
+    STRICT_FFF_FEATURE_NAMES,
     TARGET_COLUMN,
-    click_feature_name,
 )
 from study_planner.nn.dataset import (
     DatasetSchemaError,
@@ -26,20 +25,6 @@ from study_planner.nn.dataset import (
     prepare_previous_marks_inference_frame,
 )
 
-STRICT_FFF_FEATURE_NAMES = (
-    "assessment_type_cma",
-    "assessment_type_exam",
-    "assessment_type_tma",
-    "assessment_weight",
-    "assessment_weight_available",
-    "assessment_deadline_day",
-    "weeks_since_course_start",
-    *(
-        click_feature_name(group, week)
-        for group in ACTIVITY_GROUPS
-        for week in range(1, 5)
-    ),
-)
 ASSESSMENT_TYPE_COLUMNS = STRICT_FFF_FEATURE_NAMES[:3]
 
 
