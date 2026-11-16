@@ -28,6 +28,7 @@ from study_planner.search.session_mapping import (
     STRICT_FFF_FEATURE_NAMES,
     ClickScenario,
     ClickSupportDiagnostic,
+    IncrementalMonotonicityReporter,
     JointSupportStatus,
     MappingValidationError,
     MarginalSupportStatus,
@@ -36,7 +37,6 @@ from study_planner.search.session_mapping import (
     MonotonicityReport,
     SessionClickMappingConfig,
     SessionClickMappingResult,
-    evaluate_monotonicity,
     map_sessions_to_clicks,
 )
 
@@ -157,13 +157,10 @@ class ScheduledSession:
     def __post_init__(self) -> None:
         if not isinstance(self.slot_id, str) or not self.slot_id:
             raise CandidateEvaluationError("slot_id must be a non-empty string")
-        if (
-            self.relative_window is not None
-            and (
-                isinstance(self.relative_window, bool)
-                or not isinstance(self.relative_window, int)
-                or self.relative_window not in {1, 2, 3, 4}
-            )
+        if self.relative_window is not None and (
+            isinstance(self.relative_window, bool)
+            or not isinstance(self.relative_window, int)
+            or self.relative_window not in {1, 2, 3, 4}
         ):
             raise CandidateEvaluationError(
                 "relative_window must be absent or from 1 through 4"
@@ -389,9 +386,7 @@ class CandidatePredictionResult:
         """Check candidate, schedule, and verification identities before use."""
         self.assert_candidate(identity)
         predictor = (
-            None
-            if self._predictor_reference is None
-            else self._predictor_reference()
+            None if self._predictor_reference is None else self._predictor_reference()
         )
         if predictor is None:
             return False
@@ -529,17 +524,9 @@ class SessionNNAdapter:
     fitted_artifact_digest: str = field(init=False)
     feature_schema_identity: str = field(init=False)
     model_provenance_identity: str = field(init=False)
-    _artifact_provenance: _TrustedArtifactProvenance = field(
-        init=False, repr=False
-    )
+    _artifact_provenance: _TrustedArtifactProvenance = field(init=False, repr=False)
     _monotonicity_observations: dict[
-        MonotonicityContext,
-        dict[
-            tuple[
-                tuple[int, int, int, int], tuple[tuple[str, int | None], ...]
-            ],
-            float,
-        ],
+        MonotonicityContext, IncrementalMonotonicityReporter
     ] = field(default_factory=dict, init=False, repr=False)
 
     def __post_init__(self) -> None:
@@ -569,9 +556,7 @@ class SessionNNAdapter:
         except ValueError as error:
             raise CandidateEvaluationError(str(error)) from error
         expected_mode = (
-            "strict"
-            if self.model_mode is NNModelMode.MODEL_A_STRICT
-            else "proxy"
+            "strict" if self.model_mode is NNModelMode.MODEL_A_STRICT else "proxy"
         )
         if artifact_provenance.mode != expected_mode:
             raise CandidateEvaluationError("artifact mode and predictor schema differ")
@@ -670,9 +655,7 @@ class SessionNNAdapter:
         if expected_model_provenance_identity != self.model_provenance_identity:
             raise CandidateEvaluationError("model provenance identity mismatch")
         try:
-            verify_trusted_artifact_integrity(
-                self.predictor, self._artifact_provenance
-            )
+            verify_trusted_artifact_integrity(self.predictor, self._artifact_provenance)
         except ValueError as error:
             raise CandidateEvaluationError(str(error)) from error
         expected_identity = self.candidate_identity(allocation, context)
@@ -744,9 +727,8 @@ class SessionNNAdapter:
             base_feature_context_id=expected_identity.base_feature_context_identity,
             mapping_scenario_id=self.mapping_scenario_identity,
         )
-        observation_key = (schedule.weekly_sessions, schedule.schedule_identity)
-        observations = self._monotonicity_observations.setdefault(
-            comparison_context, {}
+        reporter = self._monotonicity_observations.setdefault(
+            comparison_context, IncrementalMonotonicityReporter()
         )
         result = self._predict(
             expected_identity,
@@ -764,17 +746,12 @@ class SessionNNAdapter:
             result.status is EvaluationStatus.PREDICTED
             and result.prediction is not None
         ):
-            observations[observation_key] = result.prediction
-            report = evaluate_monotonicity(
-                tuple(
-                    MonotonicityObservation(
-                        weekly_sessions=counts,
-                        predicted_mark=mark,
-                        context=comparison_context,
-                        schedule_identity=schedule_identity,
-                    )
-                    for (counts, schedule_identity), mark in observations.items()
-                    if np.isfinite(mark)
+            report = reporter.upsert(
+                MonotonicityObservation(
+                    weekly_sessions=schedule.weekly_sessions,
+                    predicted_mark=result.prediction,
+                    context=comparison_context,
+                    schedule_identity=schedule.schedule_identity,
                 )
             )
             result = replace(result, monotonicity_report=report)
@@ -810,9 +787,7 @@ class SessionNNAdapter:
         verification_policy_version: str | None = None,
     ) -> CandidatePredictionResult:
         try:
-            verify_trusted_artifact_integrity(
-                self.predictor, self._artifact_provenance
-            )
+            verify_trusted_artifact_integrity(self.predictor, self._artifact_provenance)
         except ValueError as error:
             raise CandidateEvaluationError(str(error)) from error
         snapshot = MappingEvaluationSnapshot.from_mapping(mapping)
@@ -871,9 +846,7 @@ class SessionNNAdapter:
             _predictor_reference=weakref.ref(self.predictor),
         )
         try:
-            verify_trusted_artifact_integrity(
-                self.predictor, self._artifact_provenance
-            )
+            verify_trusted_artifact_integrity(self.predictor, self._artifact_provenance)
         except ValueError as error:
             raise CandidateEvaluationError(str(error)) from error
         return replace(

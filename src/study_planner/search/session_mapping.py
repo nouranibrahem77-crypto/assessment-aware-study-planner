@@ -245,6 +245,205 @@ class MonotonicityReport:
         return len(self.violations) / self.comparisons if self.comparisons else 0.0
 
 
+class IncrementalMonotonicityReporter:
+    """Accumulate monotonicity results without revisiting old observation pairs.
+
+    ``add`` follows the batch evaluator's duplicate rejection contract.
+    ``upsert`` supports callers that retain observations in an insertion-ordered
+    mapping: an existing identity is replaced at its original position, as a
+    dictionary assignment would do.
+    """
+
+    def __init__(self, tolerance: float = 0.0) -> None:
+        self._tolerance = _validate_mark(tolerance, "tolerance")
+        if self._tolerance < 0:
+            raise ValueError("tolerance must be non-negative")
+        self._observations: list[MonotonicityObservation] = []
+        self._indices: dict[
+            tuple[
+                MonotonicityContext,
+                tuple[int, int, int, int],
+                tuple[Hashable, ...],
+            ],
+            int,
+        ] = {}
+        self._comparisons = 0
+        self._violations_by_parent: list[list[tuple[int, MonotonicityViolation]]] = []
+
+    def add(self, observation: MonotonicityObservation) -> MonotonicityReport:
+        """Append one unique observation and compare only its new pairs."""
+        normalized = _normalize_monotonicity_observation(observation)
+        identity = _monotonicity_observation_identity(normalized)
+        if identity in self._indices:
+            raise ValueError(
+                "monotonicity observations must be unique within each context"
+            )
+        self._append(normalized, identity)
+        return self.report()
+
+    def upsert(self, observation: MonotonicityObservation) -> MonotonicityReport:
+        """Append or replace an observation while retaining its original order."""
+        normalized = _normalize_monotonicity_observation(observation)
+        identity = _monotonicity_observation_identity(normalized)
+        index = self._indices.get(identity)
+        if index is None:
+            self._append(normalized, identity)
+        else:
+            self._replace(index, normalized)
+        return self.report()
+
+    def report(self) -> MonotonicityReport:
+        """Return the complete batch-compatible report in deterministic order."""
+        violations = tuple(
+            violation
+            for parent_violations in self._violations_by_parent
+            for _, violation in parent_violations
+        )
+        return MonotonicityReport(
+            comparisons=self._comparisons,
+            violations=violations,
+            tolerance=self._tolerance,
+            observations=tuple(self._observations),
+        )
+
+    def _append(
+        self,
+        observation: MonotonicityObservation,
+        identity: tuple[
+            MonotonicityContext,
+            tuple[int, int, int, int],
+            tuple[Hashable, ...],
+        ],
+    ) -> None:
+        new_index = len(self._observations)
+        new_parent_violations: list[tuple[int, MonotonicityViolation]] = []
+        for parent_index, parent in enumerate(self._observations):
+            is_comparison, violation = _monotonicity_pair_result(
+                parent, observation, self._tolerance
+            )
+            if is_comparison:
+                self._comparisons += 1
+            if violation is not None:
+                self._violations_by_parent[parent_index].append((new_index, violation))
+
+            is_comparison, violation = _monotonicity_pair_result(
+                observation, parent, self._tolerance
+            )
+            if is_comparison:
+                self._comparisons += 1
+            if violation is not None:
+                new_parent_violations.append((parent_index, violation))
+
+        self._observations.append(observation)
+        self._indices[identity] = new_index
+        self._violations_by_parent.append(new_parent_violations)
+
+    def _replace(self, index: int, observation: MonotonicityObservation) -> None:
+        """Update only comparisons touching a replaced mapping observation."""
+        self._observations[index] = observation
+        self._violations_by_parent[index].clear()
+        for parent_index, parent_violations in enumerate(self._violations_by_parent):
+            if parent_index == index:
+                continue
+            parent_violations[:] = [
+                entry for entry in parent_violations if entry[0] != index
+            ]
+
+        for other_index, other in enumerate(self._observations):
+            if other_index == index:
+                continue
+            _, violation = _monotonicity_pair_result(
+                other, observation, self._tolerance
+            )
+            if violation is not None:
+                self._insert_violation(other_index, index, violation)
+            _, violation = _monotonicity_pair_result(
+                observation, other, self._tolerance
+            )
+            if violation is not None:
+                self._insert_violation(index, other_index, violation)
+
+    def _insert_violation(
+        self, parent_index: int, child_index: int, violation: MonotonicityViolation
+    ) -> None:
+        row = self._violations_by_parent[parent_index]
+        position = next(
+            (
+                offset
+                for offset, (existing_index, _) in enumerate(row)
+                if existing_index > child_index
+            ),
+            len(row),
+        )
+        row.insert(position, (child_index, violation))
+
+
+def _normalize_monotonicity_observation(
+    observation: MonotonicityObservation,
+) -> MonotonicityObservation:
+    if len(observation.weekly_sessions) != 4:
+        raise ValueError("weekly_sessions must contain exactly four counts")
+    counts = _validate_weekly_sessions(
+        {week: count for week, count in enumerate(observation.weekly_sessions, 1)}
+    )
+    if not isinstance(observation.schedule_identity, tuple):
+        raise ValueError("schedule_identity must be a canonical tuple")
+    try:
+        hash(observation.schedule_identity)
+    except TypeError as error:
+        raise ValueError("schedule_identity must be hashable") from error
+    return MonotonicityObservation(
+        weekly_sessions=counts,
+        predicted_mark=_validate_mark(observation.predicted_mark, "predicted_mark"),
+        context=observation.context,
+        schedule_identity=observation.schedule_identity,
+    )
+
+
+def _monotonicity_observation_identity(
+    observation: MonotonicityObservation,
+) -> tuple[
+    MonotonicityContext,
+    tuple[int, int, int, int],
+    tuple[Hashable, ...],
+]:
+    return (
+        observation.context,
+        observation.weekly_sessions,
+        observation.schedule_identity,
+    )
+
+
+def _monotonicity_pair_result(
+    parent: MonotonicityObservation,
+    child: MonotonicityObservation,
+    tolerance: float,
+) -> tuple[bool, MonotonicityViolation | None]:
+    if parent.context != child.context:
+        return False, None
+    differences = tuple(
+        child_count - parent_count
+        for parent_count, child_count in zip(
+            parent.weekly_sessions, child.weekly_sessions, strict=True
+        )
+    )
+    if any(difference < 0 for difference in differences) or sum(differences) != 1:
+        return False, None
+    delta = child.predicted_mark - parent.predicted_mark
+    if delta >= -tolerance:
+        return True, None
+    return True, MonotonicityViolation(
+        parent_sessions=parent.weekly_sessions,
+        child_sessions=child.weekly_sessions,
+        changed_window=differences.index(1) + 1,
+        parent_mark=parent.predicted_mark,
+        child_mark=child.predicted_mark,
+        prediction_delta=delta,
+        parent_schedule_identity=parent.schedule_identity,
+        child_schedule_identity=child.schedule_identity,
+    )
+
+
 def _validate_weekly_sessions(
     weekly_sessions: Mapping[int, int],
 ) -> tuple[int, int, int, int]:

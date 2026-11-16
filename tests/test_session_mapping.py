@@ -15,6 +15,7 @@ from study_planner.nn.dataset import prepare_inference_frame
 from study_planner.search.session_mapping import (
     TRAINING_CLICK_SUPPORT,
     ClickScenario,
+    IncrementalMonotonicityReporter,
     JointSupportStatus,
     MappingValidationError,
     MarginalSupportStatus,
@@ -436,6 +437,77 @@ def test_monotonicity_compares_only_within_matching_context() -> None:
 
     assert report.comparisons == 0
     assert report.violations == ()
+
+
+def test_incremental_monotonicity_matches_batch_for_effort_and_context_cases() -> None:
+    context = MonotonicityContext(
+        "student-1", "assignment-1", "base-1", "central:content_navigation:62"
+    )
+    other_assignment = MonotonicityContext(
+        "student-1", "assignment-2", "base-2", "central:content_navigation:62"
+    )
+    other_student = MonotonicityContext(
+        "student-2", "assignment-1", "base-3", "central:content_navigation:62"
+    )
+    observations = (
+        MonotonicityObservation((0, 0, 0, 0), 70, context, ("zero",)),
+        MonotonicityObservation((1, 0, 0, 0), 68, context, ("one-a",)),
+        MonotonicityObservation((0, 1, 0, 0), 72, context, ("one-b",)),
+        MonotonicityObservation((2, 0, 0, 0), 67, context, ("two-a",)),
+        MonotonicityObservation((1, 1, 0, 0), 60, context, ("two-mixed",)),
+        # Equal effort and decreasing effort do not create one-session comparisons.
+        MonotonicityObservation((1, 0, 0, 0), 50, context, ("one-equal-effort",)),
+        MonotonicityObservation(
+            (0, 0, 0, 0), 99, other_assignment, ("other-assignment",)
+        ),
+        MonotonicityObservation((0, 0, 1, 0), 99, other_student, ("other-student",)),
+    )
+    insertion_orders = (
+        tuple(range(len(observations))),
+        tuple(reversed(range(len(observations)))),
+        (2, 5, 0, 7, 4, 1, 6, 3),
+    )
+
+    for order in insertion_orders:
+        ordered = tuple(observations[index] for index in order)
+        reporter = IncrementalMonotonicityReporter(tolerance=0.5)
+        reports = [reporter.add(item) for item in ordered]
+
+        assert reports[-1] == evaluate_monotonicity(ordered, tolerance=0.5)
+        assert reporter.report() == reports[-1]
+
+
+def test_incremental_monotonicity_empty_single_and_duplicate_inputs() -> None:
+    context = MonotonicityContext(
+        "student-1", "assignment-1", "base-1", "central:content_navigation:62"
+    )
+    observation = MonotonicityObservation((0, 0, 0, 0), 70, context, ("schedule",))
+    reporter = IncrementalMonotonicityReporter()
+
+    assert reporter.report() == evaluate_monotonicity(())
+    assert reporter.add(observation) == evaluate_monotonicity((observation,))
+    with pytest.raises(ValueError, match="unique"):
+        reporter.add(observation)
+    with pytest.raises(ValueError, match="unique"):
+        evaluate_monotonicity((observation, observation))
+
+
+def test_incremental_upsert_matches_insertion_ordered_mapping_semantics() -> None:
+    context = MonotonicityContext(
+        "student-1", "assignment-1", "base-1", "central:content_navigation:62"
+    )
+    first = MonotonicityObservation((0, 0, 0, 0), 70, context, ("zero",))
+    replacement = MonotonicityObservation((0, 0, 0, 0), 65, context, ("zero",))
+    child = MonotonicityObservation((1, 0, 0, 0), 60, context, ("one",))
+    reporter = IncrementalMonotonicityReporter()
+
+    reporter.upsert(first)
+    reporter.upsert(child)
+    actual = reporter.upsert(replacement)
+    expected = evaluate_monotonicity((replacement, child))
+
+    assert actual == expected
+    assert actual.violations[0].prediction_delta == -5
 
 
 def test_monotonicity_rejects_invalid_tolerance_or_prediction() -> None:
