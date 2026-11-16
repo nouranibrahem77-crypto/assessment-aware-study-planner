@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 import argparse
+import csv
 import json
 import logging
 from collections import Counter
@@ -44,15 +45,14 @@ from study_planner.integration.application_inputs import (
     AllocationBounds,
     ApplicationAssignmentRule,
     ApplicationInputConfig,
-    ApplicationSlot,
     ModelArtifactIdentity,
     OuladPresentationSplit,
     OutOfSupportAction,
     SupportPolicy,
+    SyntheticWeeklySlotPattern,
     TargetRule,
-    WeeklySlotCatalog,
-    WeeklyTimeWindow,
     build_application_inputs,
+    build_synthetic_weekly_slot_catalog,
     load_session_nn_adapter,
     load_simple_average_adapter,
 )
@@ -74,6 +74,38 @@ ASSIGNMENTS = ("a_34899", "a_34900", "a_34901")
 ASSESSMENTS = ("34899", "34900", "34901")
 DEADLINES = (24, 52, 94)
 DEMO_TARGET_MARK = 60.0
+DEMO_SLOT_WEEKS = (3, 7, 13)
+
+
+def _synthetic_demo_catalog():
+    catalog, eligible_by_assignment = build_synthetic_weekly_slot_catalog(
+        identity="synthetic-demo-slots",
+        version="v1",
+        weekly_capacity=2,
+        deadline_policy_identity="synthetic-demo-deadline",
+        deadline_policy_version="v1",
+        assignment_deadlines=tuple(zip(ASSIGNMENTS, DEADLINES, strict=True)),
+        week_indices=DEMO_SLOT_WEEKS,
+        pattern=SyntheticWeeklySlotPattern(
+            weekdays_iso=(1,),
+            start_minute_local=9 * 60,
+            end_minute_local=10 * 60,
+            timezone_identity="UTC",
+        ),
+    )
+    slots_by_week = {slot.slot.week_index: slot for slot in catalog.slots}
+    selected_slots = tuple(
+        (identity, (slots_by_week[week].slot.slot_id,))
+        for identity, week in zip(ASSIGNMENTS, DEMO_SLOT_WEEKS, strict=True)
+    )
+    available = dict(eligible_by_assignment)
+    if any(
+        slot_id not in available[identity]
+        for identity, slot_ids in selected_slots
+        for slot_id in slot_ids
+    ):
+        raise RuntimeError("synthetic demo slot is not deadline eligible")
+    return catalog, selected_slots
 
 
 @dataclass(frozen=True, slots=True)
@@ -190,38 +222,19 @@ def _csp_scenarios() -> tuple[CspScenario, ...]:
 
 
 def _synthetic_config(adapter: SessionNNAdapter) -> ApplicationInputConfig:
-    slots = tuple(
-        ApplicationSlot(
-            slot,
-            WeeklyTimeWindow(
-                weekday_iso=index * 2 + 1,
-                start_minute_local=9 * 60,
-                end_minute_local=10 * 60,
-                timezone_identity="UTC",
-            ),
-            tuple((identity, index + 1) for identity in ASSIGNMENTS),
-        )
-        for index, slot in enumerate(_demo_slots(shared_week=False))
-    )
-    catalog = WeeklySlotCatalog(
-        "synthetic-demo-slots",
-        "v1",
-        2,
-        "synthetic-demo-deadline",
-        "v1",
-        slots,
-    )
+    catalog, eligible_by_assignment = _synthetic_demo_catalog()
+    eligible = dict(eligible_by_assignment)
     rules = tuple(
         ApplicationAssignmentRule(
             identity,
             assessment_id,
             DEMO_TARGET_MARK,
             deadline,
-            (slots[index].slot.slot_id,),
+            eligible[identity],
             AllocationBounds(0, 1),
         )
-        for index, (identity, assessment_id, deadline) in enumerate(
-            zip(ASSIGNMENTS, ASSESSMENTS, DEADLINES, strict=True)
+        for identity, assessment_id, deadline in zip(
+            ASSIGNMENTS, ASSESSMENTS, DEADLINES, strict=True
         )
     )
     targets = tuple((identity, DEMO_TARGET_MARK) for identity in ASSIGNMENTS)
@@ -245,6 +258,7 @@ def _prediction_scenarios(
     feature_rows: pd.DataFrame,
     student_ids: tuple[str, ...],
     adapters: dict[str, SessionNNAdapter],
+    planner_results: dict[tuple[str, str], FinalPlannerResult],
 ) -> tuple[PredictionScenario, ...]:
     scenarios = []
     for student_id in student_ids:
@@ -282,6 +296,7 @@ def _prediction_scenarios(
                 csp_algorithm=CspAlgorithm.BT_FC_AC3,
             )
             cache[method] = result
+            planner_results[(identity, method)] = result
             return result
 
         scenarios.append(
@@ -299,7 +314,172 @@ def _prediction_scenarios(
     return tuple(scenarios)
 
 
+def _write_prediction_plans(
+    output_directory: Path,
+    records: Sequence[ExperimentRunRecord],
+    planner_results: Mapping[tuple[str, str], FinalPlannerResult],
+    student_ids: tuple[str, ...],
+) -> tuple[Path, Path]:
+    """Persist one detailed planner result per profile and predictor."""
+    catalog, _eligible_by_assignment = _synthetic_demo_catalog()
+    slot_catalog = [
+        {
+            "slot_id": slot.slot.slot_id,
+            "week_index": slot.slot.week_index,
+            "weekday_iso": slot.time_window.weekday_iso,
+            "local_start": "09:00",
+            "local_end": "10:00",
+            "timezone": slot.time_window.timezone_identity,
+            "relative_windows": dict(slot.relative_windows),
+        }
+        for slot in catalog.slots
+    ]
+    slots_by_id = {slot["slot_id"]: slot for slot in slot_catalog}
+    details: list[dict[str, object]] = []
+    for student_id in student_ids:
+        for method in ("nn", "average"):
+            run_record = next(
+                record
+                for record in records
+                if record.profile_id == student_id
+                and record.method == method
+                and record.seed == DEFAULT_EXPERIMENT_SEEDS[0]
+            )
+            result = planner_results.get((student_id, method))
+            if result is None:
+                details.append(
+                    {
+                        "configuration_status": "SYNTHETIC_DEMO_ONLY_NOT_PRODUCTION",
+                        "student_id": student_id,
+                        "method": method,
+                        "seed": run_record.seed,
+                        "status": run_record.status.value,
+                        "outcome": None,
+                        "search_complete": None,
+                        "allocations": [],
+                        "weekly_timetable": None,
+                        "predicted_marks": [],
+                        "failure_reasons": list(run_record.failure_reasons),
+                        "error_type": run_record.error_type,
+                        "error_message": run_record.error_message,
+                    }
+                )
+                continue
+
+            details.append(
+                {
+                    "configuration_status": "SYNTHETIC_DEMO_ONLY_NOT_PRODUCTION",
+                    "student_id": student_id,
+                    "method": method,
+                    "seed": run_record.seed,
+                    "status": result.status.value,
+                    "outcome": result.outcome.value,
+                    "search_complete": result.search_complete,
+                    "model_identity": result.nn_model_identity,
+                    "model_mode": result.nn_model_mode.value,
+                    "artifact_digest": result.nn_fitted_artifact_digest,
+                    "allocations": [
+                        {
+                            "assignment_identity": item.assignment_identity,
+                            "weekly_sessions": list(item.weekly_sessions),
+                            "session_count": sum(item.weekly_sessions),
+                        }
+                        for item in result.allocations
+                    ],
+                    "weekly_timetable": (
+                        None
+                        if result.weekly_timetable is None
+                        else [
+                            {
+                                "assignment_identity": schedule.assignment_identity,
+                                "sessions": [
+                                    {
+                                        "session_index": session.session_index,
+                                        **slots_by_id[session.slot_id],
+                                    }
+                                    for session in schedule.sessions
+                                ],
+                            }
+                            for schedule in result.weekly_timetable
+                        ]
+                    ),
+                    "predicted_marks": [
+                        {
+                            "assignment_identity": item.assignment_identity,
+                            "predicted_mark": item.predicted_mark,
+                            "target_mark": item.target_mark,
+                        }
+                        for item in result.predicted_marks
+                    ],
+                    "failure_reasons": list(result.failure_reasons),
+                    "error_type": None,
+                    "error_message": None,
+                }
+            )
+
+    output_directory.mkdir(parents=True, exist_ok=True)
+    json_path = output_directory / "prediction_plans.json"
+    csv_path = output_directory / "prediction_plans.csv"
+    json_path.write_text(
+        json.dumps(
+            {
+                "configuration_status": "SYNTHETIC_DEMO_ONLY_NOT_PRODUCTION",
+                "profile_count": len(student_ids),
+                "methods": ["nn", "average"],
+                "run_seeds": list(DEFAULT_EXPERIMENT_SEEDS),
+                "plans_are_deterministic_across_seeds": True,
+                "slot_catalog": slot_catalog,
+                "plans": details,
+            },
+            indent=2,
+            sort_keys=True,
+        )
+        + "\n",
+        encoding="utf-8",
+    )
+    csv_fields = (
+        "student_id",
+        "configuration_status",
+        "method",
+        "seed",
+        "status",
+        "outcome",
+        "search_complete",
+        "model_identity",
+        "model_mode",
+        "artifact_digest",
+        "allocations_json",
+        "weekly_timetable_json",
+        "predicted_marks_json",
+        "failure_reasons_json",
+        "error_type",
+        "error_message",
+    )
+    with csv_path.open("w", newline="", encoding="utf-8") as stream:
+        writer = csv.DictWriter(stream, fieldnames=csv_fields)
+        writer.writeheader()
+        for detail in details:
+            writer.writerow(
+                {
+                    **{
+                        field: detail.get(field)
+                        for field in csv_fields
+                        if not field.endswith("_json")
+                    },
+                    "allocations_json": json.dumps(detail["allocations"]),
+                    "weekly_timetable_json": json.dumps(
+                        detail["weekly_timetable"]
+                    ),
+                    "predicted_marks_json": json.dumps(detail["predicted_marks"]),
+                    "failure_reasons_json": json.dumps(detail["failure_reasons"]),
+                }
+            )
+    return csv_path, json_path
+
+
 def _write_demo_config(path: Path, profile_manifest: Path) -> None:
+    catalog, eligible_by_assignment = _synthetic_demo_catalog()
+    eligible = dict(eligible_by_assignment)
     payload = {
         "configuration_status": "SYNTHETIC_DEMO_ONLY_NOT_PRODUCTION",
         "profile_manifest": str(profile_manifest),
@@ -311,20 +491,28 @@ def _write_demo_config(path: Path, profile_manifest: Path) -> None:
                 "assessment_id": assessment_id,
                 "target_mark": DEMO_TARGET_MARK,
                 "deadline_day": deadline,
-                "eligible_slots": [f"demo-slot-{index + 1}"],
+                "eligible_slots": list(eligible[identity]),
                 "allocation_bounds": {"minimum_sessions": 0, "maximum_sessions": 1},
             }
-            for index, (identity, assessment_id, deadline) in enumerate(
-                zip(ASSIGNMENTS, ASSESSMENTS, DEADLINES, strict=True)
+            for identity, assessment_id, deadline in zip(
+                ASSIGNMENTS, ASSESSMENTS, DEADLINES, strict=True
             )
         ],
         "slot_catalog": {
-            "slot_ids": ["demo-slot-1", "demo-slot-2", "demo-slot-3"],
-            "weeks": [0, 1, 2],
-            "weekday_iso": [1, 3, 5],
-            "local_time": "09:00-10:00",
-            "timezone": "UTC",
-            "weekly_capacity": 2,
+            "identity": catalog.identity,
+            "version": catalog.version,
+            "slots": [
+                {
+                    "slot_id": slot.slot.slot_id,
+                    "week_index": slot.slot.week_index,
+                    "weekday_iso": slot.time_window.weekday_iso,
+                    "local_time": "09:00-10:00",
+                    "timezone": slot.time_window.timezone_identity,
+                    "relative_windows": dict(slot.relative_windows),
+                }
+                for slot in catalog.slots
+            ],
+            "weekly_capacity": catalog.weekly_capacity,
         },
         "target_rule": f"synthetic per-assignment target of {DEMO_TARGET_MARK:g}",
         "deadline_policy": "explicit slot lists; no calendar derivation",
@@ -334,7 +522,7 @@ def _write_demo_config(path: Path, profile_manifest: Path) -> None:
             "scenario": "low",
             "activity_group": "content_navigation",
             "clicks_per_session": 22,
-            "window_rule": "demo-slot index maps to relative click window 1, 2, or 3",
+            "window_rule": "computed from each synthetic slot's week, weekday, and assignment deadline",
         },
         "seed_policy": list(DEFAULT_EXPERIMENT_SEEDS),
         "prediction_seed_execution": (
@@ -439,8 +627,9 @@ def main(argv: list[str] | None = None) -> int:
     )
     csp_records = run_csp_comparison(_csp_scenarios())
     write_experiment_bundle(csp_records, output, "csp", "nodes_visited")
+    planner_results: dict[tuple[str, str], FinalPlannerResult] = {}
     prediction_records = run_prediction_comparison(
-        _prediction_scenarios(feature_rows, student_ids, adapters)
+        _prediction_scenarios(feature_rows, student_ids, adapters, planner_results)
     )
     write_experiment_bundle(
         prediction_records,
@@ -449,6 +638,7 @@ def main(argv: list[str] | None = None) -> int:
         "mean_predicted_mark",
         group_by_scenario=False,
     )
+    _write_prediction_plans(output, prediction_records, planner_results, student_ids)
     _write_demo_report(
         output / "experiment_report.md",
         {
@@ -519,9 +709,11 @@ def _write_demo_report(
             "",
             "Run-level and mean/sample-standard-deviation metric tables are in the",
             "matching CSV/JSON files. SVG comparisons are generated from those same",
-            "run records. These results demonstrate the experiment pipeline; they",
-            "must not be used to make claims about approved planner settings or a",
-            "causal effect of study sessions on marks.",
+            "run records. Per-profile allocations, verified timetables, and predicted",
+            "marks are in `prediction_plans.csv` and `prediction_plans.json`. The",
+            "weekly slot catalog in those files gives week, weekday, and UTC times.",
+            "These synthetic results demonstrate the experiment pipeline; they must",
+            "not be used as approved planner settings or causal evidence.",
             "",
         )
     )

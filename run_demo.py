@@ -138,15 +138,25 @@ def _test_config(
 
 
 def _load_binding(
-    scenario: Scenario, model: Literal["strict", "proxy"]
+    scenario: Scenario,
+    model: Literal["strict", "proxy"],
+    artifact_directory: Path | None = None,
 ) -> tuple[SessionNNAdapter, ValidatedApplicationInputs, ApplicationPlanningBinding]:
     if model == "strict":
         mode = NNModelMode.MODEL_A_STRICT
-        model_path = ROOT / "data/processed/nn_experiment_60ep"
+        model_path = (
+            artifact_directory
+            if artifact_directory is not None
+            else ROOT / "data/processed/nn_experiment_60ep"
+        )
         feature_path = ROOT / "data/processed/strict"
     else:
         mode = NNModelMode.MODEL_B_PREVIOUS_MARKS
-        model_path = ROOT / "data/processed/nn_experiment_previous_marks"
+        model_path = (
+            artifact_directory
+            if artifact_directory is not None
+            else ROOT / "data/processed/nn_experiment_previous_marks"
+        )
         feature_path = ROOT / "data/processed/proxy"
     mapping = SessionClickMappingConfig(ClickScenario.LOW)
     adapter = load_session_nn_adapter(model_path, mode, mapping)
@@ -287,12 +297,14 @@ def _print_result(scenario: Scenario, result: FinalPlannerResult) -> None:
 
 
 def run_scenario(
-    scenario: Scenario, model: Literal["strict", "proxy"] = "strict"
+    scenario: Scenario,
+    model: Literal["strict", "proxy"] = "strict",
+    artifact_directory: Path | None = None,
 ) -> FinalPlannerResult:
     """Run one scenario using local artifacts and TEST-only policy values."""
     if scenario not in SCENARIOS:
         raise ValueError(f"unknown scenario: {scenario}")
-    adapter, inputs, binding = _load_binding(scenario, model)
+    adapter, inputs, binding = _load_binding(scenario, model, artifact_directory)
     if scenario == "NN_ACCEPTS_CSP_INFEASIBLE":
         state = binding.allocation_space.initial_state
         for _ in range(2):
@@ -475,8 +487,16 @@ def main() -> None:
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("scenario", choices=SCENARIOS, nargs="?", default="NORMAL")
     parser.add_argument("--model", choices=("strict", "proxy"), default="strict")
+    parser.add_argument(
+        "--artifact-directory",
+        type=Path,
+        help=(
+            "override the default fitted artifact directory; the feature schema "
+            "must match --model"
+        ),
+    )
     args = parser.parse_args()
-    run_scenario(args.scenario, args.model)
+    run_scenario(args.scenario, args.model, args.artifact_directory)
 
 
 if __name__ == "__main__":

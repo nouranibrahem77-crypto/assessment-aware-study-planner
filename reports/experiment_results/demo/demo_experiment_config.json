@@ -1,6 +1,6 @@
 {
   "configuration_status": "SYNTHETIC_DEMO_ONLY_NOT_PRODUCTION",
-  "profile_manifest": "C:\\Users\\janam\\OneDrive\\Desktop\\3 sem 1\\Intelligent systems\\project 1\\assessment-aware-study-planner\\reports\\experiment_results\\profiles_fff_2014J.json",
+  "profile_manifest": "/mnt/c/Users/janam/OneDrive/Desktop/3 sem 1/Intelligent systems/project 1/assessment-aware-study-planner/reports/experiment_results/profiles_fff_2014J.json",
   "course": "FFF",
   "presentation": "2014J",
   "assignments": [
@@ -10,7 +10,7 @@
       "target_mark": 60.0,
       "deadline_day": 24,
       "eligible_slots": [
-        "demo-slot-1"
+        "synthetic-demo-slots-W03-D1-T0540-0600"
       ],
       "allocation_bounds": {
         "minimum_sessions": 0,
@@ -23,7 +23,7 @@
       "target_mark": 60.0,
       "deadline_day": 52,
       "eligible_slots": [
-        "demo-slot-2"
+        "synthetic-demo-slots-W07-D1-T0540-0600"
       ],
       "allocation_bounds": {
         "minimum_sessions": 0,
@@ -36,7 +36,7 @@
       "target_mark": 60.0,
       "deadline_day": 94,
       "eligible_slots": [
-        "demo-slot-3"
+        "synthetic-demo-slots-W13-D1-T0540-0600"
       ],
       "allocation_bounds": {
         "minimum_sessions": 0,
@@ -45,23 +45,40 @@
     }
   ],
   "slot_catalog": {
-    "slot_ids": [
-      "demo-slot-1",
-      "demo-slot-2",
-      "demo-slot-3"
+    "identity": "synthetic-demo-slots",
+    "version": "v1",
+    "slots": [
+      {
+        "slot_id": "synthetic-demo-slots-W03-D1-T0540-0600",
+        "week_index": 3,
+        "weekday_iso": 1,
+        "local_time": "09:00-10:00",
+        "timezone": "UTC",
+        "relative_windows": {
+          "a_34899": 4
+        }
+      },
+      {
+        "slot_id": "synthetic-demo-slots-W07-D1-T0540-0600",
+        "week_index": 7,
+        "weekday_iso": 1,
+        "local_time": "09:00-10:00",
+        "timezone": "UTC",
+        "relative_windows": {
+          "a_34900": 4
+        }
+      },
+      {
+        "slot_id": "synthetic-demo-slots-W13-D1-T0540-0600",
+        "week_index": 13,
+        "weekday_iso": 1,
+        "local_time": "09:00-10:00",
+        "timezone": "UTC",
+        "relative_windows": {
+          "a_34901": 4
+        }
+      }
     ],
-    "weeks": [
-      0,
-      1,
-      2
-    ],
-    "weekday_iso": [
-      1,
-      3,
-      5
-    ],
-    "local_time": "09:00-10:00",
-    "timezone": "UTC",
     "weekly_capacity": 2
   },
   "target_rule": "synthetic per-assignment target of 60",
@@ -72,7 +89,7 @@
     "scenario": "low",
     "activity_group": "content_navigation",
     "clicks_per_session": 22,
-    "window_rule": "demo-slot index maps to relative click window 1, 2, or 3"
+    "window_rule": "computed from each synthetic slot's week, weekday, and assignment deadline"
   },
   "seed_policy": [
     42,

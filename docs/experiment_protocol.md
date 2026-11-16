@@ -211,6 +211,9 @@ Store generated deliverables under `reports/experiment_results/`:
 - `profiles_fff_2014J.json` — reproducible shared profile manifest.
 - `*_runs.csv` — one row per requested run, including configuration, method,
   seed, status, metrics, provenance, and error details where applicable.
+- `prediction_plans.csv` and `prediction_plans.json` — detailed per-profile
+  allocations, verified weekly timetables, predicted marks, status, and model
+  provenance for the NN and average predictor demo runs.
 - `*_summary.csv` — grouped sample count, mean, standard deviation, and status
   counts for each reported metric.
 - `*_comparison.svg` — plots generated from the saved run-level data.

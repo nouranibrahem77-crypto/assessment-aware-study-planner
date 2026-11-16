@@ -22,8 +22,8 @@
         "nodes_visited": 31,
         "rejected_schedules": 0,
         "schedules_examined": 0,
-        "solver_time_seconds": 0.0062873999995645136,
-        "wall_time_seconds": 0.006316200000583194
+        "solver_time_seconds": 0.004656246000195097,
+        "wall_time_seconds": 0.004695771999649878
       },
       "profile_id": null,
       "provenance": {
@@ -57,8 +57,8 @@
         "nodes_visited": 31,
         "rejected_schedules": 0,
         "schedules_examined": 0,
-        "solver_time_seconds": 0.07581529999151826,
-        "wall_time_seconds": 0.07584580000548158
+        "solver_time_seconds": 0.004245033999723091,
+        "wall_time_seconds": 0.0042607790001056856
       },
       "profile_id": null,
       "provenance": {
@@ -92,8 +92,8 @@
         "nodes_visited": 31,
         "rejected_schedules": 0,
         "schedules_examined": 0,
-        "solver_time_seconds": 0.007754999998724088,
-        "wall_time_seconds": 0.007772100012516603
+        "solver_time_seconds": 0.004070979999596602,
+        "wall_time_seconds": 0.004082090999872889
       },
       "profile_id": null,
       "provenance": {
@@ -127,8 +127,8 @@
         "nodes_visited": 31,
         "rejected_schedules": 0,
         "schedules_examined": 0,
-        "solver_time_seconds": 0.006231599996681325,
-        "wall_time_seconds": 0.0062471999990521
+        "solver_time_seconds": 0.004204118999950879,
+        "wall_time_seconds": 0.004215594000015699
       },
       "profile_id": null,
       "provenance": {
@@ -162,8 +162,8 @@
         "nodes_visited": 31,
         "rejected_schedules": 0,
         "schedules_examined": 0,
-        "solver_time_seconds": 0.007762699999148026,
-        "wall_time_seconds": 0.007779299994581379
+        "solver_time_seconds": 0.004237957000441384,
+        "wall_time_seconds": 0.004249286000231223
       },
       "profile_id": null,
       "provenance": {
@@ -197,8 +197,8 @@
         "nodes_visited": 4,
         "rejected_schedules": 0,
         "schedules_examined": 0,
-        "solver_time_seconds": 0.0019268999894848093,
-        "wall_time_seconds": 0.0019487999961711466
+        "solver_time_seconds": 0.0012922659998366726,
+        "wall_time_seconds": 0.0013141379995431635
       },
       "profile_id": null,
       "provenance": {
@@ -232,8 +232,8 @@
         "nodes_visited": 4,
         "rejected_schedules": 0,
         "schedules_examined": 0,
-        "solver_time_seconds": 0.001793500006897375,
-        "wall_time_seconds": 0.0018060000002151355
+        "solver_time_seconds": 0.001241887999640312,
+        "wall_time_seconds": 0.0012530470003184746
       },
       "profile_id": null,
       "provenance": {
@@ -267,8 +267,8 @@
         "nodes_visited": 4,
         "rejected_schedules": 0,
         "schedules_examined": 0,
-        "solver_time_seconds": 0.0017247999930987135,
-        "wall_time_seconds": 0.0017417999915778637
+        "solver_time_seconds": 0.001171455999610771,
+        "wall_time_seconds": 0.0011804550003944314
       },
       "profile_id": null,
       "provenance": {
@@ -302,8 +302,8 @@
         "nodes_visited": 4,
         "rejected_schedules": 0,
         "schedules_examined": 0,
-        "solver_time_seconds": 0.0017009000002872199,
-        "wall_time_seconds": 0.0017128000035881996
+        "solver_time_seconds": 0.001195510999423277,
+        "wall_time_seconds": 0.0012038510003549163
       },
       "profile_id": null,
       "provenance": {
@@ -337,8 +337,8 @@
         "nodes_visited": 4,
         "rejected_schedules": 0,
         "schedules_examined": 0,
-        "solver_time_seconds": 0.0017256999999517575,
-        "wall_time_seconds": 0.0017366999963996932
+        "solver_time_seconds": 0.001271211000130279,
+        "wall_time_seconds": 0.0012804899997718167
       },
       "profile_id": null,
       "provenance": {
@@ -372,8 +372,8 @@
         "nodes_visited": 4,
         "rejected_schedules": 0,
         "schedules_examined": 0,
-        "solver_time_seconds": 0.0019420999888097867,
-        "wall_time_seconds": 0.001962499998626299
+        "solver_time_seconds": 0.001442106000467902,
+        "wall_time_seconds": 0.0014668009998786147
       },
       "profile_id": null,
       "provenance": {
@@ -407,8 +407,8 @@
         "nodes_visited": 4,
         "rejected_schedules": 0,
         "schedules_examined": 0,
-        "solver_time_seconds": 0.0017928000015672296,
-        "wall_time_seconds": 0.0018050000071525574
+        "solver_time_seconds": 0.0013041989996054326,
+        "wall_time_seconds": 0.0013169080002626288
       },
       "profile_id": null,
       "provenance": {
@@ -442,8 +442,8 @@
         "nodes_visited": 4,
         "rejected_schedules": 0,
         "schedules_examined": 0,
-        "solver_time_seconds": 0.002559899992775172,
-        "wall_time_seconds": 0.002572800003690645
+        "solver_time_seconds": 0.001293827000154124,
+        "wall_time_seconds": 0.0013041869997323374
       },
       "profile_id": null,
       "provenance": {
@@ -477,8 +477,8 @@
         "nodes_visited": 4,
         "rejected_schedules": 0,
         "schedules_examined": 0,
-        "solver_time_seconds": 0.0017941999976756051,
-        "wall_time_seconds": 0.001807099994039163
+        "solver_time_seconds": 0.0012782409994542832,
+        "wall_time_seconds": 0.001287724000576418
       },
       "profile_id": null,
       "provenance": {
@@ -512,8 +512,8 @@
         "nodes_visited": 4,
         "rejected_schedules": 0,
         "schedules_examined": 0,
-        "solver_time_seconds": 0.001800300000468269,
-        "wall_time_seconds": 0.0018119000014849007
+        "solver_time_seconds": 0.0013432010000542505,
+        "wall_time_seconds": 0.0013527540004361072
       },
       "profile_id": null,
       "provenance": {
@@ -547,8 +547,8 @@
         "nodes_visited": 31,
         "rejected_schedules": 0,
         "schedules_examined": 6,
-        "solver_time_seconds": 0.006018399988533929,
-        "wall_time_seconds": 0.007384399999864399
+        "solver_time_seconds": 0.004390975000205799,
+        "wall_time_seconds": 0.005562211000324169
       },
       "profile_id": null,
       "provenance": {
@@ -582,8 +582,8 @@
         "nodes_visited": 31,
         "rejected_schedules": 0,
         "schedules_examined": 6,
-        "solver_time_seconds": 0.008083199980319478,
-        "wall_time_seconds": 0.00946750000002794
+        "solver_time_seconds": 0.0042342120004832395,
+        "wall_time_seconds": 0.005139967999639339
       },
       "profile_id": null,
       "provenance": {
@@ -617,8 +617,8 @@
         "nodes_visited": 31,
         "rejected_schedules": 0,
         "schedules_examined": 6,
-        "solver_time_seconds": 0.0059136999770998955,
-        "wall_time_seconds": 0.00705470000684727
+        "solver_time_seconds": 0.004328158000134863,
+        "wall_time_seconds": 0.005205338999985543
       },
       "profile_id": null,
       "provenance": {
@@ -652,8 +652,8 @@
         "nodes_visited": 31,
         "rejected_schedules": 0,
         "schedules_examined": 6,
-        "solver_time_seconds": 0.005816899996716529,
-        "wall_time_seconds": 0.006971700000576675
+        "solver_time_seconds": 0.004423487001986359,
+        "wall_time_seconds": 0.0053253469995979685
       },
       "profile_id": null,
       "provenance": {
@@ -687,8 +687,8 @@
         "nodes_visited": 31,
         "rejected_schedules": 0,
         "schedules_examined": 6,
-        "solver_time_seconds": 0.006133700007922016,
-        "wall_time_seconds": 0.007333300003665499
+        "solver_time_seconds": 0.004786480999428022,
+        "wall_time_seconds": 0.005890714999623015
       },
       "profile_id": null,
       "provenance": {
@@ -722,8 +722,8 @@
         "nodes_visited": 16,
         "rejected_schedules": 0,
         "schedules_examined": 6,
-        "solver_time_seconds": 0.002522300012060441,
-        "wall_time_seconds": 0.003651699997135438
+        "solver_time_seconds": 0.0019205550006518024,
+        "wall_time_seconds": 0.002856858000086504
       },
       "profile_id": null,
       "provenance": {
@@ -757,8 +757,8 @@
         "nodes_visited": 16,
         "rejected_schedules": 0,
         "schedules_examined": 6,
-        "solver_time_seconds": 0.002501399998436682,
-        "wall_time_seconds": 0.0036148999934084713
+        "solver_time_seconds": 0.0019419710006332025,
+        "wall_time_seconds": 0.002834547000020393
       },
       "profile_id": null,
       "provenance": {
@@ -792,8 +792,8 @@
         "nodes_visited": 16,
         "rejected_schedules": 0,
         "schedules_examined": 6,
-        "solver_time_seconds": 0.0025130999856628478,
-        "wall_time_seconds": 0.0035900000075343996
+        "solver_time_seconds": 0.001876683999398665,
+        "wall_time_seconds": 0.0027505789994393126
       },
       "profile_id": null,
       "provenance": {
@@ -827,8 +827,8 @@
         "nodes_visited": 16,
         "rejected_schedules": 0,
         "schedules_examined": 6,
-        "solver_time_seconds": 0.0025114999734796584,
-        "wall_time_seconds": 0.0036066000029677525
+        "solver_time_seconds": 0.0018999349986188463,
+        "wall_time_seconds": 0.002762156000244431
       },
       "profile_id": null,
       "provenance": {
@@ -862,8 +862,8 @@
         "nodes_visited": 16,
         "rejected_schedules": 0,
         "schedules_examined": 6,
-        "solver_time_seconds": 0.002512500010197982,
-        "wall_time_seconds": 0.003595600006519817
+        "solver_time_seconds": 0.0020683439997810638,
+        "wall_time_seconds": 0.0031135529998209677
       },
       "profile_id": null,
       "provenance": {
@@ -897,8 +897,8 @@
         "nodes_visited": 16,
         "rejected_schedules": 0,
         "schedules_examined": 6,
-        "solver_time_seconds": 0.0036496999819064513,
-        "wall_time_seconds": 0.00479000000632368
+        "solver_time_seconds": 0.0031508350002695806,
+        "wall_time_seconds": 0.004199396999865712
       },
       "profile_id": null,
       "provenance": {
@@ -932,8 +932,8 @@
         "nodes_visited": 16,
         "rejected_schedules": 0,
         "schedules_examined": 6,
-        "solver_time_seconds": 0.003599300005589612,
-        "wall_time_seconds": 0.004720199998700991
+        "solver_time_seconds": 0.0030270519991972833,
+        "wall_time_seconds": 0.004085428999133001
       },
       "profile_id": null,
       "provenance": {
@@ -967,8 +967,8 @@
         "nodes_visited": 16,
         "rejected_schedules": 0,
         "schedules_examined": 6,
-        "solver_time_seconds": 0.003593899993575178,
-        "wall_time_seconds": 0.004707899992354214
+        "solver_time_seconds": 0.003645691000201623,
+        "wall_time_seconds": 0.004752246999487397
       },
       "profile_id": null,
       "provenance": {
@@ -1002,8 +1002,8 @@
         "nodes_visited": 16,
         "rejected_schedules": 0,
         "schedules_examined": 6,
-        "solver_time_seconds": 0.0036312999873189256,
-        "wall_time_seconds": 0.00473519999650307
+        "solver_time_seconds": 0.003133467999759887,
+        "wall_time_seconds": 0.0041675620004753
       },
       "profile_id": null,
       "provenance": {
@@ -1037,8 +1037,8 @@
         "nodes_visited": 16,
         "rejected_schedules": 0,
         "schedules_examined": 6,
-        "solver_time_seconds": 0.003571300010662526,
-        "wall_time_seconds": 0.004700800011050887
+        "solver_time_seconds": 0.0036819439992541447,
+        "wall_time_seconds": 0.00483103700025822
       },
       "profile_id": null,
       "provenance": {
@@ -1072,8 +1072,8 @@
         "nodes_visited": 31,
         "rejected_schedules": 0,
         "schedules_examined": 6,
-        "solver_time_seconds": 0.005860199991730042,
-        "wall_time_seconds": 0.006978800010983832
+        "solver_time_seconds": 0.004922700999486551,
+        "wall_time_seconds": 0.006237599000087357
       },
       "profile_id": null,
       "provenance": {
@@ -1107,8 +1107,8 @@
         "nodes_visited": 31,
         "rejected_schedules": 0,
         "schedules_examined": 6,
-        "solver_time_seconds": 0.006125600019004196,
-        "wall_time_seconds": 0.007261000006110407
+        "solver_time_seconds": 0.004372288000013214,
+        "wall_time_seconds": 0.005331403000127466
       },
       "profile_id": null,
       "provenance": {
@@ -1142,8 +1142,8 @@
         "nodes_visited": 31,
         "rejected_schedules": 0,
         "schedules_examined": 6,
-        "solver_time_seconds": 0.0058351999905426055,
-        "wall_time_seconds": 0.006953699994483031
+        "solver_time_seconds": 0.004420592000315082,
+        "wall_time_seconds": 0.005315059000167821
       },
       "profile_id": null,
       "provenance": {
@@ -1177,8 +1177,8 @@
         "nodes_visited": 31,
         "rejected_schedules": 0,
         "schedules_examined": 6,
-        "solver_time_seconds": 0.006278900007600896,
-        "wall_time_seconds": 0.007569800000055693
+        "solver_time_seconds": 0.004159629001151188,
+        "wall_time_seconds": 0.005065108999588119
       },
       "profile_id": null,
       "provenance": {
@@ -1212,8 +1212,8 @@
         "nodes_visited": 31,
         "rejected_schedules": 0,
         "schedules_examined": 6,
-        "solver_time_seconds": 0.005797799996798858,
-        "wall_time_seconds": 0.00691460000234656
+        "solver_time_seconds": 0.004258305998519063,
+        "wall_time_seconds": 0.005166435000319325
       },
       "profile_id": null,
       "provenance": {
@@ -1247,8 +1247,8 @@
         "nodes_visited": 16,
         "rejected_schedules": 0,
         "schedules_examined": 6,
-        "solver_time_seconds": 0.0026827000110642985,
-        "wall_time_seconds": 0.003925100012565963
+        "solver_time_seconds": 0.0018380419996901765,
+        "wall_time_seconds": 0.002761686000667396
       },
       "profile_id": null,
       "provenance": {
@@ -1282,8 +1282,8 @@
         "nodes_visited": 16,
         "rejected_schedules": 0,
         "schedules_examined": 6,
-        "solver_time_seconds": 0.0025547999975970015,
-        "wall_time_seconds": 0.0037001000018790364
+        "solver_time_seconds": 0.0018503429992051679,
+        "wall_time_seconds": 0.002706315999603248
       },
       "profile_id": null,
       "provenance": {
@@ -1317,8 +1317,8 @@
         "nodes_visited": 16,
         "rejected_schedules": 0,
         "schedules_examined": 6,
-        "solver_time_seconds": 0.002531099977204576,
-        "wall_time_seconds": 0.003612900007283315
+        "solver_time_seconds": 0.0018509329993321444,
+        "wall_time_seconds": 0.0027516480004123878
       },
       "profile_id": null,
       "provenance": {
@@ -1352,8 +1352,8 @@
         "nodes_visited": 16,
         "rejected_schedules": 0,
         "schedules_examined": 6,
-        "solver_time_seconds": 0.002522099981433712,
-        "wall_time_seconds": 0.003598399998736568
+        "solver_time_seconds": 0.0018225920011900598,
+        "wall_time_seconds": 0.0026604659997246927
       },
       "profile_id": null,
       "provenance": {
@@ -1387,8 +1387,8 @@
         "nodes_visited": 16,
         "rejected_schedules": 0,
         "schedules_examined": 6,
-        "solver_time_seconds": 0.0024909000348998234,
-        "wall_time_seconds": 0.003581800003303215
+        "solver_time_seconds": 0.0018635659998835763,
+        "wall_time_seconds": 0.0027064539999628323
       },
       "profile_id": null,
       "provenance": {
@@ -1422,8 +1422,8 @@
         "nodes_visited": 16,
         "rejected_schedules": 0,
         "schedules_examined": 6,
-        "solver_time_seconds": 0.00364480001735501,
-        "wall_time_seconds": 0.0047627000021748245
+        "solver_time_seconds": 0.0027937260010730824,
+        "wall_time_seconds": 0.0037047370005893754
       },
       "profile_id": null,
       "provenance": {
@@ -1457,8 +1457,8 @@
         "nodes_visited": 16,
         "rejected_schedules": 0,
         "schedules_examined": 6,
-        "solver_time_seconds": 0.0036008999886689708,
-        "wall_time_seconds": 0.004700399993453175
+        "solver_time_seconds": 0.00271375800093665,
+        "wall_time_seconds": 0.003573555999537348
       },
       "profile_id": null,
       "provenance": {
@@ -1492,8 +1492,8 @@
         "nodes_visited": 16,
         "rejected_schedules": 0,
         "schedules_examined": 6,
-        "solver_time_seconds": 0.0035696999984793365,
-        "wall_time_seconds": 0.004679899997427128
+        "solver_time_seconds": 0.0029284900019774796,
+        "wall_time_seconds": 0.004540752999673714
       },
       "profile_id": null,
       "provenance": {
@@ -1527,8 +1527,8 @@
         "nodes_visited": 16,
         "rejected_schedules": 0,
         "schedules_examined": 6,
-        "solver_time_seconds": 0.00358030000643339,
-        "wall_time_seconds": 0.004680400001234375
+        "solver_time_seconds": 0.002926573000877397,
+        "wall_time_seconds": 0.0044542980003825505
       },
       "profile_id": null,
       "provenance": {
@@ -1562,8 +1562,8 @@
         "nodes_visited": 16,
         "rejected_schedules": 0,
         "schedules_examined": 6,
-        "solver_time_seconds": 0.003557899995939806,
-        "wall_time_seconds": 0.004660400009015575
+        "solver_time_seconds": 0.0029546559999289457,
+        "wall_time_seconds": 0.003914304999852902
       },
       "profile_id": null,
       "provenance": {
@@ -1715,11 +1715,11 @@
       "feasible_count": 0,
       "incomplete_count": 0,
       "infeasible_count": 5,
-      "mean": 0.020770399997127244,
+      "mean": 0.004282867199981411,
       "method": "bt",
       "metric": "solver_time_seconds",
       "scenario_id": "weekly-capacity-2",
-      "standard_deviation": 0.030780171808043637,
+      "standard_deviation": 0.00022020301440289335,
       "valid_count": 5
     },
     {
@@ -1728,11 +1728,11 @@
       "feasible_count": 0,
       "incomplete_count": 0,
       "infeasible_count": 5,
-      "mean": 0.02079212000244297,
+      "mean": 0.004300704399975075,
       "method": "bt",
       "metric": "wall_time_seconds",
       "scenario_id": "weekly-capacity-2",
-      "standard_deviation": 0.030785016829528215,
+      "standard_deviation": 0.0002320301147401146,
       "valid_count": 5
     },
     {
@@ -1871,11 +1871,11 @@
       "feasible_count": 5,
       "incomplete_count": 0,
       "infeasible_count": 0,
-      "mean": 0.00639317999011837,
+      "mean": 0.004432662600447656,
       "method": "bt",
       "metric": "solver_time_seconds",
       "scenario_id": "weekly-capacity-3",
-      "standard_deviation": 0.0009520973153657965,
+      "standard_deviation": 0.0002105429642560224,
       "valid_count": 5
     },
     {
@@ -1884,11 +1884,11 @@
       "feasible_count": 5,
       "incomplete_count": 0,
       "infeasible_count": 0,
-      "mean": 0.007642320002196357,
+      "mean": 0.0054247159998340065,
       "method": "bt",
       "metric": "wall_time_seconds",
       "scenario_id": "weekly-capacity-3",
-      "standard_deviation": 0.001035413752695736,
+      "standard_deviation": 0.00030624411539221076,
       "valid_count": 5
     },
     {
@@ -2027,11 +2027,11 @@
       "feasible_count": 5,
       "incomplete_count": 0,
       "infeasible_count": 0,
-      "mean": 0.0059795400011353195,
+      "mean": 0.00442670319989702,
       "method": "bt",
       "metric": "solver_time_seconds",
       "scenario_id": "weekly-capacity-4",
-      "standard_deviation": 0.0002115747196440894,
+      "standard_deviation": 0.0002952534601846513,
       "valid_count": 5
     },
     {
@@ -2040,11 +2040,11 @@
       "feasible_count": 5,
       "incomplete_count": 0,
       "infeasible_count": 0,
-      "mean": 0.007135580002795905,
+      "mean": 0.005423121000058017,
       "method": "bt",
       "metric": "wall_time_seconds",
       "scenario_id": "weekly-capacity-4",
-      "standard_deviation": 0.0002787335856632535,
+      "standard_deviation": 0.0004683813336389573,
       "valid_count": 5
     },
     {
@@ -2183,11 +2183,11 @@
       "feasible_count": 0,
       "incomplete_count": 0,
       "infeasible_count": 5,
-      "mean": 0.001774359997943975,
+      "mean": 0.0012344663997282622,
       "method": "bt_fc",
       "metric": "solver_time_seconds",
       "scenario_id": "weekly-capacity-2",
-      "standard_deviation": 9.19988446973785e-05,
+      "standard_deviation": 5.058130413635693e-05,
       "valid_count": 5
     },
     {
@@ -2196,11 +2196,11 @@
       "feasible_count": 0,
       "incomplete_count": 0,
       "infeasible_count": 5,
-      "mean": 0.0017892199975904077,
+      "mean": 0.0012463962000765604,
       "method": "bt_fc",
       "metric": "wall_time_seconds",
       "scenario_id": "weekly-capacity-2",
-      "standard_deviation": 9.564827156529593e-05,
+      "standard_deviation": 5.4666963404245704e-05,
       "valid_count": 5
     },
     {
@@ -2339,11 +2339,11 @@
       "feasible_count": 5,
       "incomplete_count": 0,
       "infeasible_count": 0,
-      "mean": 0.0025121599959675224,
+      "mean": 0.001941497799816716,
       "method": "bt_fc",
       "metric": "solver_time_seconds",
       "scenario_id": "weekly-capacity-3",
-      "standard_deviation": 7.416742769185508e-06,
+      "standard_deviation": 7.492842980023422e-05,
       "valid_count": 5
     },
     {
@@ -2352,11 +2352,11 @@
       "feasible_count": 5,
       "incomplete_count": 0,
       "infeasible_count": 0,
-      "mean": 0.0036117600015131758,
+      "mean": 0.0028635385999223216,
       "method": "bt_fc",
       "metric": "wall_time_seconds",
       "scenario_id": "weekly-capacity-3",
-      "standard_deviation": 2.432247500018954e-05,
+      "standard_deviation": 0.00014699544745879744,
       "valid_count": 5
     },
     {
@@ -2495,11 +2495,11 @@
       "feasible_count": 5,
       "incomplete_count": 0,
       "infeasible_count": 0,
-      "mean": 0.0025563200004398825,
+      "mean": 0.0018450951998602249,
       "method": "bt_fc",
       "metric": "solver_time_seconds",
       "scenario_id": "weekly-capacity-4",
-      "standard_deviation": 7.426481107850548e-05,
+      "standard_deviation": 1.5483308247669943e-05,
       "valid_count": 5
     },
     {
@@ -2508,11 +2508,11 @@
       "feasible_count": 5,
       "incomplete_count": 0,
       "infeasible_count": 0,
-      "mean": 0.0036836600047536194,
+      "mean": 0.0027173140000741115,
       "method": "bt_fc",
       "metric": "wall_time_seconds",
       "scenario_id": "weekly-capacity-4",
-      "standard_deviation": 0.00014249145293789538,
+      "standard_deviation": 4.0676432907707174e-05,
       "valid_count": 5
     },
     {
@@ -2651,11 +2651,11 @@
       "feasible_count": 0,
       "incomplete_count": 0,
       "infeasible_count": 5,
-      "mean": 0.0019778599962592125,
+      "mean": 0.0013323147999471986,
       "method": "bt_fc_ac3",
       "metric": "solver_time_seconds",
       "scenario_id": "weekly-capacity-2",
-      "standard_deviation": 0.00033149475278557893,
+      "standard_deviation": 6.589461648356705e-05,
       "valid_count": 5
     },
     {
@@ -2664,11 +2664,11 @@
       "feasible_count": 0,
       "incomplete_count": 0,
       "infeasible_count": 5,
-      "mean": 0.001991860000998713,
+      "mean": 0.0013456748001772212,
       "method": "bt_fc_ac3",
       "metric": "wall_time_seconds",
       "scenario_id": "weekly-capacity-2",
-      "standard_deviation": 0.0003315840072153284,
+      "standard_deviation": 7.181353087660504e-05,
       "valid_count": 5
     },
     {
@@ -2807,11 +2807,11 @@
       "feasible_count": 5,
       "incomplete_count": 0,
       "infeasible_count": 0,
-      "mean": 0.0036090999958105384,
+      "mean": 0.0033277979997365036,
       "method": "bt_fc_ac3",
       "metric": "solver_time_seconds",
       "scenario_id": "weekly-capacity-3",
-      "standard_deviation": 3.1213447612511354e-05,
+      "standard_deviation": 0.000310645922889165,
       "valid_count": 5
     },
     {
@@ -2820,11 +2820,11 @@
       "feasible_count": 5,
       "incomplete_count": 0,
       "infeasible_count": 0,
-      "mean": 0.004730820000986569,
+      "mean": 0.004407134399843926,
       "method": "bt_fc_ac3",
       "metric": "wall_time_seconds",
       "scenario_id": "weekly-capacity-3",
-      "standard_deviation": 3.556953904823764e-05,
+      "standard_deviation": 0.0003545561478123746,
       "valid_count": 5
     },
     {
@@ -2963,11 +2963,11 @@
       "feasible_count": 5,
       "incomplete_count": 0,
       "infeasible_count": 0,
-      "mean": 0.0035907200013753026,
+      "mean": 0.002863440600958711,
       "method": "bt_fc_ac3",
       "metric": "solver_time_seconds",
       "scenario_id": "weekly-capacity-4",
-      "standard_deviation": 3.411689406579447e-05,
+      "standard_deviation": 0.00010464509029126748,
       "valid_count": 5
     },
     {
@@ -2976,11 +2976,11 @@
       "feasible_count": 5,
       "incomplete_count": 0,
       "infeasible_count": 0,
-      "mean": 0.004696760000661016,
+      "mean": 0.004037529800007178,
       "method": "bt_fc_ac3",
       "metric": "wall_time_seconds",
       "scenario_id": "weekly-capacity-4",
-      "standard_deviation": 3.948193140510912e-05,
+      "standard_deviation": 0.0004382169576153374,
       "valid_count": 5
     }
   ]

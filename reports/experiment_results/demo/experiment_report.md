@@ -2,7 +2,7 @@
 
 **Configuration status:** SYNTHETIC DEMO ONLY — not production evidence.
 
-Profile manifest: `C:\Users\janam\OneDrive\Desktop\3 sem 1\Intelligent systems\project 1\assessment-aware-study-planner\reports\experiment_results\profiles_fff_2014J.json` (30 selected FFF 2014J students).
+Profile manifest: `/mnt/c/Users/janam/OneDrive/Desktop/3 sem 1/Intelligent systems/project 1/assessment-aware-study-planner/reports/experiment_results/profiles_fff_2014J.json` (30 selected FFF 2014J students).
 Experiment seeds: `[42, 123, 2025, 31415, 271828]`.
 Demo NN artifact digest: `ab6d3a07b9fc4768e2e5341583f9a8e49c8e03e0520b26cf3daa9d7372e03e9a`.
 Average baseline artifact identity: `0b3325d145d56a8aad8a48df2203b6db4d47bdf70b4e8256db00e312d09457a0`.
@@ -30,6 +30,8 @@ the first evaluation time repeated in the seed rows.
 
 Run-level and mean/sample-standard-deviation metric tables are in the
 matching CSV/JSON files. SVG comparisons are generated from those same
-run records. These results demonstrate the experiment pipeline; they
-must not be used to make claims about approved planner settings or a
-causal effect of study sessions on marks.
+run records. Per-profile allocations, verified timetables, and predicted
+marks are in `prediction_plans.csv` and `prediction_plans.json`. The
+weekly slot catalog in those files gives week, weekday, and UTC times.
+These synthetic results demonstrate the experiment pipeline; they must
+not be used as approved planner settings or causal evidence.

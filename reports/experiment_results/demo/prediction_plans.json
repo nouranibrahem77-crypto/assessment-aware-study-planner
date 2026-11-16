@@ -1,0 +1,4733 @@
+{
+  "configuration_status": "SYNTHETIC_DEMO_ONLY_NOT_PRODUCTION",
+  "methods": [
+    "nn",
+    "average"
+  ],
+  "plans": [
+    {
+      "allocations": [
+        {
+          "assignment_identity": "a_34899",
+          "session_count": 0,
+          "weekly_sessions": [
+            0,
+            0,
+            0,
+            0
+          ]
+        },
+        {
+          "assignment_identity": "a_34900",
+          "session_count": 0,
+          "weekly_sessions": [
+            0,
+            0,
+            0,
+            0
+          ]
+        },
+        {
+          "assignment_identity": "a_34901",
+          "session_count": 0,
+          "weekly_sessions": [
+            0,
+            0,
+            0,
+            0
+          ]
+        }
+      ],
+      "artifact_digest": "ab6d3a07b9fc4768e2e5341583f9a8e49c8e03e0520b26cf3daa9d7372e03e9a",
+      "configuration_status": "SYNTHETIC_DEMO_ONLY_NOT_PRODUCTION",
+      "error_message": null,
+      "error_type": null,
+      "failure_reasons": [],
+      "method": "nn",
+      "model_identity": "040c2af6327e413c71769c29f5fd27802dba65bd18d970d92e68930af70c7679",
+      "model_mode": "model_a_strict",
+      "outcome": "target_achieved",
+      "predicted_marks": [
+        {
+          "assignment_identity": "a_34899",
+          "predicted_mark": 86.22099304199219,
+          "target_mark": 60.0
+        },
+        {
+          "assignment_identity": "a_34900",
+          "predicted_mark": 74.59243774414062,
+          "target_mark": 60.0
+        },
+        {
+          "assignment_identity": "a_34901",
+          "predicted_mark": 70.22737884521484,
+          "target_mark": 60.0
+        }
+      ],
+      "search_complete": false,
+      "seed": 42,
+      "status": "feasible",
+      "student_id": "1631797",
+      "weekly_timetable": [
+        {
+          "assignment_identity": "a_34899",
+          "sessions": []
+        },
+        {
+          "assignment_identity": "a_34900",
+          "sessions": []
+        },
+        {
+          "assignment_identity": "a_34901",
+          "sessions": []
+        }
+      ]
+    },
+    {
+      "allocations": [
+        {
+          "assignment_identity": "a_34899",
+          "session_count": 0,
+          "weekly_sessions": [
+            0,
+            0,
+            0,
+            0
+          ]
+        },
+        {
+          "assignment_identity": "a_34900",
+          "session_count": 0,
+          "weekly_sessions": [
+            0,
+            0,
+            0,
+            0
+          ]
+        },
+        {
+          "assignment_identity": "a_34901",
+          "session_count": 0,
+          "weekly_sessions": [
+            0,
+            0,
+            0,
+            0
+          ]
+        }
+      ],
+      "artifact_digest": "674e212ec06c3233bcb6010af907ec33ba6c68e3a9a867a8fed589866d8682c8",
+      "configuration_status": "SYNTHETIC_DEMO_ONLY_NOT_PRODUCTION",
+      "error_message": null,
+      "error_type": null,
+      "failure_reasons": [],
+      "method": "average",
+      "model_identity": "0b3325d145d56a8aad8a48df2203b6db4d47bdf70b4e8256db00e312d09457a0",
+      "model_mode": "simple_average_mark_baseline",
+      "outcome": "target_achieved",
+      "predicted_marks": [
+        {
+          "assignment_identity": "a_34899",
+          "predicted_mark": 78.76094970074121,
+          "target_mark": 60.0
+        },
+        {
+          "assignment_identity": "a_34900",
+          "predicted_mark": 78.76094970074121,
+          "target_mark": 60.0
+        },
+        {
+          "assignment_identity": "a_34901",
+          "predicted_mark": 78.76094970074121,
+          "target_mark": 60.0
+        }
+      ],
+      "search_complete": false,
+      "seed": 42,
+      "status": "feasible",
+      "student_id": "1631797",
+      "weekly_timetable": [
+        {
+          "assignment_identity": "a_34899",
+          "sessions": []
+        },
+        {
+          "assignment_identity": "a_34900",
+          "sessions": []
+        },
+        {
+          "assignment_identity": "a_34901",
+          "sessions": []
+        }
+      ]
+    },
+    {
+      "allocations": [
+        {
+          "assignment_identity": "a_34899",
+          "session_count": 0,
+          "weekly_sessions": [
+            0,
+            0,
+            0,
+            0
+          ]
+        },
+        {
+          "assignment_identity": "a_34900",
+          "session_count": 0,
+          "weekly_sessions": [
+            0,
+            0,
+            0,
+            0
+          ]
+        },
+        {
+          "assignment_identity": "a_34901",
+          "session_count": 0,
+          "weekly_sessions": [
+            0,
+            0,
+            0,
+            0
+          ]
+        }
+      ],
+      "artifact_digest": "ab6d3a07b9fc4768e2e5341583f9a8e49c8e03e0520b26cf3daa9d7372e03e9a",
+      "configuration_status": "SYNTHETIC_DEMO_ONLY_NOT_PRODUCTION",
+      "error_message": null,
+      "error_type": null,
+      "failure_reasons": [],
+      "method": "nn",
+      "model_identity": "040c2af6327e413c71769c29f5fd27802dba65bd18d970d92e68930af70c7679",
+      "model_mode": "model_a_strict",
+      "outcome": "target_achieved",
+      "predicted_marks": [
+        {
+          "assignment_identity": "a_34899",
+          "predicted_mark": 74.52274322509766,
+          "target_mark": 60.0
+        },
+        {
+          "assignment_identity": "a_34900",
+          "predicted_mark": 67.03865814208984,
+          "target_mark": 60.0
+        },
+        {
+          "assignment_identity": "a_34901",
+          "predicted_mark": 68.23058319091797,
+          "target_mark": 60.0
+        }
+      ],
+      "search_complete": false,
+      "seed": 42,
+      "status": "feasible",
+      "student_id": "2067799",
+      "weekly_timetable": [
+        {
+          "assignment_identity": "a_34899",
+          "sessions": []
+        },
+        {
+          "assignment_identity": "a_34900",
+          "sessions": []
+        },
+        {
+          "assignment_identity": "a_34901",
+          "sessions": []
+        }
+      ]
+    },
+    {
+      "allocations": [
+        {
+          "assignment_identity": "a_34899",
+          "session_count": 0,
+          "weekly_sessions": [
+            0,
+            0,
+            0,
+            0
+          ]
+        },
+        {
+          "assignment_identity": "a_34900",
+          "session_count": 0,
+          "weekly_sessions": [
+            0,
+            0,
+            0,
+            0
+          ]
+        },
+        {
+          "assignment_identity": "a_34901",
+          "session_count": 0,
+          "weekly_sessions": [
+            0,
+            0,
+            0,
+            0
+          ]
+        }
+      ],
+      "artifact_digest": "674e212ec06c3233bcb6010af907ec33ba6c68e3a9a867a8fed589866d8682c8",
+      "configuration_status": "SYNTHETIC_DEMO_ONLY_NOT_PRODUCTION",
+      "error_message": null,
+      "error_type": null,
+      "failure_reasons": [],
+      "method": "average",
+      "model_identity": "0b3325d145d56a8aad8a48df2203b6db4d47bdf70b4e8256db00e312d09457a0",
+      "model_mode": "simple_average_mark_baseline",
+      "outcome": "target_achieved",
+      "predicted_marks": [
+        {
+          "assignment_identity": "a_34899",
+          "predicted_mark": 78.76094970074121,
+          "target_mark": 60.0
+        },
+        {
+          "assignment_identity": "a_34900",
+          "predicted_mark": 78.76094970074121,
+          "target_mark": 60.0
+        },
+        {
+          "assignment_identity": "a_34901",
+          "predicted_mark": 78.76094970074121,
+          "target_mark": 60.0
+        }
+      ],
+      "search_complete": false,
+      "seed": 42,
+      "status": "feasible",
+      "student_id": "2067799",
+      "weekly_timetable": [
+        {
+          "assignment_identity": "a_34899",
+          "sessions": []
+        },
+        {
+          "assignment_identity": "a_34900",
+          "sessions": []
+        },
+        {
+          "assignment_identity": "a_34901",
+          "sessions": []
+        }
+      ]
+    },
+    {
+      "allocations": [
+        {
+          "assignment_identity": "a_34899",
+          "session_count": 0,
+          "weekly_sessions": [
+            0,
+            0,
+            0,
+            0
+          ]
+        },
+        {
+          "assignment_identity": "a_34900",
+          "session_count": 0,
+          "weekly_sessions": [
+            0,
+            0,
+            0,
+            0
+          ]
+        },
+        {
+          "assignment_identity": "a_34901",
+          "session_count": 0,
+          "weekly_sessions": [
+            0,
+            0,
+            0,
+            0
+          ]
+        }
+      ],
+      "artifact_digest": "ab6d3a07b9fc4768e2e5341583f9a8e49c8e03e0520b26cf3daa9d7372e03e9a",
+      "configuration_status": "SYNTHETIC_DEMO_ONLY_NOT_PRODUCTION",
+      "error_message": null,
+      "error_type": null,
+      "failure_reasons": [],
+      "method": "nn",
+      "model_identity": "040c2af6327e413c71769c29f5fd27802dba65bd18d970d92e68930af70c7679",
+      "model_mode": "model_a_strict",
+      "outcome": "target_achieved",
+      "predicted_marks": [
+        {
+          "assignment_identity": "a_34899",
+          "predicted_mark": 82.79611206054688,
+          "target_mark": 60.0
+        },
+        {
+          "assignment_identity": "a_34900",
+          "predicted_mark": 79.0032730102539,
+          "target_mark": 60.0
+        },
+        {
+          "assignment_identity": "a_34901",
+          "predicted_mark": 78.5650405883789,
+          "target_mark": 60.0
+        }
+      ],
+      "search_complete": false,
+      "seed": 42,
+      "status": "feasible",
+      "student_id": "2140300",
+      "weekly_timetable": [
+        {
+          "assignment_identity": "a_34899",
+          "sessions": []
+        },
+        {
+          "assignment_identity": "a_34900",
+          "sessions": []
+        },
+        {
+          "assignment_identity": "a_34901",
+          "sessions": []
+        }
+      ]
+    },
+    {
+      "allocations": [
+        {
+          "assignment_identity": "a_34899",
+          "session_count": 0,
+          "weekly_sessions": [
+            0,
+            0,
+            0,
+            0
+          ]
+        },
+        {
+          "assignment_identity": "a_34900",
+          "session_count": 0,
+          "weekly_sessions": [
+            0,
+            0,
+            0,
+            0
+          ]
+        },
+        {
+          "assignment_identity": "a_34901",
+          "session_count": 0,
+          "weekly_sessions": [
+            0,
+            0,
+            0,
+            0
+          ]
+        }
+      ],
+      "artifact_digest": "674e212ec06c3233bcb6010af907ec33ba6c68e3a9a867a8fed589866d8682c8",
+      "configuration_status": "SYNTHETIC_DEMO_ONLY_NOT_PRODUCTION",
+      "error_message": null,
+      "error_type": null,
+      "failure_reasons": [],
+      "method": "average",
+      "model_identity": "0b3325d145d56a8aad8a48df2203b6db4d47bdf70b4e8256db00e312d09457a0",
+      "model_mode": "simple_average_mark_baseline",
+      "outcome": "target_achieved",
+      "predicted_marks": [
+        {
+          "assignment_identity": "a_34899",
+          "predicted_mark": 78.76094970074121,
+          "target_mark": 60.0
+        },
+        {
+          "assignment_identity": "a_34900",
+          "predicted_mark": 78.76094970074121,
+          "target_mark": 60.0
+        },
+        {
+          "assignment_identity": "a_34901",
+          "predicted_mark": 78.76094970074121,
+          "target_mark": 60.0
+        }
+      ],
+      "search_complete": false,
+      "seed": 42,
+      "status": "feasible",
+      "student_id": "2140300",
+      "weekly_timetable": [
+        {
+          "assignment_identity": "a_34899",
+          "sessions": []
+        },
+        {
+          "assignment_identity": "a_34900",
+          "sessions": []
+        },
+        {
+          "assignment_identity": "a_34901",
+          "sessions": []
+        }
+      ]
+    },
+    {
+      "allocations": [
+        {
+          "assignment_identity": "a_34899",
+          "session_count": 0,
+          "weekly_sessions": [
+            0,
+            0,
+            0,
+            0
+          ]
+        },
+        {
+          "assignment_identity": "a_34900",
+          "session_count": 0,
+          "weekly_sessions": [
+            0,
+            0,
+            0,
+            0
+          ]
+        },
+        {
+          "assignment_identity": "a_34901",
+          "session_count": 0,
+          "weekly_sessions": [
+            0,
+            0,
+            0,
+            0
+          ]
+        }
+      ],
+      "artifact_digest": "ab6d3a07b9fc4768e2e5341583f9a8e49c8e03e0520b26cf3daa9d7372e03e9a",
+      "configuration_status": "SYNTHETIC_DEMO_ONLY_NOT_PRODUCTION",
+      "error_message": null,
+      "error_type": null,
+      "failure_reasons": [],
+      "method": "nn",
+      "model_identity": "040c2af6327e413c71769c29f5fd27802dba65bd18d970d92e68930af70c7679",
+      "model_mode": "model_a_strict",
+      "outcome": "target_achieved",
+      "predicted_marks": [
+        {
+          "assignment_identity": "a_34899",
+          "predicted_mark": 75.71549224853516,
+          "target_mark": 60.0
+        },
+        {
+          "assignment_identity": "a_34900",
+          "predicted_mark": 72.16280364990234,
+          "target_mark": 60.0
+        },
+        {
+          "assignment_identity": "a_34901",
+          "predicted_mark": 72.88609313964844,
+          "target_mark": 60.0
+        }
+      ],
+      "search_complete": false,
+      "seed": 42,
+      "status": "feasible",
+      "student_id": "2154361",
+      "weekly_timetable": [
+        {
+          "assignment_identity": "a_34899",
+          "sessions": []
+        },
+        {
+          "assignment_identity": "a_34900",
+          "sessions": []
+        },
+        {
+          "assignment_identity": "a_34901",
+          "sessions": []
+        }
+      ]
+    },
+    {
+      "allocations": [
+        {
+          "assignment_identity": "a_34899",
+          "session_count": 0,
+          "weekly_sessions": [
+            0,
+            0,
+            0,
+            0
+          ]
+        },
+        {
+          "assignment_identity": "a_34900",
+          "session_count": 0,
+          "weekly_sessions": [
+            0,
+            0,
+            0,
+            0
+          ]
+        },
+        {
+          "assignment_identity": "a_34901",
+          "session_count": 0,
+          "weekly_sessions": [
+            0,
+            0,
+            0,
+            0
+          ]
+        }
+      ],
+      "artifact_digest": "674e212ec06c3233bcb6010af907ec33ba6c68e3a9a867a8fed589866d8682c8",
+      "configuration_status": "SYNTHETIC_DEMO_ONLY_NOT_PRODUCTION",
+      "error_message": null,
+      "error_type": null,
+      "failure_reasons": [],
+      "method": "average",
+      "model_identity": "0b3325d145d56a8aad8a48df2203b6db4d47bdf70b4e8256db00e312d09457a0",
+      "model_mode": "simple_average_mark_baseline",
+      "outcome": "target_achieved",
+      "predicted_marks": [
+        {
+          "assignment_identity": "a_34899",
+          "predicted_mark": 78.76094970074121,
+          "target_mark": 60.0
+        },
+        {
+          "assignment_identity": "a_34900",
+          "predicted_mark": 78.76094970074121,
+          "target_mark": 60.0
+        },
+        {
+          "assignment_identity": "a_34901",
+          "predicted_mark": 78.76094970074121,
+          "target_mark": 60.0
+        }
+      ],
+      "search_complete": false,
+      "seed": 42,
+      "status": "feasible",
+      "student_id": "2154361",
+      "weekly_timetable": [
+        {
+          "assignment_identity": "a_34899",
+          "sessions": []
+        },
+        {
+          "assignment_identity": "a_34900",
+          "sessions": []
+        },
+        {
+          "assignment_identity": "a_34901",
+          "sessions": []
+        }
+      ]
+    },
+    {
+      "allocations": [
+        {
+          "assignment_identity": "a_34899",
+          "session_count": 0,
+          "weekly_sessions": [
+            0,
+            0,
+            0,
+            0
+          ]
+        },
+        {
+          "assignment_identity": "a_34900",
+          "session_count": 0,
+          "weekly_sessions": [
+            0,
+            0,
+            0,
+            0
+          ]
+        },
+        {
+          "assignment_identity": "a_34901",
+          "session_count": 0,
+          "weekly_sessions": [
+            0,
+            0,
+            0,
+            0
+          ]
+        }
+      ],
+      "artifact_digest": "ab6d3a07b9fc4768e2e5341583f9a8e49c8e03e0520b26cf3daa9d7372e03e9a",
+      "configuration_status": "SYNTHETIC_DEMO_ONLY_NOT_PRODUCTION",
+      "error_message": null,
+      "error_type": null,
+      "failure_reasons": [],
+      "method": "nn",
+      "model_identity": "040c2af6327e413c71769c29f5fd27802dba65bd18d970d92e68930af70c7679",
+      "model_mode": "model_a_strict",
+      "outcome": "target_achieved",
+      "predicted_marks": [
+        {
+          "assignment_identity": "a_34899",
+          "predicted_mark": 82.36203002929688,
+          "target_mark": 60.0
+        },
+        {
+          "assignment_identity": "a_34900",
+          "predicted_mark": 88.22709655761719,
+          "target_mark": 60.0
+        },
+        {
+          "assignment_identity": "a_34901",
+          "predicted_mark": 84.64700317382812,
+          "target_mark": 60.0
+        }
+      ],
+      "search_complete": false,
+      "seed": 42,
+      "status": "feasible",
+      "student_id": "2301830",
+      "weekly_timetable": [
+        {
+          "assignment_identity": "a_34899",
+          "sessions": []
+        },
+        {
+          "assignment_identity": "a_34900",
+          "sessions": []
+        },
+        {
+          "assignment_identity": "a_34901",
+          "sessions": []
+        }
+      ]
+    },
+    {
+      "allocations": [
+        {
+          "assignment_identity": "a_34899",
+          "session_count": 0,
+          "weekly_sessions": [
+            0,
+            0,
+            0,
+            0
+          ]
+        },
+        {
+          "assignment_identity": "a_34900",
+          "session_count": 0,
+          "weekly_sessions": [
+            0,
+            0,
+            0,
+            0
+          ]
+        },
+        {
+          "assignment_identity": "a_34901",
+          "session_count": 0,
+          "weekly_sessions": [
+            0,
+            0,
+            0,
+            0
+          ]
+        }
+      ],
+      "artifact_digest": "674e212ec06c3233bcb6010af907ec33ba6c68e3a9a867a8fed589866d8682c8",
+      "configuration_status": "SYNTHETIC_DEMO_ONLY_NOT_PRODUCTION",
+      "error_message": null,
+      "error_type": null,
+      "failure_reasons": [],
+      "method": "average",
+      "model_identity": "0b3325d145d56a8aad8a48df2203b6db4d47bdf70b4e8256db00e312d09457a0",
+      "model_mode": "simple_average_mark_baseline",
+      "outcome": "target_achieved",
+      "predicted_marks": [
+        {
+          "assignment_identity": "a_34899",
+          "predicted_mark": 78.76094970074121,
+          "target_mark": 60.0
+        },
+        {
+          "assignment_identity": "a_34900",
+          "predicted_mark": 78.76094970074121,
+          "target_mark": 60.0
+        },
+        {
+          "assignment_identity": "a_34901",
+          "predicted_mark": 78.76094970074121,
+          "target_mark": 60.0
+        }
+      ],
+      "search_complete": false,
+      "seed": 42,
+      "status": "feasible",
+      "student_id": "2301830",
+      "weekly_timetable": [
+        {
+          "assignment_identity": "a_34899",
+          "sessions": []
+        },
+        {
+          "assignment_identity": "a_34900",
+          "sessions": []
+        },
+        {
+          "assignment_identity": "a_34901",
+          "sessions": []
+        }
+      ]
+    },
+    {
+      "allocations": [
+        {
+          "assignment_identity": "a_34899",
+          "session_count": 0,
+          "weekly_sessions": [
+            0,
+            0,
+            0,
+            0
+          ]
+        },
+        {
+          "assignment_identity": "a_34900",
+          "session_count": 0,
+          "weekly_sessions": [
+            0,
+            0,
+            0,
+            0
+          ]
+        },
+        {
+          "assignment_identity": "a_34901",
+          "session_count": 0,
+          "weekly_sessions": [
+            0,
+            0,
+            0,
+            0
+          ]
+        }
+      ],
+      "artifact_digest": "ab6d3a07b9fc4768e2e5341583f9a8e49c8e03e0520b26cf3daa9d7372e03e9a",
+      "configuration_status": "SYNTHETIC_DEMO_ONLY_NOT_PRODUCTION",
+      "error_message": null,
+      "error_type": null,
+      "failure_reasons": [],
+      "method": "nn",
+      "model_identity": "040c2af6327e413c71769c29f5fd27802dba65bd18d970d92e68930af70c7679",
+      "model_mode": "model_a_strict",
+      "outcome": "target_achieved",
+      "predicted_marks": [
+        {
+          "assignment_identity": "a_34899",
+          "predicted_mark": 78.24943542480469,
+          "target_mark": 60.0
+        },
+        {
+          "assignment_identity": "a_34900",
+          "predicted_mark": 80.22750091552734,
+          "target_mark": 60.0
+        },
+        {
+          "assignment_identity": "a_34901",
+          "predicted_mark": 67.66217041015625,
+          "target_mark": 60.0
+        }
+      ],
+      "search_complete": false,
+      "seed": 42,
+      "status": "feasible",
+      "student_id": "235768",
+      "weekly_timetable": [
+        {
+          "assignment_identity": "a_34899",
+          "sessions": []
+        },
+        {
+          "assignment_identity": "a_34900",
+          "sessions": []
+        },
+        {
+          "assignment_identity": "a_34901",
+          "sessions": []
+        }
+      ]
+    },
+    {
+      "allocations": [
+        {
+          "assignment_identity": "a_34899",
+          "session_count": 0,
+          "weekly_sessions": [
+            0,
+            0,
+            0,
+            0
+          ]
+        },
+        {
+          "assignment_identity": "a_34900",
+          "session_count": 0,
+          "weekly_sessions": [
+            0,
+            0,
+            0,
+            0
+          ]
+        },
+        {
+          "assignment_identity": "a_34901",
+          "session_count": 0,
+          "weekly_sessions": [
+            0,
+            0,
+            0,
+            0
+          ]
+        }
+      ],
+      "artifact_digest": "674e212ec06c3233bcb6010af907ec33ba6c68e3a9a867a8fed589866d8682c8",
+      "configuration_status": "SYNTHETIC_DEMO_ONLY_NOT_PRODUCTION",
+      "error_message": null,
+      "error_type": null,
+      "failure_reasons": [],
+      "method": "average",
+      "model_identity": "0b3325d145d56a8aad8a48df2203b6db4d47bdf70b4e8256db00e312d09457a0",
+      "model_mode": "simple_average_mark_baseline",
+      "outcome": "target_achieved",
+      "predicted_marks": [
+        {
+          "assignment_identity": "a_34899",
+          "predicted_mark": 78.76094970074121,
+          "target_mark": 60.0
+        },
+        {
+          "assignment_identity": "a_34900",
+          "predicted_mark": 78.76094970074121,
+          "target_mark": 60.0
+        },
+        {
+          "assignment_identity": "a_34901",
+          "predicted_mark": 78.76094970074121,
+          "target_mark": 60.0
+        }
+      ],
+      "search_complete": false,
+      "seed": 42,
+      "status": "feasible",
+      "student_id": "235768",
+      "weekly_timetable": [
+        {
+          "assignment_identity": "a_34899",
+          "sessions": []
+        },
+        {
+          "assignment_identity": "a_34900",
+          "sessions": []
+        },
+        {
+          "assignment_identity": "a_34901",
+          "sessions": []
+        }
+      ]
+    },
+    {
+      "allocations": [
+        {
+          "assignment_identity": "a_34899",
+          "session_count": 0,
+          "weekly_sessions": [
+            0,
+            0,
+            0,
+            0
+          ]
+        },
+        {
+          "assignment_identity": "a_34900",
+          "session_count": 0,
+          "weekly_sessions": [
+            0,
+            0,
+            0,
+            0
+          ]
+        },
+        {
+          "assignment_identity": "a_34901",
+          "session_count": 0,
+          "weekly_sessions": [
+            0,
+            0,
+            0,
+            0
+          ]
+        }
+      ],
+      "artifact_digest": "ab6d3a07b9fc4768e2e5341583f9a8e49c8e03e0520b26cf3daa9d7372e03e9a",
+      "configuration_status": "SYNTHETIC_DEMO_ONLY_NOT_PRODUCTION",
+      "error_message": null,
+      "error_type": null,
+      "failure_reasons": [],
+      "method": "nn",
+      "model_identity": "040c2af6327e413c71769c29f5fd27802dba65bd18d970d92e68930af70c7679",
+      "model_mode": "model_a_strict",
+      "outcome": "target_achieved",
+      "predicted_marks": [
+        {
+          "assignment_identity": "a_34899",
+          "predicted_mark": 77.29492950439453,
+          "target_mark": 60.0
+        },
+        {
+          "assignment_identity": "a_34900",
+          "predicted_mark": 79.8073501586914,
+          "target_mark": 60.0
+        },
+        {
+          "assignment_identity": "a_34901",
+          "predicted_mark": 73.7428970336914,
+          "target_mark": 60.0
+        }
+      ],
+      "search_complete": false,
+      "seed": 42,
+      "status": "feasible",
+      "student_id": "2399758",
+      "weekly_timetable": [
+        {
+          "assignment_identity": "a_34899",
+          "sessions": []
+        },
+        {
+          "assignment_identity": "a_34900",
+          "sessions": []
+        },
+        {
+          "assignment_identity": "a_34901",
+          "sessions": []
+        }
+      ]
+    },
+    {
+      "allocations": [
+        {
+          "assignment_identity": "a_34899",
+          "session_count": 0,
+          "weekly_sessions": [
+            0,
+            0,
+            0,
+            0
+          ]
+        },
+        {
+          "assignment_identity": "a_34900",
+          "session_count": 0,
+          "weekly_sessions": [
+            0,
+            0,
+            0,
+            0
+          ]
+        },
+        {
+          "assignment_identity": "a_34901",
+          "session_count": 0,
+          "weekly_sessions": [
+            0,
+            0,
+            0,
+            0
+          ]
+        }
+      ],
+      "artifact_digest": "674e212ec06c3233bcb6010af907ec33ba6c68e3a9a867a8fed589866d8682c8",
+      "configuration_status": "SYNTHETIC_DEMO_ONLY_NOT_PRODUCTION",
+      "error_message": null,
+      "error_type": null,
+      "failure_reasons": [],
+      "method": "average",
+      "model_identity": "0b3325d145d56a8aad8a48df2203b6db4d47bdf70b4e8256db00e312d09457a0",
+      "model_mode": "simple_average_mark_baseline",
+      "outcome": "target_achieved",
+      "predicted_marks": [
+        {
+          "assignment_identity": "a_34899",
+          "predicted_mark": 78.76094970074121,
+          "target_mark": 60.0
+        },
+        {
+          "assignment_identity": "a_34900",
+          "predicted_mark": 78.76094970074121,
+          "target_mark": 60.0
+        },
+        {
+          "assignment_identity": "a_34901",
+          "predicted_mark": 78.76094970074121,
+          "target_mark": 60.0
+        }
+      ],
+      "search_complete": false,
+      "seed": 42,
+      "status": "feasible",
+      "student_id": "2399758",
+      "weekly_timetable": [
+        {
+          "assignment_identity": "a_34899",
+          "sessions": []
+        },
+        {
+          "assignment_identity": "a_34900",
+          "sessions": []
+        },
+        {
+          "assignment_identity": "a_34901",
+          "sessions": []
+        }
+      ]
+    },
+    {
+      "allocations": [
+        {
+          "assignment_identity": "a_34899",
+          "session_count": 0,
+          "weekly_sessions": [
+            0,
+            0,
+            0,
+            0
+          ]
+        },
+        {
+          "assignment_identity": "a_34900",
+          "session_count": 0,
+          "weekly_sessions": [
+            0,
+            0,
+            0,
+            0
+          ]
+        },
+        {
+          "assignment_identity": "a_34901",
+          "session_count": 0,
+          "weekly_sessions": [
+            0,
+            0,
+            0,
+            0
+          ]
+        }
+      ],
+      "artifact_digest": "ab6d3a07b9fc4768e2e5341583f9a8e49c8e03e0520b26cf3daa9d7372e03e9a",
+      "configuration_status": "SYNTHETIC_DEMO_ONLY_NOT_PRODUCTION",
+      "error_message": null,
+      "error_type": null,
+      "failure_reasons": [],
+      "method": "nn",
+      "model_identity": "040c2af6327e413c71769c29f5fd27802dba65bd18d970d92e68930af70c7679",
+      "model_mode": "model_a_strict",
+      "outcome": "target_achieved",
+      "predicted_marks": [
+        {
+          "assignment_identity": "a_34899",
+          "predicted_mark": 69.89395141601562,
+          "target_mark": 60.0
+        },
+        {
+          "assignment_identity": "a_34900",
+          "predicted_mark": 73.57288360595703,
+          "target_mark": 60.0
+        },
+        {
+          "assignment_identity": "a_34901",
+          "predicted_mark": 72.41255950927734,
+          "target_mark": 60.0
+        }
+      ],
+      "search_complete": false,
+      "seed": 42,
+      "status": "feasible",
+      "student_id": "372509",
+      "weekly_timetable": [
+        {
+          "assignment_identity": "a_34899",
+          "sessions": []
+        },
+        {
+          "assignment_identity": "a_34900",
+          "sessions": []
+        },
+        {
+          "assignment_identity": "a_34901",
+          "sessions": []
+        }
+      ]
+    },
+    {
+      "allocations": [
+        {
+          "assignment_identity": "a_34899",
+          "session_count": 0,
+          "weekly_sessions": [
+            0,
+            0,
+            0,
+            0
+          ]
+        },
+        {
+          "assignment_identity": "a_34900",
+          "session_count": 0,
+          "weekly_sessions": [
+            0,
+            0,
+            0,
+            0
+          ]
+        },
+        {
+          "assignment_identity": "a_34901",
+          "session_count": 0,
+          "weekly_sessions": [
+            0,
+            0,
+            0,
+            0
+          ]
+        }
+      ],
+      "artifact_digest": "674e212ec06c3233bcb6010af907ec33ba6c68e3a9a867a8fed589866d8682c8",
+      "configuration_status": "SYNTHETIC_DEMO_ONLY_NOT_PRODUCTION",
+      "error_message": null,
+      "error_type": null,
+      "failure_reasons": [],
+      "method": "average",
+      "model_identity": "0b3325d145d56a8aad8a48df2203b6db4d47bdf70b4e8256db00e312d09457a0",
+      "model_mode": "simple_average_mark_baseline",
+      "outcome": "target_achieved",
+      "predicted_marks": [
+        {
+          "assignment_identity": "a_34899",
+          "predicted_mark": 78.76094970074121,
+          "target_mark": 60.0
+        },
+        {
+          "assignment_identity": "a_34900",
+          "predicted_mark": 78.76094970074121,
+          "target_mark": 60.0
+        },
+        {
+          "assignment_identity": "a_34901",
+          "predicted_mark": 78.76094970074121,
+          "target_mark": 60.0
+        }
+      ],
+      "search_complete": false,
+      "seed": 42,
+      "status": "feasible",
+      "student_id": "372509",
+      "weekly_timetable": [
+        {
+          "assignment_identity": "a_34899",
+          "sessions": []
+        },
+        {
+          "assignment_identity": "a_34900",
+          "sessions": []
+        },
+        {
+          "assignment_identity": "a_34901",
+          "sessions": []
+        }
+      ]
+    },
+    {
+      "allocations": [
+        {
+          "assignment_identity": "a_34899",
+          "session_count": 0,
+          "weekly_sessions": [
+            0,
+            0,
+            0,
+            0
+          ]
+        },
+        {
+          "assignment_identity": "a_34900",
+          "session_count": 0,
+          "weekly_sessions": [
+            0,
+            0,
+            0,
+            0
+          ]
+        },
+        {
+          "assignment_identity": "a_34901",
+          "session_count": 0,
+          "weekly_sessions": [
+            0,
+            0,
+            0,
+            0
+          ]
+        }
+      ],
+      "artifact_digest": "ab6d3a07b9fc4768e2e5341583f9a8e49c8e03e0520b26cf3daa9d7372e03e9a",
+      "configuration_status": "SYNTHETIC_DEMO_ONLY_NOT_PRODUCTION",
+      "error_message": null,
+      "error_type": null,
+      "failure_reasons": [],
+      "method": "nn",
+      "model_identity": "040c2af6327e413c71769c29f5fd27802dba65bd18d970d92e68930af70c7679",
+      "model_mode": "model_a_strict",
+      "outcome": "target_achieved",
+      "predicted_marks": [
+        {
+          "assignment_identity": "a_34899",
+          "predicted_mark": 71.47705078125,
+          "target_mark": 60.0
+        },
+        {
+          "assignment_identity": "a_34900",
+          "predicted_mark": 69.6612777709961,
+          "target_mark": 60.0
+        },
+        {
+          "assignment_identity": "a_34901",
+          "predicted_mark": 67.64266967773438,
+          "target_mark": 60.0
+        }
+      ],
+      "search_complete": false,
+      "seed": 42,
+      "status": "feasible",
+      "student_id": "413180",
+      "weekly_timetable": [
+        {
+          "assignment_identity": "a_34899",
+          "sessions": []
+        },
+        {
+          "assignment_identity": "a_34900",
+          "sessions": []
+        },
+        {
+          "assignment_identity": "a_34901",
+          "sessions": []
+        }
+      ]
+    },
+    {
+      "allocations": [
+        {
+          "assignment_identity": "a_34899",
+          "session_count": 0,
+          "weekly_sessions": [
+            0,
+            0,
+            0,
+            0
+          ]
+        },
+        {
+          "assignment_identity": "a_34900",
+          "session_count": 0,
+          "weekly_sessions": [
+            0,
+            0,
+            0,
+            0
+          ]
+        },
+        {
+          "assignment_identity": "a_34901",
+          "session_count": 0,
+          "weekly_sessions": [
+            0,
+            0,
+            0,
+            0
+          ]
+        }
+      ],
+      "artifact_digest": "674e212ec06c3233bcb6010af907ec33ba6c68e3a9a867a8fed589866d8682c8",
+      "configuration_status": "SYNTHETIC_DEMO_ONLY_NOT_PRODUCTION",
+      "error_message": null,
+      "error_type": null,
+      "failure_reasons": [],
+      "method": "average",
+      "model_identity": "0b3325d145d56a8aad8a48df2203b6db4d47bdf70b4e8256db00e312d09457a0",
+      "model_mode": "simple_average_mark_baseline",
+      "outcome": "target_achieved",
+      "predicted_marks": [
+        {
+          "assignment_identity": "a_34899",
+          "predicted_mark": 78.76094970074121,
+          "target_mark": 60.0
+        },
+        {
+          "assignment_identity": "a_34900",
+          "predicted_mark": 78.76094970074121,
+          "target_mark": 60.0
+        },
+        {
+          "assignment_identity": "a_34901",
+          "predicted_mark": 78.76094970074121,
+          "target_mark": 60.0
+        }
+      ],
+      "search_complete": false,
+      "seed": 42,
+      "status": "feasible",
+      "student_id": "413180",
+      "weekly_timetable": [
+        {
+          "assignment_identity": "a_34899",
+          "sessions": []
+        },
+        {
+          "assignment_identity": "a_34900",
+          "sessions": []
+        },
+        {
+          "assignment_identity": "a_34901",
+          "sessions": []
+        }
+      ]
+    },
+    {
+      "allocations": [
+        {
+          "assignment_identity": "a_34899",
+          "session_count": 0,
+          "weekly_sessions": [
+            0,
+            0,
+            0,
+            0
+          ]
+        },
+        {
+          "assignment_identity": "a_34900",
+          "session_count": 0,
+          "weekly_sessions": [
+            0,
+            0,
+            0,
+            0
+          ]
+        },
+        {
+          "assignment_identity": "a_34901",
+          "session_count": 0,
+          "weekly_sessions": [
+            0,
+            0,
+            0,
+            0
+          ]
+        }
+      ],
+      "artifact_digest": "ab6d3a07b9fc4768e2e5341583f9a8e49c8e03e0520b26cf3daa9d7372e03e9a",
+      "configuration_status": "SYNTHETIC_DEMO_ONLY_NOT_PRODUCTION",
+      "error_message": null,
+      "error_type": null,
+      "failure_reasons": [],
+      "method": "nn",
+      "model_identity": "040c2af6327e413c71769c29f5fd27802dba65bd18d970d92e68930af70c7679",
+      "model_mode": "model_a_strict",
+      "outcome": "target_achieved",
+      "predicted_marks": [
+        {
+          "assignment_identity": "a_34899",
+          "predicted_mark": 80.05724334716797,
+          "target_mark": 60.0
+        },
+        {
+          "assignment_identity": "a_34900",
+          "predicted_mark": 69.76545715332031,
+          "target_mark": 60.0
+        },
+        {
+          "assignment_identity": "a_34901",
+          "predicted_mark": 70.44945526123047,
+          "target_mark": 60.0
+        }
+      ],
+      "search_complete": false,
+      "seed": 42,
+      "status": "feasible",
+      "student_id": "491863",
+      "weekly_timetable": [
+        {
+          "assignment_identity": "a_34899",
+          "sessions": []
+        },
+        {
+          "assignment_identity": "a_34900",
+          "sessions": []
+        },
+        {
+          "assignment_identity": "a_34901",
+          "sessions": []
+        }
+      ]
+    },
+    {
+      "allocations": [
+        {
+          "assignment_identity": "a_34899",
+          "session_count": 0,
+          "weekly_sessions": [
+            0,
+            0,
+            0,
+            0
+          ]
+        },
+        {
+          "assignment_identity": "a_34900",
+          "session_count": 0,
+          "weekly_sessions": [
+            0,
+            0,
+            0,
+            0
+          ]
+        },
+        {
+          "assignment_identity": "a_34901",
+          "session_count": 0,
+          "weekly_sessions": [
+            0,
+            0,
+            0,
+            0
+          ]
+        }
+      ],
+      "artifact_digest": "674e212ec06c3233bcb6010af907ec33ba6c68e3a9a867a8fed589866d8682c8",
+      "configuration_status": "SYNTHETIC_DEMO_ONLY_NOT_PRODUCTION",
+      "error_message": null,
+      "error_type": null,
+      "failure_reasons": [],
+      "method": "average",
+      "model_identity": "0b3325d145d56a8aad8a48df2203b6db4d47bdf70b4e8256db00e312d09457a0",
+      "model_mode": "simple_average_mark_baseline",
+      "outcome": "target_achieved",
+      "predicted_marks": [
+        {
+          "assignment_identity": "a_34899",
+          "predicted_mark": 78.76094970074121,
+          "target_mark": 60.0
+        },
+        {
+          "assignment_identity": "a_34900",
+          "predicted_mark": 78.76094970074121,
+          "target_mark": 60.0
+        },
+        {
+          "assignment_identity": "a_34901",
+          "predicted_mark": 78.76094970074121,
+          "target_mark": 60.0
+        }
+      ],
+      "search_complete": false,
+      "seed": 42,
+      "status": "feasible",
+      "student_id": "491863",
+      "weekly_timetable": [
+        {
+          "assignment_identity": "a_34899",
+          "sessions": []
+        },
+        {
+          "assignment_identity": "a_34900",
+          "sessions": []
+        },
+        {
+          "assignment_identity": "a_34901",
+          "sessions": []
+        }
+      ]
+    },
+    {
+      "allocations": [
+        {
+          "assignment_identity": "a_34899",
+          "session_count": 0,
+          "weekly_sessions": [
+            0,
+            0,
+            0,
+            0
+          ]
+        },
+        {
+          "assignment_identity": "a_34900",
+          "session_count": 0,
+          "weekly_sessions": [
+            0,
+            0,
+            0,
+            0
+          ]
+        },
+        {
+          "assignment_identity": "a_34901",
+          "session_count": 0,
+          "weekly_sessions": [
+            0,
+            0,
+            0,
+            0
+          ]
+        }
+      ],
+      "artifact_digest": "ab6d3a07b9fc4768e2e5341583f9a8e49c8e03e0520b26cf3daa9d7372e03e9a",
+      "configuration_status": "SYNTHETIC_DEMO_ONLY_NOT_PRODUCTION",
+      "error_message": null,
+      "error_type": null,
+      "failure_reasons": [],
+      "method": "nn",
+      "model_identity": "040c2af6327e413c71769c29f5fd27802dba65bd18d970d92e68930af70c7679",
+      "model_mode": "model_a_strict",
+      "outcome": "target_achieved",
+      "predicted_marks": [
+        {
+          "assignment_identity": "a_34899",
+          "predicted_mark": 70.4461898803711,
+          "target_mark": 60.0
+        },
+        {
+          "assignment_identity": "a_34900",
+          "predicted_mark": 87.99797058105469,
+          "target_mark": 60.0
+        },
+        {
+          "assignment_identity": "a_34901",
+          "predicted_mark": 70.38505554199219,
+          "target_mark": 60.0
+        }
+      ],
+      "search_complete": false,
+      "seed": 42,
+      "status": "feasible",
+      "student_id": "572074",
+      "weekly_timetable": [
+        {
+          "assignment_identity": "a_34899",
+          "sessions": []
+        },
+        {
+          "assignment_identity": "a_34900",
+          "sessions": []
+        },
+        {
+          "assignment_identity": "a_34901",
+          "sessions": []
+        }
+      ]
+    },
+    {
+      "allocations": [
+        {
+          "assignment_identity": "a_34899",
+          "session_count": 0,
+          "weekly_sessions": [
+            0,
+            0,
+            0,
+            0
+          ]
+        },
+        {
+          "assignment_identity": "a_34900",
+          "session_count": 0,
+          "weekly_sessions": [
+            0,
+            0,
+            0,
+            0
+          ]
+        },
+        {
+          "assignment_identity": "a_34901",
+          "session_count": 0,
+          "weekly_sessions": [
+            0,
+            0,
+            0,
+            0
+          ]
+        }
+      ],
+      "artifact_digest": "674e212ec06c3233bcb6010af907ec33ba6c68e3a9a867a8fed589866d8682c8",
+      "configuration_status": "SYNTHETIC_DEMO_ONLY_NOT_PRODUCTION",
+      "error_message": null,
+      "error_type": null,
+      "failure_reasons": [],
+      "method": "average",
+      "model_identity": "0b3325d145d56a8aad8a48df2203b6db4d47bdf70b4e8256db00e312d09457a0",
+      "model_mode": "simple_average_mark_baseline",
+      "outcome": "target_achieved",
+      "predicted_marks": [
+        {
+          "assignment_identity": "a_34899",
+          "predicted_mark": 78.76094970074121,
+          "target_mark": 60.0
+        },
+        {
+          "assignment_identity": "a_34900",
+          "predicted_mark": 78.76094970074121,
+          "target_mark": 60.0
+        },
+        {
+          "assignment_identity": "a_34901",
+          "predicted_mark": 78.76094970074121,
+          "target_mark": 60.0
+        }
+      ],
+      "search_complete": false,
+      "seed": 42,
+      "status": "feasible",
+      "student_id": "572074",
+      "weekly_timetable": [
+        {
+          "assignment_identity": "a_34899",
+          "sessions": []
+        },
+        {
+          "assignment_identity": "a_34900",
+          "sessions": []
+        },
+        {
+          "assignment_identity": "a_34901",
+          "sessions": []
+        }
+      ]
+    },
+    {
+      "allocations": [
+        {
+          "assignment_identity": "a_34899",
+          "session_count": 0,
+          "weekly_sessions": [
+            0,
+            0,
+            0,
+            0
+          ]
+        },
+        {
+          "assignment_identity": "a_34900",
+          "session_count": 0,
+          "weekly_sessions": [
+            0,
+            0,
+            0,
+            0
+          ]
+        },
+        {
+          "assignment_identity": "a_34901",
+          "session_count": 0,
+          "weekly_sessions": [
+            0,
+            0,
+            0,
+            0
+          ]
+        }
+      ],
+      "artifact_digest": "ab6d3a07b9fc4768e2e5341583f9a8e49c8e03e0520b26cf3daa9d7372e03e9a",
+      "configuration_status": "SYNTHETIC_DEMO_ONLY_NOT_PRODUCTION",
+      "error_message": null,
+      "error_type": null,
+      "failure_reasons": [],
+      "method": "nn",
+      "model_identity": "040c2af6327e413c71769c29f5fd27802dba65bd18d970d92e68930af70c7679",
+      "model_mode": "model_a_strict",
+      "outcome": "target_achieved",
+      "predicted_marks": [
+        {
+          "assignment_identity": "a_34899",
+          "predicted_mark": 86.32139587402344,
+          "target_mark": 60.0
+        },
+        {
+          "assignment_identity": "a_34900",
+          "predicted_mark": 79.6539077758789,
+          "target_mark": 60.0
+        },
+        {
+          "assignment_identity": "a_34901",
+          "predicted_mark": 79.40694427490234,
+          "target_mark": 60.0
+        }
+      ],
+      "search_complete": false,
+      "seed": 42,
+      "status": "feasible",
+      "student_id": "633931",
+      "weekly_timetable": [
+        {
+          "assignment_identity": "a_34899",
+          "sessions": []
+        },
+        {
+          "assignment_identity": "a_34900",
+          "sessions": []
+        },
+        {
+          "assignment_identity": "a_34901",
+          "sessions": []
+        }
+      ]
+    },
+    {
+      "allocations": [
+        {
+          "assignment_identity": "a_34899",
+          "session_count": 0,
+          "weekly_sessions": [
+            0,
+            0,
+            0,
+            0
+          ]
+        },
+        {
+          "assignment_identity": "a_34900",
+          "session_count": 0,
+          "weekly_sessions": [
+            0,
+            0,
+            0,
+            0
+          ]
+        },
+        {
+          "assignment_identity": "a_34901",
+          "session_count": 0,
+          "weekly_sessions": [
+            0,
+            0,
+            0,
+            0
+          ]
+        }
+      ],
+      "artifact_digest": "674e212ec06c3233bcb6010af907ec33ba6c68e3a9a867a8fed589866d8682c8",
+      "configuration_status": "SYNTHETIC_DEMO_ONLY_NOT_PRODUCTION",
+      "error_message": null,
+      "error_type": null,
+      "failure_reasons": [],
+      "method": "average",
+      "model_identity": "0b3325d145d56a8aad8a48df2203b6db4d47bdf70b4e8256db00e312d09457a0",
+      "model_mode": "simple_average_mark_baseline",
+      "outcome": "target_achieved",
+      "predicted_marks": [
+        {
+          "assignment_identity": "a_34899",
+          "predicted_mark": 78.76094970074121,
+          "target_mark": 60.0
+        },
+        {
+          "assignment_identity": "a_34900",
+          "predicted_mark": 78.76094970074121,
+          "target_mark": 60.0
+        },
+        {
+          "assignment_identity": "a_34901",
+          "predicted_mark": 78.76094970074121,
+          "target_mark": 60.0
+        }
+      ],
+      "search_complete": false,
+      "seed": 42,
+      "status": "feasible",
+      "student_id": "633931",
+      "weekly_timetable": [
+        {
+          "assignment_identity": "a_34899",
+          "sessions": []
+        },
+        {
+          "assignment_identity": "a_34900",
+          "sessions": []
+        },
+        {
+          "assignment_identity": "a_34901",
+          "sessions": []
+        }
+      ]
+    },
+    {
+      "allocations": [
+        {
+          "assignment_identity": "a_34899",
+          "session_count": 0,
+          "weekly_sessions": [
+            0,
+            0,
+            0,
+            0
+          ]
+        },
+        {
+          "assignment_identity": "a_34900",
+          "session_count": 0,
+          "weekly_sessions": [
+            0,
+            0,
+            0,
+            0
+          ]
+        },
+        {
+          "assignment_identity": "a_34901",
+          "session_count": 0,
+          "weekly_sessions": [
+            0,
+            0,
+            0,
+            0
+          ]
+        }
+      ],
+      "artifact_digest": "ab6d3a07b9fc4768e2e5341583f9a8e49c8e03e0520b26cf3daa9d7372e03e9a",
+      "configuration_status": "SYNTHETIC_DEMO_ONLY_NOT_PRODUCTION",
+      "error_message": null,
+      "error_type": null,
+      "failure_reasons": [],
+      "method": "nn",
+      "model_identity": "040c2af6327e413c71769c29f5fd27802dba65bd18d970d92e68930af70c7679",
+      "model_mode": "model_a_strict",
+      "outcome": "target_achieved",
+      "predicted_marks": [
+        {
+          "assignment_identity": "a_34899",
+          "predicted_mark": 80.09143829345703,
+          "target_mark": 60.0
+        },
+        {
+          "assignment_identity": "a_34900",
+          "predicted_mark": 77.15508270263672,
+          "target_mark": 60.0
+        },
+        {
+          "assignment_identity": "a_34901",
+          "predicted_mark": 70.53045654296875,
+          "target_mark": 60.0
+        }
+      ],
+      "search_complete": false,
+      "seed": 42,
+      "status": "feasible",
+      "student_id": "637004",
+      "weekly_timetable": [
+        {
+          "assignment_identity": "a_34899",
+          "sessions": []
+        },
+        {
+          "assignment_identity": "a_34900",
+          "sessions": []
+        },
+        {
+          "assignment_identity": "a_34901",
+          "sessions": []
+        }
+      ]
+    },
+    {
+      "allocations": [
+        {
+          "assignment_identity": "a_34899",
+          "session_count": 0,
+          "weekly_sessions": [
+            0,
+            0,
+            0,
+            0
+          ]
+        },
+        {
+          "assignment_identity": "a_34900",
+          "session_count": 0,
+          "weekly_sessions": [
+            0,
+            0,
+            0,
+            0
+          ]
+        },
+        {
+          "assignment_identity": "a_34901",
+          "session_count": 0,
+          "weekly_sessions": [
+            0,
+            0,
+            0,
+            0
+          ]
+        }
+      ],
+      "artifact_digest": "674e212ec06c3233bcb6010af907ec33ba6c68e3a9a867a8fed589866d8682c8",
+      "configuration_status": "SYNTHETIC_DEMO_ONLY_NOT_PRODUCTION",
+      "error_message": null,
+      "error_type": null,
+      "failure_reasons": [],
+      "method": "average",
+      "model_identity": "0b3325d145d56a8aad8a48df2203b6db4d47bdf70b4e8256db00e312d09457a0",
+      "model_mode": "simple_average_mark_baseline",
+      "outcome": "target_achieved",
+      "predicted_marks": [
+        {
+          "assignment_identity": "a_34899",
+          "predicted_mark": 78.76094970074121,
+          "target_mark": 60.0
+        },
+        {
+          "assignment_identity": "a_34900",
+          "predicted_mark": 78.76094970074121,
+          "target_mark": 60.0
+        },
+        {
+          "assignment_identity": "a_34901",
+          "predicted_mark": 78.76094970074121,
+          "target_mark": 60.0
+        }
+      ],
+      "search_complete": false,
+      "seed": 42,
+      "status": "feasible",
+      "student_id": "637004",
+      "weekly_timetable": [
+        {
+          "assignment_identity": "a_34899",
+          "sessions": []
+        },
+        {
+          "assignment_identity": "a_34900",
+          "sessions": []
+        },
+        {
+          "assignment_identity": "a_34901",
+          "sessions": []
+        }
+      ]
+    },
+    {
+      "allocations": [
+        {
+          "assignment_identity": "a_34899",
+          "session_count": 0,
+          "weekly_sessions": [
+            0,
+            0,
+            0,
+            0
+          ]
+        },
+        {
+          "assignment_identity": "a_34900",
+          "session_count": 0,
+          "weekly_sessions": [
+            0,
+            0,
+            0,
+            0
+          ]
+        },
+        {
+          "assignment_identity": "a_34901",
+          "session_count": 0,
+          "weekly_sessions": [
+            0,
+            0,
+            0,
+            0
+          ]
+        }
+      ],
+      "artifact_digest": "ab6d3a07b9fc4768e2e5341583f9a8e49c8e03e0520b26cf3daa9d7372e03e9a",
+      "configuration_status": "SYNTHETIC_DEMO_ONLY_NOT_PRODUCTION",
+      "error_message": null,
+      "error_type": null,
+      "failure_reasons": [],
+      "method": "nn",
+      "model_identity": "040c2af6327e413c71769c29f5fd27802dba65bd18d970d92e68930af70c7679",
+      "model_mode": "model_a_strict",
+      "outcome": "target_achieved",
+      "predicted_marks": [
+        {
+          "assignment_identity": "a_34899",
+          "predicted_mark": 81.25599670410156,
+          "target_mark": 60.0
+        },
+        {
+          "assignment_identity": "a_34900",
+          "predicted_mark": 70.51422882080078,
+          "target_mark": 60.0
+        },
+        {
+          "assignment_identity": "a_34901",
+          "predicted_mark": 76.63375091552734,
+          "target_mark": 60.0
+        }
+      ],
+      "search_complete": false,
+      "seed": 42,
+      "status": "feasible",
+      "student_id": "646539",
+      "weekly_timetable": [
+        {
+          "assignment_identity": "a_34899",
+          "sessions": []
+        },
+        {
+          "assignment_identity": "a_34900",
+          "sessions": []
+        },
+        {
+          "assignment_identity": "a_34901",
+          "sessions": []
+        }
+      ]
+    },
+    {
+      "allocations": [
+        {
+          "assignment_identity": "a_34899",
+          "session_count": 0,
+          "weekly_sessions": [
+            0,
+            0,
+            0,
+            0
+          ]
+        },
+        {
+          "assignment_identity": "a_34900",
+          "session_count": 0,
+          "weekly_sessions": [
+            0,
+            0,
+            0,
+            0
+          ]
+        },
+        {
+          "assignment_identity": "a_34901",
+          "session_count": 0,
+          "weekly_sessions": [
+            0,
+            0,
+            0,
+            0
+          ]
+        }
+      ],
+      "artifact_digest": "674e212ec06c3233bcb6010af907ec33ba6c68e3a9a867a8fed589866d8682c8",
+      "configuration_status": "SYNTHETIC_DEMO_ONLY_NOT_PRODUCTION",
+      "error_message": null,
+      "error_type": null,
+      "failure_reasons": [],
+      "method": "average",
+      "model_identity": "0b3325d145d56a8aad8a48df2203b6db4d47bdf70b4e8256db00e312d09457a0",
+      "model_mode": "simple_average_mark_baseline",
+      "outcome": "target_achieved",
+      "predicted_marks": [
+        {
+          "assignment_identity": "a_34899",
+          "predicted_mark": 78.76094970074121,
+          "target_mark": 60.0
+        },
+        {
+          "assignment_identity": "a_34900",
+          "predicted_mark": 78.76094970074121,
+          "target_mark": 60.0
+        },
+        {
+          "assignment_identity": "a_34901",
+          "predicted_mark": 78.76094970074121,
+          "target_mark": 60.0
+        }
+      ],
+      "search_complete": false,
+      "seed": 42,
+      "status": "feasible",
+      "student_id": "646539",
+      "weekly_timetable": [
+        {
+          "assignment_identity": "a_34899",
+          "sessions": []
+        },
+        {
+          "assignment_identity": "a_34900",
+          "sessions": []
+        },
+        {
+          "assignment_identity": "a_34901",
+          "sessions": []
+        }
+      ]
+    },
+    {
+      "allocations": [
+        {
+          "assignment_identity": "a_34899",
+          "session_count": 0,
+          "weekly_sessions": [
+            0,
+            0,
+            0,
+            0
+          ]
+        },
+        {
+          "assignment_identity": "a_34900",
+          "session_count": 0,
+          "weekly_sessions": [
+            0,
+            0,
+            0,
+            0
+          ]
+        },
+        {
+          "assignment_identity": "a_34901",
+          "session_count": 0,
+          "weekly_sessions": [
+            0,
+            0,
+            0,
+            0
+          ]
+        }
+      ],
+      "artifact_digest": "ab6d3a07b9fc4768e2e5341583f9a8e49c8e03e0520b26cf3daa9d7372e03e9a",
+      "configuration_status": "SYNTHETIC_DEMO_ONLY_NOT_PRODUCTION",
+      "error_message": null,
+      "error_type": null,
+      "failure_reasons": [],
+      "method": "nn",
+      "model_identity": "040c2af6327e413c71769c29f5fd27802dba65bd18d970d92e68930af70c7679",
+      "model_mode": "model_a_strict",
+      "outcome": "target_achieved",
+      "predicted_marks": [
+        {
+          "assignment_identity": "a_34899",
+          "predicted_mark": 77.2967758178711,
+          "target_mark": 60.0
+        },
+        {
+          "assignment_identity": "a_34900",
+          "predicted_mark": 78.69340515136719,
+          "target_mark": 60.0
+        },
+        {
+          "assignment_identity": "a_34901",
+          "predicted_mark": 80.08119201660156,
+          "target_mark": 60.0
+        }
+      ],
+      "search_complete": false,
+      "seed": 42,
+      "status": "feasible",
+      "student_id": "648040",
+      "weekly_timetable": [
+        {
+          "assignment_identity": "a_34899",
+          "sessions": []
+        },
+        {
+          "assignment_identity": "a_34900",
+          "sessions": []
+        },
+        {
+          "assignment_identity": "a_34901",
+          "sessions": []
+        }
+      ]
+    },
+    {
+      "allocations": [
+        {
+          "assignment_identity": "a_34899",
+          "session_count": 0,
+          "weekly_sessions": [
+            0,
+            0,
+            0,
+            0
+          ]
+        },
+        {
+          "assignment_identity": "a_34900",
+          "session_count": 0,
+          "weekly_sessions": [
+            0,
+            0,
+            0,
+            0
+          ]
+        },
+        {
+          "assignment_identity": "a_34901",
+          "session_count": 0,
+          "weekly_sessions": [
+            0,
+            0,
+            0,
+            0
+          ]
+        }
+      ],
+      "artifact_digest": "674e212ec06c3233bcb6010af907ec33ba6c68e3a9a867a8fed589866d8682c8",
+      "configuration_status": "SYNTHETIC_DEMO_ONLY_NOT_PRODUCTION",
+      "error_message": null,
+      "error_type": null,
+      "failure_reasons": [],
+      "method": "average",
+      "model_identity": "0b3325d145d56a8aad8a48df2203b6db4d47bdf70b4e8256db00e312d09457a0",
+      "model_mode": "simple_average_mark_baseline",
+      "outcome": "target_achieved",
+      "predicted_marks": [
+        {
+          "assignment_identity": "a_34899",
+          "predicted_mark": 78.76094970074121,
+          "target_mark": 60.0
+        },
+        {
+          "assignment_identity": "a_34900",
+          "predicted_mark": 78.76094970074121,
+          "target_mark": 60.0
+        },
+        {
+          "assignment_identity": "a_34901",
+          "predicted_mark": 78.76094970074121,
+          "target_mark": 60.0
+        }
+      ],
+      "search_complete": false,
+      "seed": 42,
+      "status": "feasible",
+      "student_id": "648040",
+      "weekly_timetable": [
+        {
+          "assignment_identity": "a_34899",
+          "sessions": []
+        },
+        {
+          "assignment_identity": "a_34900",
+          "sessions": []
+        },
+        {
+          "assignment_identity": "a_34901",
+          "sessions": []
+        }
+      ]
+    },
+    {
+      "allocations": [
+        {
+          "assignment_identity": "a_34899",
+          "session_count": 0,
+          "weekly_sessions": [
+            0,
+            0,
+            0,
+            0
+          ]
+        },
+        {
+          "assignment_identity": "a_34900",
+          "session_count": 0,
+          "weekly_sessions": [
+            0,
+            0,
+            0,
+            0
+          ]
+        },
+        {
+          "assignment_identity": "a_34901",
+          "session_count": 0,
+          "weekly_sessions": [
+            0,
+            0,
+            0,
+            0
+          ]
+        }
+      ],
+      "artifact_digest": "ab6d3a07b9fc4768e2e5341583f9a8e49c8e03e0520b26cf3daa9d7372e03e9a",
+      "configuration_status": "SYNTHETIC_DEMO_ONLY_NOT_PRODUCTION",
+      "error_message": null,
+      "error_type": null,
+      "failure_reasons": [],
+      "method": "nn",
+      "model_identity": "040c2af6327e413c71769c29f5fd27802dba65bd18d970d92e68930af70c7679",
+      "model_mode": "model_a_strict",
+      "outcome": "target_achieved",
+      "predicted_marks": [
+        {
+          "assignment_identity": "a_34899",
+          "predicted_mark": 91.73174285888672,
+          "target_mark": 60.0
+        },
+        {
+          "assignment_identity": "a_34900",
+          "predicted_mark": 80.03176879882812,
+          "target_mark": 60.0
+        },
+        {
+          "assignment_identity": "a_34901",
+          "predicted_mark": 81.62114715576172,
+          "target_mark": 60.0
+        }
+      ],
+      "search_complete": false,
+      "seed": 42,
+      "status": "feasible",
+      "student_id": "648365",
+      "weekly_timetable": [
+        {
+          "assignment_identity": "a_34899",
+          "sessions": []
+        },
+        {
+          "assignment_identity": "a_34900",
+          "sessions": []
+        },
+        {
+          "assignment_identity": "a_34901",
+          "sessions": []
+        }
+      ]
+    },
+    {
+      "allocations": [
+        {
+          "assignment_identity": "a_34899",
+          "session_count": 0,
+          "weekly_sessions": [
+            0,
+            0,
+            0,
+            0
+          ]
+        },
+        {
+          "assignment_identity": "a_34900",
+          "session_count": 0,
+          "weekly_sessions": [
+            0,
+            0,
+            0,
+            0
+          ]
+        },
+        {
+          "assignment_identity": "a_34901",
+          "session_count": 0,
+          "weekly_sessions": [
+            0,
+            0,
+            0,
+            0
+          ]
+        }
+      ],
+      "artifact_digest": "674e212ec06c3233bcb6010af907ec33ba6c68e3a9a867a8fed589866d8682c8",
+      "configuration_status": "SYNTHETIC_DEMO_ONLY_NOT_PRODUCTION",
+      "error_message": null,
+      "error_type": null,
+      "failure_reasons": [],
+      "method": "average",
+      "model_identity": "0b3325d145d56a8aad8a48df2203b6db4d47bdf70b4e8256db00e312d09457a0",
+      "model_mode": "simple_average_mark_baseline",
+      "outcome": "target_achieved",
+      "predicted_marks": [
+        {
+          "assignment_identity": "a_34899",
+          "predicted_mark": 78.76094970074121,
+          "target_mark": 60.0
+        },
+        {
+          "assignment_identity": "a_34900",
+          "predicted_mark": 78.76094970074121,
+          "target_mark": 60.0
+        },
+        {
+          "assignment_identity": "a_34901",
+          "predicted_mark": 78.76094970074121,
+          "target_mark": 60.0
+        }
+      ],
+      "search_complete": false,
+      "seed": 42,
+      "status": "feasible",
+      "student_id": "648365",
+      "weekly_timetable": [
+        {
+          "assignment_identity": "a_34899",
+          "sessions": []
+        },
+        {
+          "assignment_identity": "a_34900",
+          "sessions": []
+        },
+        {
+          "assignment_identity": "a_34901",
+          "sessions": []
+        }
+      ]
+    },
+    {
+      "allocations": [
+        {
+          "assignment_identity": "a_34899",
+          "session_count": 0,
+          "weekly_sessions": [
+            0,
+            0,
+            0,
+            0
+          ]
+        },
+        {
+          "assignment_identity": "a_34900",
+          "session_count": 0,
+          "weekly_sessions": [
+            0,
+            0,
+            0,
+            0
+          ]
+        },
+        {
+          "assignment_identity": "a_34901",
+          "session_count": 0,
+          "weekly_sessions": [
+            0,
+            0,
+            0,
+            0
+          ]
+        }
+      ],
+      "artifact_digest": "ab6d3a07b9fc4768e2e5341583f9a8e49c8e03e0520b26cf3daa9d7372e03e9a",
+      "configuration_status": "SYNTHETIC_DEMO_ONLY_NOT_PRODUCTION",
+      "error_message": null,
+      "error_type": null,
+      "failure_reasons": [],
+      "method": "nn",
+      "model_identity": "040c2af6327e413c71769c29f5fd27802dba65bd18d970d92e68930af70c7679",
+      "model_mode": "model_a_strict",
+      "outcome": "target_achieved",
+      "predicted_marks": [
+        {
+          "assignment_identity": "a_34899",
+          "predicted_mark": 87.5141372680664,
+          "target_mark": 60.0
+        },
+        {
+          "assignment_identity": "a_34900",
+          "predicted_mark": 71.99610137939453,
+          "target_mark": 60.0
+        },
+        {
+          "assignment_identity": "a_34901",
+          "predicted_mark": 67.65876770019531,
+          "target_mark": 60.0
+        }
+      ],
+      "search_complete": false,
+      "seed": 42,
+      "status": "feasible",
+      "student_id": "648536",
+      "weekly_timetable": [
+        {
+          "assignment_identity": "a_34899",
+          "sessions": []
+        },
+        {
+          "assignment_identity": "a_34900",
+          "sessions": []
+        },
+        {
+          "assignment_identity": "a_34901",
+          "sessions": []
+        }
+      ]
+    },
+    {
+      "allocations": [
+        {
+          "assignment_identity": "a_34899",
+          "session_count": 0,
+          "weekly_sessions": [
+            0,
+            0,
+            0,
+            0
+          ]
+        },
+        {
+          "assignment_identity": "a_34900",
+          "session_count": 0,
+          "weekly_sessions": [
+            0,
+            0,
+            0,
+            0
+          ]
+        },
+        {
+          "assignment_identity": "a_34901",
+          "session_count": 0,
+          "weekly_sessions": [
+            0,
+            0,
+            0,
+            0
+          ]
+        }
+      ],
+      "artifact_digest": "674e212ec06c3233bcb6010af907ec33ba6c68e3a9a867a8fed589866d8682c8",
+      "configuration_status": "SYNTHETIC_DEMO_ONLY_NOT_PRODUCTION",
+      "error_message": null,
+      "error_type": null,
+      "failure_reasons": [],
+      "method": "average",
+      "model_identity": "0b3325d145d56a8aad8a48df2203b6db4d47bdf70b4e8256db00e312d09457a0",
+      "model_mode": "simple_average_mark_baseline",
+      "outcome": "target_achieved",
+      "predicted_marks": [
+        {
+          "assignment_identity": "a_34899",
+          "predicted_mark": 78.76094970074121,
+          "target_mark": 60.0
+        },
+        {
+          "assignment_identity": "a_34900",
+          "predicted_mark": 78.76094970074121,
+          "target_mark": 60.0
+        },
+        {
+          "assignment_identity": "a_34901",
+          "predicted_mark": 78.76094970074121,
+          "target_mark": 60.0
+        }
+      ],
+      "search_complete": false,
+      "seed": 42,
+      "status": "feasible",
+      "student_id": "648536",
+      "weekly_timetable": [
+        {
+          "assignment_identity": "a_34899",
+          "sessions": []
+        },
+        {
+          "assignment_identity": "a_34900",
+          "sessions": []
+        },
+        {
+          "assignment_identity": "a_34901",
+          "sessions": []
+        }
+      ]
+    },
+    {
+      "allocations": [
+        {
+          "assignment_identity": "a_34899",
+          "session_count": 0,
+          "weekly_sessions": [
+            0,
+            0,
+            0,
+            0
+          ]
+        },
+        {
+          "assignment_identity": "a_34900",
+          "session_count": 0,
+          "weekly_sessions": [
+            0,
+            0,
+            0,
+            0
+          ]
+        },
+        {
+          "assignment_identity": "a_34901",
+          "session_count": 0,
+          "weekly_sessions": [
+            0,
+            0,
+            0,
+            0
+          ]
+        }
+      ],
+      "artifact_digest": "ab6d3a07b9fc4768e2e5341583f9a8e49c8e03e0520b26cf3daa9d7372e03e9a",
+      "configuration_status": "SYNTHETIC_DEMO_ONLY_NOT_PRODUCTION",
+      "error_message": null,
+      "error_type": null,
+      "failure_reasons": [],
+      "method": "nn",
+      "model_identity": "040c2af6327e413c71769c29f5fd27802dba65bd18d970d92e68930af70c7679",
+      "model_mode": "model_a_strict",
+      "outcome": "target_achieved",
+      "predicted_marks": [
+        {
+          "assignment_identity": "a_34899",
+          "predicted_mark": 86.0516128540039,
+          "target_mark": 60.0
+        },
+        {
+          "assignment_identity": "a_34900",
+          "predicted_mark": 78.22840118408203,
+          "target_mark": 60.0
+        },
+        {
+          "assignment_identity": "a_34901",
+          "predicted_mark": 80.49791717529297,
+          "target_mark": 60.0
+        }
+      ],
+      "search_complete": false,
+      "seed": 42,
+      "status": "feasible",
+      "student_id": "649084",
+      "weekly_timetable": [
+        {
+          "assignment_identity": "a_34899",
+          "sessions": []
+        },
+        {
+          "assignment_identity": "a_34900",
+          "sessions": []
+        },
+        {
+          "assignment_identity": "a_34901",
+          "sessions": []
+        }
+      ]
+    },
+    {
+      "allocations": [
+        {
+          "assignment_identity": "a_34899",
+          "session_count": 0,
+          "weekly_sessions": [
+            0,
+            0,
+            0,
+            0
+          ]
+        },
+        {
+          "assignment_identity": "a_34900",
+          "session_count": 0,
+          "weekly_sessions": [
+            0,
+            0,
+            0,
+            0
+          ]
+        },
+        {
+          "assignment_identity": "a_34901",
+          "session_count": 0,
+          "weekly_sessions": [
+            0,
+            0,
+            0,
+            0
+          ]
+        }
+      ],
+      "artifact_digest": "674e212ec06c3233bcb6010af907ec33ba6c68e3a9a867a8fed589866d8682c8",
+      "configuration_status": "SYNTHETIC_DEMO_ONLY_NOT_PRODUCTION",
+      "error_message": null,
+      "error_type": null,
+      "failure_reasons": [],
+      "method": "average",
+      "model_identity": "0b3325d145d56a8aad8a48df2203b6db4d47bdf70b4e8256db00e312d09457a0",
+      "model_mode": "simple_average_mark_baseline",
+      "outcome": "target_achieved",
+      "predicted_marks": [
+        {
+          "assignment_identity": "a_34899",
+          "predicted_mark": 78.76094970074121,
+          "target_mark": 60.0
+        },
+        {
+          "assignment_identity": "a_34900",
+          "predicted_mark": 78.76094970074121,
+          "target_mark": 60.0
+        },
+        {
+          "assignment_identity": "a_34901",
+          "predicted_mark": 78.76094970074121,
+          "target_mark": 60.0
+        }
+      ],
+      "search_complete": false,
+      "seed": 42,
+      "status": "feasible",
+      "student_id": "649084",
+      "weekly_timetable": [
+        {
+          "assignment_identity": "a_34899",
+          "sessions": []
+        },
+        {
+          "assignment_identity": "a_34900",
+          "sessions": []
+        },
+        {
+          "assignment_identity": "a_34901",
+          "sessions": []
+        }
+      ]
+    },
+    {
+      "allocations": [
+        {
+          "assignment_identity": "a_34899",
+          "session_count": 0,
+          "weekly_sessions": [
+            0,
+            0,
+            0,
+            0
+          ]
+        },
+        {
+          "assignment_identity": "a_34900",
+          "session_count": 0,
+          "weekly_sessions": [
+            0,
+            0,
+            0,
+            0
+          ]
+        },
+        {
+          "assignment_identity": "a_34901",
+          "session_count": 0,
+          "weekly_sessions": [
+            0,
+            0,
+            0,
+            0
+          ]
+        }
+      ],
+      "artifact_digest": "ab6d3a07b9fc4768e2e5341583f9a8e49c8e03e0520b26cf3daa9d7372e03e9a",
+      "configuration_status": "SYNTHETIC_DEMO_ONLY_NOT_PRODUCTION",
+      "error_message": null,
+      "error_type": null,
+      "failure_reasons": [],
+      "method": "nn",
+      "model_identity": "040c2af6327e413c71769c29f5fd27802dba65bd18d970d92e68930af70c7679",
+      "model_mode": "model_a_strict",
+      "outcome": "target_achieved",
+      "predicted_marks": [
+        {
+          "assignment_identity": "a_34899",
+          "predicted_mark": 81.69078063964844,
+          "target_mark": 60.0
+        },
+        {
+          "assignment_identity": "a_34900",
+          "predicted_mark": 66.43921661376953,
+          "target_mark": 60.0
+        },
+        {
+          "assignment_identity": "a_34901",
+          "predicted_mark": 70.29493713378906,
+          "target_mark": 60.0
+        }
+      ],
+      "search_complete": false,
+      "seed": 42,
+      "status": "feasible",
+      "student_id": "649400",
+      "weekly_timetable": [
+        {
+          "assignment_identity": "a_34899",
+          "sessions": []
+        },
+        {
+          "assignment_identity": "a_34900",
+          "sessions": []
+        },
+        {
+          "assignment_identity": "a_34901",
+          "sessions": []
+        }
+      ]
+    },
+    {
+      "allocations": [
+        {
+          "assignment_identity": "a_34899",
+          "session_count": 0,
+          "weekly_sessions": [
+            0,
+            0,
+            0,
+            0
+          ]
+        },
+        {
+          "assignment_identity": "a_34900",
+          "session_count": 0,
+          "weekly_sessions": [
+            0,
+            0,
+            0,
+            0
+          ]
+        },
+        {
+          "assignment_identity": "a_34901",
+          "session_count": 0,
+          "weekly_sessions": [
+            0,
+            0,
+            0,
+            0
+          ]
+        }
+      ],
+      "artifact_digest": "674e212ec06c3233bcb6010af907ec33ba6c68e3a9a867a8fed589866d8682c8",
+      "configuration_status": "SYNTHETIC_DEMO_ONLY_NOT_PRODUCTION",
+      "error_message": null,
+      "error_type": null,
+      "failure_reasons": [],
+      "method": "average",
+      "model_identity": "0b3325d145d56a8aad8a48df2203b6db4d47bdf70b4e8256db00e312d09457a0",
+      "model_mode": "simple_average_mark_baseline",
+      "outcome": "target_achieved",
+      "predicted_marks": [
+        {
+          "assignment_identity": "a_34899",
+          "predicted_mark": 78.76094970074121,
+          "target_mark": 60.0
+        },
+        {
+          "assignment_identity": "a_34900",
+          "predicted_mark": 78.76094970074121,
+          "target_mark": 60.0
+        },
+        {
+          "assignment_identity": "a_34901",
+          "predicted_mark": 78.76094970074121,
+          "target_mark": 60.0
+        }
+      ],
+      "search_complete": false,
+      "seed": 42,
+      "status": "feasible",
+      "student_id": "649400",
+      "weekly_timetable": [
+        {
+          "assignment_identity": "a_34899",
+          "sessions": []
+        },
+        {
+          "assignment_identity": "a_34900",
+          "sessions": []
+        },
+        {
+          "assignment_identity": "a_34901",
+          "sessions": []
+        }
+      ]
+    },
+    {
+      "allocations": [
+        {
+          "assignment_identity": "a_34899",
+          "session_count": 0,
+          "weekly_sessions": [
+            0,
+            0,
+            0,
+            0
+          ]
+        },
+        {
+          "assignment_identity": "a_34900",
+          "session_count": 0,
+          "weekly_sessions": [
+            0,
+            0,
+            0,
+            0
+          ]
+        },
+        {
+          "assignment_identity": "a_34901",
+          "session_count": 0,
+          "weekly_sessions": [
+            0,
+            0,
+            0,
+            0
+          ]
+        }
+      ],
+      "artifact_digest": "ab6d3a07b9fc4768e2e5341583f9a8e49c8e03e0520b26cf3daa9d7372e03e9a",
+      "configuration_status": "SYNTHETIC_DEMO_ONLY_NOT_PRODUCTION",
+      "error_message": null,
+      "error_type": null,
+      "failure_reasons": [],
+      "method": "nn",
+      "model_identity": "040c2af6327e413c71769c29f5fd27802dba65bd18d970d92e68930af70c7679",
+      "model_mode": "model_a_strict",
+      "outcome": "target_achieved",
+      "predicted_marks": [
+        {
+          "assignment_identity": "a_34899",
+          "predicted_mark": 79.42269134521484,
+          "target_mark": 60.0
+        },
+        {
+          "assignment_identity": "a_34900",
+          "predicted_mark": 75.89513397216797,
+          "target_mark": 60.0
+        },
+        {
+          "assignment_identity": "a_34901",
+          "predicted_mark": 80.7766342163086,
+          "target_mark": 60.0
+        }
+      ],
+      "search_complete": false,
+      "seed": 42,
+      "status": "feasible",
+      "student_id": "649952",
+      "weekly_timetable": [
+        {
+          "assignment_identity": "a_34899",
+          "sessions": []
+        },
+        {
+          "assignment_identity": "a_34900",
+          "sessions": []
+        },
+        {
+          "assignment_identity": "a_34901",
+          "sessions": []
+        }
+      ]
+    },
+    {
+      "allocations": [
+        {
+          "assignment_identity": "a_34899",
+          "session_count": 0,
+          "weekly_sessions": [
+            0,
+            0,
+            0,
+            0
+          ]
+        },
+        {
+          "assignment_identity": "a_34900",
+          "session_count": 0,
+          "weekly_sessions": [
+            0,
+            0,
+            0,
+            0
+          ]
+        },
+        {
+          "assignment_identity": "a_34901",
+          "session_count": 0,
+          "weekly_sessions": [
+            0,
+            0,
+            0,
+            0
+          ]
+        }
+      ],
+      "artifact_digest": "674e212ec06c3233bcb6010af907ec33ba6c68e3a9a867a8fed589866d8682c8",
+      "configuration_status": "SYNTHETIC_DEMO_ONLY_NOT_PRODUCTION",
+      "error_message": null,
+      "error_type": null,
+      "failure_reasons": [],
+      "method": "average",
+      "model_identity": "0b3325d145d56a8aad8a48df2203b6db4d47bdf70b4e8256db00e312d09457a0",
+      "model_mode": "simple_average_mark_baseline",
+      "outcome": "target_achieved",
+      "predicted_marks": [
+        {
+          "assignment_identity": "a_34899",
+          "predicted_mark": 78.76094970074121,
+          "target_mark": 60.0
+        },
+        {
+          "assignment_identity": "a_34900",
+          "predicted_mark": 78.76094970074121,
+          "target_mark": 60.0
+        },
+        {
+          "assignment_identity": "a_34901",
+          "predicted_mark": 78.76094970074121,
+          "target_mark": 60.0
+        }
+      ],
+      "search_complete": false,
+      "seed": 42,
+      "status": "feasible",
+      "student_id": "649952",
+      "weekly_timetable": [
+        {
+          "assignment_identity": "a_34899",
+          "sessions": []
+        },
+        {
+          "assignment_identity": "a_34900",
+          "sessions": []
+        },
+        {
+          "assignment_identity": "a_34901",
+          "sessions": []
+        }
+      ]
+    },
+    {
+      "allocations": [
+        {
+          "assignment_identity": "a_34899",
+          "session_count": 0,
+          "weekly_sessions": [
+            0,
+            0,
+            0,
+            0
+          ]
+        },
+        {
+          "assignment_identity": "a_34900",
+          "session_count": 0,
+          "weekly_sessions": [
+            0,
+            0,
+            0,
+            0
+          ]
+        },
+        {
+          "assignment_identity": "a_34901",
+          "session_count": 0,
+          "weekly_sessions": [
+            0,
+            0,
+            0,
+            0
+          ]
+        }
+      ],
+      "artifact_digest": "ab6d3a07b9fc4768e2e5341583f9a8e49c8e03e0520b26cf3daa9d7372e03e9a",
+      "configuration_status": "SYNTHETIC_DEMO_ONLY_NOT_PRODUCTION",
+      "error_message": null,
+      "error_type": null,
+      "failure_reasons": [],
+      "method": "nn",
+      "model_identity": "040c2af6327e413c71769c29f5fd27802dba65bd18d970d92e68930af70c7679",
+      "model_mode": "model_a_strict",
+      "outcome": "target_achieved",
+      "predicted_marks": [
+        {
+          "assignment_identity": "a_34899",
+          "predicted_mark": 82.07843017578125,
+          "target_mark": 60.0
+        },
+        {
+          "assignment_identity": "a_34900",
+          "predicted_mark": 76.13951873779297,
+          "target_mark": 60.0
+        },
+        {
+          "assignment_identity": "a_34901",
+          "predicted_mark": 79.3936767578125,
+          "target_mark": 60.0
+        }
+      ],
+      "search_complete": false,
+      "seed": 42,
+      "status": "feasible",
+      "student_id": "651598",
+      "weekly_timetable": [
+        {
+          "assignment_identity": "a_34899",
+          "sessions": []
+        },
+        {
+          "assignment_identity": "a_34900",
+          "sessions": []
+        },
+        {
+          "assignment_identity": "a_34901",
+          "sessions": []
+        }
+      ]
+    },
+    {
+      "allocations": [
+        {
+          "assignment_identity": "a_34899",
+          "session_count": 0,
+          "weekly_sessions": [
+            0,
+            0,
+            0,
+            0
+          ]
+        },
+        {
+          "assignment_identity": "a_34900",
+          "session_count": 0,
+          "weekly_sessions": [
+            0,
+            0,
+            0,
+            0
+          ]
+        },
+        {
+          "assignment_identity": "a_34901",
+          "session_count": 0,
+          "weekly_sessions": [
+            0,
+            0,
+            0,
+            0
+          ]
+        }
+      ],
+      "artifact_digest": "674e212ec06c3233bcb6010af907ec33ba6c68e3a9a867a8fed589866d8682c8",
+      "configuration_status": "SYNTHETIC_DEMO_ONLY_NOT_PRODUCTION",
+      "error_message": null,
+      "error_type": null,
+      "failure_reasons": [],
+      "method": "average",
+      "model_identity": "0b3325d145d56a8aad8a48df2203b6db4d47bdf70b4e8256db00e312d09457a0",
+      "model_mode": "simple_average_mark_baseline",
+      "outcome": "target_achieved",
+      "predicted_marks": [
+        {
+          "assignment_identity": "a_34899",
+          "predicted_mark": 78.76094970074121,
+          "target_mark": 60.0
+        },
+        {
+          "assignment_identity": "a_34900",
+          "predicted_mark": 78.76094970074121,
+          "target_mark": 60.0
+        },
+        {
+          "assignment_identity": "a_34901",
+          "predicted_mark": 78.76094970074121,
+          "target_mark": 60.0
+        }
+      ],
+      "search_complete": false,
+      "seed": 42,
+      "status": "feasible",
+      "student_id": "651598",
+      "weekly_timetable": [
+        {
+          "assignment_identity": "a_34899",
+          "sessions": []
+        },
+        {
+          "assignment_identity": "a_34900",
+          "sessions": []
+        },
+        {
+          "assignment_identity": "a_34901",
+          "sessions": []
+        }
+      ]
+    },
+    {
+      "allocations": [
+        {
+          "assignment_identity": "a_34899",
+          "session_count": 0,
+          "weekly_sessions": [
+            0,
+            0,
+            0,
+            0
+          ]
+        },
+        {
+          "assignment_identity": "a_34900",
+          "session_count": 0,
+          "weekly_sessions": [
+            0,
+            0,
+            0,
+            0
+          ]
+        },
+        {
+          "assignment_identity": "a_34901",
+          "session_count": 0,
+          "weekly_sessions": [
+            0,
+            0,
+            0,
+            0
+          ]
+        }
+      ],
+      "artifact_digest": "ab6d3a07b9fc4768e2e5341583f9a8e49c8e03e0520b26cf3daa9d7372e03e9a",
+      "configuration_status": "SYNTHETIC_DEMO_ONLY_NOT_PRODUCTION",
+      "error_message": null,
+      "error_type": null,
+      "failure_reasons": [],
+      "method": "nn",
+      "model_identity": "040c2af6327e413c71769c29f5fd27802dba65bd18d970d92e68930af70c7679",
+      "model_mode": "model_a_strict",
+      "outcome": "target_achieved",
+      "predicted_marks": [
+        {
+          "assignment_identity": "a_34899",
+          "predicted_mark": 77.27149963378906,
+          "target_mark": 60.0
+        },
+        {
+          "assignment_identity": "a_34900",
+          "predicted_mark": 70.60132598876953,
+          "target_mark": 60.0
+        },
+        {
+          "assignment_identity": "a_34901",
+          "predicted_mark": 68.30529022216797,
+          "target_mark": 60.0
+        }
+      ],
+      "search_complete": false,
+      "seed": 42,
+      "status": "feasible",
+      "student_id": "652576",
+      "weekly_timetable": [
+        {
+          "assignment_identity": "a_34899",
+          "sessions": []
+        },
+        {
+          "assignment_identity": "a_34900",
+          "sessions": []
+        },
+        {
+          "assignment_identity": "a_34901",
+          "sessions": []
+        }
+      ]
+    },
+    {
+      "allocations": [
+        {
+          "assignment_identity": "a_34899",
+          "session_count": 0,
+          "weekly_sessions": [
+            0,
+            0,
+            0,
+            0
+          ]
+        },
+        {
+          "assignment_identity": "a_34900",
+          "session_count": 0,
+          "weekly_sessions": [
+            0,
+            0,
+            0,
+            0
+          ]
+        },
+        {
+          "assignment_identity": "a_34901",
+          "session_count": 0,
+          "weekly_sessions": [
+            0,
+            0,
+            0,
+            0
+          ]
+        }
+      ],
+      "artifact_digest": "674e212ec06c3233bcb6010af907ec33ba6c68e3a9a867a8fed589866d8682c8",
+      "configuration_status": "SYNTHETIC_DEMO_ONLY_NOT_PRODUCTION",
+      "error_message": null,
+      "error_type": null,
+      "failure_reasons": [],
+      "method": "average",
+      "model_identity": "0b3325d145d56a8aad8a48df2203b6db4d47bdf70b4e8256db00e312d09457a0",
+      "model_mode": "simple_average_mark_baseline",
+      "outcome": "target_achieved",
+      "predicted_marks": [
+        {
+          "assignment_identity": "a_34899",
+          "predicted_mark": 78.76094970074121,
+          "target_mark": 60.0
+        },
+        {
+          "assignment_identity": "a_34900",
+          "predicted_mark": 78.76094970074121,
+          "target_mark": 60.0
+        },
+        {
+          "assignment_identity": "a_34901",
+          "predicted_mark": 78.76094970074121,
+          "target_mark": 60.0
+        }
+      ],
+      "search_complete": false,
+      "seed": 42,
+      "status": "feasible",
+      "student_id": "652576",
+      "weekly_timetable": [
+        {
+          "assignment_identity": "a_34899",
+          "sessions": []
+        },
+        {
+          "assignment_identity": "a_34900",
+          "sessions": []
+        },
+        {
+          "assignment_identity": "a_34901",
+          "sessions": []
+        }
+      ]
+    },
+    {
+      "allocations": [
+        {
+          "assignment_identity": "a_34899",
+          "session_count": 0,
+          "weekly_sessions": [
+            0,
+            0,
+            0,
+            0
+          ]
+        },
+        {
+          "assignment_identity": "a_34900",
+          "session_count": 0,
+          "weekly_sessions": [
+            0,
+            0,
+            0,
+            0
+          ]
+        },
+        {
+          "assignment_identity": "a_34901",
+          "session_count": 0,
+          "weekly_sessions": [
+            0,
+            0,
+            0,
+            0
+          ]
+        }
+      ],
+      "artifact_digest": "ab6d3a07b9fc4768e2e5341583f9a8e49c8e03e0520b26cf3daa9d7372e03e9a",
+      "configuration_status": "SYNTHETIC_DEMO_ONLY_NOT_PRODUCTION",
+      "error_message": null,
+      "error_type": null,
+      "failure_reasons": [],
+      "method": "nn",
+      "model_identity": "040c2af6327e413c71769c29f5fd27802dba65bd18d970d92e68930af70c7679",
+      "model_mode": "model_a_strict",
+      "outcome": "target_achieved",
+      "predicted_marks": [
+        {
+          "assignment_identity": "a_34899",
+          "predicted_mark": 83.57028198242188,
+          "target_mark": 60.0
+        },
+        {
+          "assignment_identity": "a_34900",
+          "predicted_mark": 74.07582092285156,
+          "target_mark": 60.0
+        },
+        {
+          "assignment_identity": "a_34901",
+          "predicted_mark": 78.24627685546875,
+          "target_mark": 60.0
+        }
+      ],
+      "search_complete": false,
+      "seed": 42,
+      "status": "feasible",
+      "student_id": "652898",
+      "weekly_timetable": [
+        {
+          "assignment_identity": "a_34899",
+          "sessions": []
+        },
+        {
+          "assignment_identity": "a_34900",
+          "sessions": []
+        },
+        {
+          "assignment_identity": "a_34901",
+          "sessions": []
+        }
+      ]
+    },
+    {
+      "allocations": [
+        {
+          "assignment_identity": "a_34899",
+          "session_count": 0,
+          "weekly_sessions": [
+            0,
+            0,
+            0,
+            0
+          ]
+        },
+        {
+          "assignment_identity": "a_34900",
+          "session_count": 0,
+          "weekly_sessions": [
+            0,
+            0,
+            0,
+            0
+          ]
+        },
+        {
+          "assignment_identity": "a_34901",
+          "session_count": 0,
+          "weekly_sessions": [
+            0,
+            0,
+            0,
+            0
+          ]
+        }
+      ],
+      "artifact_digest": "674e212ec06c3233bcb6010af907ec33ba6c68e3a9a867a8fed589866d8682c8",
+      "configuration_status": "SYNTHETIC_DEMO_ONLY_NOT_PRODUCTION",
+      "error_message": null,
+      "error_type": null,
+      "failure_reasons": [],
+      "method": "average",
+      "model_identity": "0b3325d145d56a8aad8a48df2203b6db4d47bdf70b4e8256db00e312d09457a0",
+      "model_mode": "simple_average_mark_baseline",
+      "outcome": "target_achieved",
+      "predicted_marks": [
+        {
+          "assignment_identity": "a_34899",
+          "predicted_mark": 78.76094970074121,
+          "target_mark": 60.0
+        },
+        {
+          "assignment_identity": "a_34900",
+          "predicted_mark": 78.76094970074121,
+          "target_mark": 60.0
+        },
+        {
+          "assignment_identity": "a_34901",
+          "predicted_mark": 78.76094970074121,
+          "target_mark": 60.0
+        }
+      ],
+      "search_complete": false,
+      "seed": 42,
+      "status": "feasible",
+      "student_id": "652898",
+      "weekly_timetable": [
+        {
+          "assignment_identity": "a_34899",
+          "sessions": []
+        },
+        {
+          "assignment_identity": "a_34900",
+          "sessions": []
+        },
+        {
+          "assignment_identity": "a_34901",
+          "sessions": []
+        }
+      ]
+    },
+    {
+      "allocations": [
+        {
+          "assignment_identity": "a_34899",
+          "session_count": 0,
+          "weekly_sessions": [
+            0,
+            0,
+            0,
+            0
+          ]
+        },
+        {
+          "assignment_identity": "a_34900",
+          "session_count": 0,
+          "weekly_sessions": [
+            0,
+            0,
+            0,
+            0
+          ]
+        },
+        {
+          "assignment_identity": "a_34901",
+          "session_count": 0,
+          "weekly_sessions": [
+            0,
+            0,
+            0,
+            0
+          ]
+        }
+      ],
+      "artifact_digest": "ab6d3a07b9fc4768e2e5341583f9a8e49c8e03e0520b26cf3daa9d7372e03e9a",
+      "configuration_status": "SYNTHETIC_DEMO_ONLY_NOT_PRODUCTION",
+      "error_message": null,
+      "error_type": null,
+      "failure_reasons": [],
+      "method": "nn",
+      "model_identity": "040c2af6327e413c71769c29f5fd27802dba65bd18d970d92e68930af70c7679",
+      "model_mode": "model_a_strict",
+      "outcome": "target_achieved",
+      "predicted_marks": [
+        {
+          "assignment_identity": "a_34899",
+          "predicted_mark": 77.64962768554688,
+          "target_mark": 60.0
+        },
+        {
+          "assignment_identity": "a_34900",
+          "predicted_mark": 69.91938781738281,
+          "target_mark": 60.0
+        },
+        {
+          "assignment_identity": "a_34901",
+          "predicted_mark": 72.73370361328125,
+          "target_mark": 60.0
+        }
+      ],
+      "search_complete": false,
+      "seed": 42,
+      "status": "feasible",
+      "student_id": "654169",
+      "weekly_timetable": [
+        {
+          "assignment_identity": "a_34899",
+          "sessions": []
+        },
+        {
+          "assignment_identity": "a_34900",
+          "sessions": []
+        },
+        {
+          "assignment_identity": "a_34901",
+          "sessions": []
+        }
+      ]
+    },
+    {
+      "allocations": [
+        {
+          "assignment_identity": "a_34899",
+          "session_count": 0,
+          "weekly_sessions": [
+            0,
+            0,
+            0,
+            0
+          ]
+        },
+        {
+          "assignment_identity": "a_34900",
+          "session_count": 0,
+          "weekly_sessions": [
+            0,
+            0,
+            0,
+            0
+          ]
+        },
+        {
+          "assignment_identity": "a_34901",
+          "session_count": 0,
+          "weekly_sessions": [
+            0,
+            0,
+            0,
+            0
+          ]
+        }
+      ],
+      "artifact_digest": "674e212ec06c3233bcb6010af907ec33ba6c68e3a9a867a8fed589866d8682c8",
+      "configuration_status": "SYNTHETIC_DEMO_ONLY_NOT_PRODUCTION",
+      "error_message": null,
+      "error_type": null,
+      "failure_reasons": [],
+      "method": "average",
+      "model_identity": "0b3325d145d56a8aad8a48df2203b6db4d47bdf70b4e8256db00e312d09457a0",
+      "model_mode": "simple_average_mark_baseline",
+      "outcome": "target_achieved",
+      "predicted_marks": [
+        {
+          "assignment_identity": "a_34899",
+          "predicted_mark": 78.76094970074121,
+          "target_mark": 60.0
+        },
+        {
+          "assignment_identity": "a_34900",
+          "predicted_mark": 78.76094970074121,
+          "target_mark": 60.0
+        },
+        {
+          "assignment_identity": "a_34901",
+          "predicted_mark": 78.76094970074121,
+          "target_mark": 60.0
+        }
+      ],
+      "search_complete": false,
+      "seed": 42,
+      "status": "feasible",
+      "student_id": "654169",
+      "weekly_timetable": [
+        {
+          "assignment_identity": "a_34899",
+          "sessions": []
+        },
+        {
+          "assignment_identity": "a_34900",
+          "sessions": []
+        },
+        {
+          "assignment_identity": "a_34901",
+          "sessions": []
+        }
+      ]
+    },
+    {
+      "allocations": [
+        {
+          "assignment_identity": "a_34899",
+          "session_count": 0,
+          "weekly_sessions": [
+            0,
+            0,
+            0,
+            0
+          ]
+        },
+        {
+          "assignment_identity": "a_34900",
+          "session_count": 0,
+          "weekly_sessions": [
+            0,
+            0,
+            0,
+            0
+          ]
+        },
+        {
+          "assignment_identity": "a_34901",
+          "session_count": 0,
+          "weekly_sessions": [
+            0,
+            0,
+            0,
+            0
+          ]
+        }
+      ],
+      "artifact_digest": "ab6d3a07b9fc4768e2e5341583f9a8e49c8e03e0520b26cf3daa9d7372e03e9a",
+      "configuration_status": "SYNTHETIC_DEMO_ONLY_NOT_PRODUCTION",
+      "error_message": null,
+      "error_type": null,
+      "failure_reasons": [],
+      "method": "nn",
+      "model_identity": "040c2af6327e413c71769c29f5fd27802dba65bd18d970d92e68930af70c7679",
+      "model_mode": "model_a_strict",
+      "outcome": "target_achieved",
+      "predicted_marks": [
+        {
+          "assignment_identity": "a_34899",
+          "predicted_mark": 80.61109924316406,
+          "target_mark": 60.0
+        },
+        {
+          "assignment_identity": "a_34900",
+          "predicted_mark": 82.93089294433594,
+          "target_mark": 60.0
+        },
+        {
+          "assignment_identity": "a_34901",
+          "predicted_mark": 80.49494934082031,
+          "target_mark": 60.0
+        }
+      ],
+      "search_complete": false,
+      "seed": 42,
+      "status": "feasible",
+      "student_id": "674262",
+      "weekly_timetable": [
+        {
+          "assignment_identity": "a_34899",
+          "sessions": []
+        },
+        {
+          "assignment_identity": "a_34900",
+          "sessions": []
+        },
+        {
+          "assignment_identity": "a_34901",
+          "sessions": []
+        }
+      ]
+    },
+    {
+      "allocations": [
+        {
+          "assignment_identity": "a_34899",
+          "session_count": 0,
+          "weekly_sessions": [
+            0,
+            0,
+            0,
+            0
+          ]
+        },
+        {
+          "assignment_identity": "a_34900",
+          "session_count": 0,
+          "weekly_sessions": [
+            0,
+            0,
+            0,
+            0
+          ]
+        },
+        {
+          "assignment_identity": "a_34901",
+          "session_count": 0,
+          "weekly_sessions": [
+            0,
+            0,
+            0,
+            0
+          ]
+        }
+      ],
+      "artifact_digest": "674e212ec06c3233bcb6010af907ec33ba6c68e3a9a867a8fed589866d8682c8",
+      "configuration_status": "SYNTHETIC_DEMO_ONLY_NOT_PRODUCTION",
+      "error_message": null,
+      "error_type": null,
+      "failure_reasons": [],
+      "method": "average",
+      "model_identity": "0b3325d145d56a8aad8a48df2203b6db4d47bdf70b4e8256db00e312d09457a0",
+      "model_mode": "simple_average_mark_baseline",
+      "outcome": "target_achieved",
+      "predicted_marks": [
+        {
+          "assignment_identity": "a_34899",
+          "predicted_mark": 78.76094970074121,
+          "target_mark": 60.0
+        },
+        {
+          "assignment_identity": "a_34900",
+          "predicted_mark": 78.76094970074121,
+          "target_mark": 60.0
+        },
+        {
+          "assignment_identity": "a_34901",
+          "predicted_mark": 78.76094970074121,
+          "target_mark": 60.0
+        }
+      ],
+      "search_complete": false,
+      "seed": 42,
+      "status": "feasible",
+      "student_id": "674262",
+      "weekly_timetable": [
+        {
+          "assignment_identity": "a_34899",
+          "sessions": []
+        },
+        {
+          "assignment_identity": "a_34900",
+          "sessions": []
+        },
+        {
+          "assignment_identity": "a_34901",
+          "sessions": []
+        }
+      ]
+    },
+    {
+      "allocations": [
+        {
+          "assignment_identity": "a_34899",
+          "session_count": 0,
+          "weekly_sessions": [
+            0,
+            0,
+            0,
+            0
+          ]
+        },
+        {
+          "assignment_identity": "a_34900",
+          "session_count": 0,
+          "weekly_sessions": [
+            0,
+            0,
+            0,
+            0
+          ]
+        },
+        {
+          "assignment_identity": "a_34901",
+          "session_count": 0,
+          "weekly_sessions": [
+            0,
+            0,
+            0,
+            0
+          ]
+        }
+      ],
+      "artifact_digest": "ab6d3a07b9fc4768e2e5341583f9a8e49c8e03e0520b26cf3daa9d7372e03e9a",
+      "configuration_status": "SYNTHETIC_DEMO_ONLY_NOT_PRODUCTION",
+      "error_message": null,
+      "error_type": null,
+      "failure_reasons": [],
+      "method": "nn",
+      "model_identity": "040c2af6327e413c71769c29f5fd27802dba65bd18d970d92e68930af70c7679",
+      "model_mode": "model_a_strict",
+      "outcome": "target_achieved",
+      "predicted_marks": [
+        {
+          "assignment_identity": "a_34899",
+          "predicted_mark": 90.93482208251953,
+          "target_mark": 60.0
+        },
+        {
+          "assignment_identity": "a_34900",
+          "predicted_mark": 77.30758666992188,
+          "target_mark": 60.0
+        },
+        {
+          "assignment_identity": "a_34901",
+          "predicted_mark": 82.09587860107422,
+          "target_mark": 60.0
+        }
+      ],
+      "search_complete": false,
+      "seed": 42,
+      "status": "feasible",
+      "student_id": "676492",
+      "weekly_timetable": [
+        {
+          "assignment_identity": "a_34899",
+          "sessions": []
+        },
+        {
+          "assignment_identity": "a_34900",
+          "sessions": []
+        },
+        {
+          "assignment_identity": "a_34901",
+          "sessions": []
+        }
+      ]
+    },
+    {
+      "allocations": [
+        {
+          "assignment_identity": "a_34899",
+          "session_count": 0,
+          "weekly_sessions": [
+            0,
+            0,
+            0,
+            0
+          ]
+        },
+        {
+          "assignment_identity": "a_34900",
+          "session_count": 0,
+          "weekly_sessions": [
+            0,
+            0,
+            0,
+            0
+          ]
+        },
+        {
+          "assignment_identity": "a_34901",
+          "session_count": 0,
+          "weekly_sessions": [
+            0,
+            0,
+            0,
+            0
+          ]
+        }
+      ],
+      "artifact_digest": "674e212ec06c3233bcb6010af907ec33ba6c68e3a9a867a8fed589866d8682c8",
+      "configuration_status": "SYNTHETIC_DEMO_ONLY_NOT_PRODUCTION",
+      "error_message": null,
+      "error_type": null,
+      "failure_reasons": [],
+      "method": "average",
+      "model_identity": "0b3325d145d56a8aad8a48df2203b6db4d47bdf70b4e8256db00e312d09457a0",
+      "model_mode": "simple_average_mark_baseline",
+      "outcome": "target_achieved",
+      "predicted_marks": [
+        {
+          "assignment_identity": "a_34899",
+          "predicted_mark": 78.76094970074121,
+          "target_mark": 60.0
+        },
+        {
+          "assignment_identity": "a_34900",
+          "predicted_mark": 78.76094970074121,
+          "target_mark": 60.0
+        },
+        {
+          "assignment_identity": "a_34901",
+          "predicted_mark": 78.76094970074121,
+          "target_mark": 60.0
+        }
+      ],
+      "search_complete": false,
+      "seed": 42,
+      "status": "feasible",
+      "student_id": "676492",
+      "weekly_timetable": [
+        {
+          "assignment_identity": "a_34899",
+          "sessions": []
+        },
+        {
+          "assignment_identity": "a_34900",
+          "sessions": []
+        },
+        {
+          "assignment_identity": "a_34901",
+          "sessions": []
+        }
+      ]
+    },
+    {
+      "allocations": [
+        {
+          "assignment_identity": "a_34899",
+          "session_count": 0,
+          "weekly_sessions": [
+            0,
+            0,
+            0,
+            0
+          ]
+        },
+        {
+          "assignment_identity": "a_34900",
+          "session_count": 0,
+          "weekly_sessions": [
+            0,
+            0,
+            0,
+            0
+          ]
+        },
+        {
+          "assignment_identity": "a_34901",
+          "session_count": 0,
+          "weekly_sessions": [
+            0,
+            0,
+            0,
+            0
+          ]
+        }
+      ],
+      "artifact_digest": "ab6d3a07b9fc4768e2e5341583f9a8e49c8e03e0520b26cf3daa9d7372e03e9a",
+      "configuration_status": "SYNTHETIC_DEMO_ONLY_NOT_PRODUCTION",
+      "error_message": null,
+      "error_type": null,
+      "failure_reasons": [],
+      "method": "nn",
+      "model_identity": "040c2af6327e413c71769c29f5fd27802dba65bd18d970d92e68930af70c7679",
+      "model_mode": "model_a_strict",
+      "outcome": "target_achieved",
+      "predicted_marks": [
+        {
+          "assignment_identity": "a_34899",
+          "predicted_mark": 77.11849212646484,
+          "target_mark": 60.0
+        },
+        {
+          "assignment_identity": "a_34900",
+          "predicted_mark": 66.99278259277344,
+          "target_mark": 60.0
+        },
+        {
+          "assignment_identity": "a_34901",
+          "predicted_mark": 70.39373779296875,
+          "target_mark": 60.0
+        }
+      ],
+      "search_complete": false,
+      "seed": 42,
+      "status": "feasible",
+      "student_id": "681341",
+      "weekly_timetable": [
+        {
+          "assignment_identity": "a_34899",
+          "sessions": []
+        },
+        {
+          "assignment_identity": "a_34900",
+          "sessions": []
+        },
+        {
+          "assignment_identity": "a_34901",
+          "sessions": []
+        }
+      ]
+    },
+    {
+      "allocations": [
+        {
+          "assignment_identity": "a_34899",
+          "session_count": 0,
+          "weekly_sessions": [
+            0,
+            0,
+            0,
+            0
+          ]
+        },
+        {
+          "assignment_identity": "a_34900",
+          "session_count": 0,
+          "weekly_sessions": [
+            0,
+            0,
+            0,
+            0
+          ]
+        },
+        {
+          "assignment_identity": "a_34901",
+          "session_count": 0,
+          "weekly_sessions": [
+            0,
+            0,
+            0,
+            0
+          ]
+        }
+      ],
+      "artifact_digest": "674e212ec06c3233bcb6010af907ec33ba6c68e3a9a867a8fed589866d8682c8",
+      "configuration_status": "SYNTHETIC_DEMO_ONLY_NOT_PRODUCTION",
+      "error_message": null,
+      "error_type": null,
+      "failure_reasons": [],
+      "method": "average",
+      "model_identity": "0b3325d145d56a8aad8a48df2203b6db4d47bdf70b4e8256db00e312d09457a0",
+      "model_mode": "simple_average_mark_baseline",
+      "outcome": "target_achieved",
+      "predicted_marks": [
+        {
+          "assignment_identity": "a_34899",
+          "predicted_mark": 78.76094970074121,
+          "target_mark": 60.0
+        },
+        {
+          "assignment_identity": "a_34900",
+          "predicted_mark": 78.76094970074121,
+          "target_mark": 60.0
+        },
+        {
+          "assignment_identity": "a_34901",
+          "predicted_mark": 78.76094970074121,
+          "target_mark": 60.0
+        }
+      ],
+      "search_complete": false,
+      "seed": 42,
+      "status": "feasible",
+      "student_id": "681341",
+      "weekly_timetable": [
+        {
+          "assignment_identity": "a_34899",
+          "sessions": []
+        },
+        {
+          "assignment_identity": "a_34900",
+          "sessions": []
+        },
+        {
+          "assignment_identity": "a_34901",
+          "sessions": []
+        }
+      ]
+    },
+    {
+      "allocations": [
+        {
+          "assignment_identity": "a_34899",
+          "session_count": 0,
+          "weekly_sessions": [
+            0,
+            0,
+            0,
+            0
+          ]
+        },
+        {
+          "assignment_identity": "a_34900",
+          "session_count": 0,
+          "weekly_sessions": [
+            0,
+            0,
+            0,
+            0
+          ]
+        },
+        {
+          "assignment_identity": "a_34901",
+          "session_count": 0,
+          "weekly_sessions": [
+            0,
+            0,
+            0,
+            0
+          ]
+        }
+      ],
+      "artifact_digest": "ab6d3a07b9fc4768e2e5341583f9a8e49c8e03e0520b26cf3daa9d7372e03e9a",
+      "configuration_status": "SYNTHETIC_DEMO_ONLY_NOT_PRODUCTION",
+      "error_message": null,
+      "error_type": null,
+      "failure_reasons": [],
+      "method": "nn",
+      "model_identity": "040c2af6327e413c71769c29f5fd27802dba65bd18d970d92e68930af70c7679",
+      "model_mode": "model_a_strict",
+      "outcome": "target_achieved",
+      "predicted_marks": [
+        {
+          "assignment_identity": "a_34899",
+          "predicted_mark": 81.23780822753906,
+          "target_mark": 60.0
+        },
+        {
+          "assignment_identity": "a_34900",
+          "predicted_mark": 73.6886978149414,
+          "target_mark": 60.0
+        },
+        {
+          "assignment_identity": "a_34901",
+          "predicted_mark": 71.60770416259766,
+          "target_mark": 60.0
+        }
+      ],
+      "search_complete": false,
+      "seed": 42,
+      "status": "feasible",
+      "student_id": "681755",
+      "weekly_timetable": [
+        {
+          "assignment_identity": "a_34899",
+          "sessions": []
+        },
+        {
+          "assignment_identity": "a_34900",
+          "sessions": []
+        },
+        {
+          "assignment_identity": "a_34901",
+          "sessions": []
+        }
+      ]
+    },
+    {
+      "allocations": [
+        {
+          "assignment_identity": "a_34899",
+          "session_count": 0,
+          "weekly_sessions": [
+            0,
+            0,
+            0,
+            0
+          ]
+        },
+        {
+          "assignment_identity": "a_34900",
+          "session_count": 0,
+          "weekly_sessions": [
+            0,
+            0,
+            0,
+            0
+          ]
+        },
+        {
+          "assignment_identity": "a_34901",
+          "session_count": 0,
+          "weekly_sessions": [
+            0,
+            0,
+            0,
+            0
+          ]
+        }
+      ],
+      "artifact_digest": "674e212ec06c3233bcb6010af907ec33ba6c68e3a9a867a8fed589866d8682c8",
+      "configuration_status": "SYNTHETIC_DEMO_ONLY_NOT_PRODUCTION",
+      "error_message": null,
+      "error_type": null,
+      "failure_reasons": [],
+      "method": "average",
+      "model_identity": "0b3325d145d56a8aad8a48df2203b6db4d47bdf70b4e8256db00e312d09457a0",
+      "model_mode": "simple_average_mark_baseline",
+      "outcome": "target_achieved",
+      "predicted_marks": [
+        {
+          "assignment_identity": "a_34899",
+          "predicted_mark": 78.76094970074121,
+          "target_mark": 60.0
+        },
+        {
+          "assignment_identity": "a_34900",
+          "predicted_mark": 78.76094970074121,
+          "target_mark": 60.0
+        },
+        {
+          "assignment_identity": "a_34901",
+          "predicted_mark": 78.76094970074121,
+          "target_mark": 60.0
+        }
+      ],
+      "search_complete": false,
+      "seed": 42,
+      "status": "feasible",
+      "student_id": "681755",
+      "weekly_timetable": [
+        {
+          "assignment_identity": "a_34899",
+          "sessions": []
+        },
+        {
+          "assignment_identity": "a_34900",
+          "sessions": []
+        },
+        {
+          "assignment_identity": "a_34901",
+          "sessions": []
+        }
+      ]
+    },
+    {
+      "allocations": [
+        {
+          "assignment_identity": "a_34899",
+          "session_count": 0,
+          "weekly_sessions": [
+            0,
+            0,
+            0,
+            0
+          ]
+        },
+        {
+          "assignment_identity": "a_34900",
+          "session_count": 0,
+          "weekly_sessions": [
+            0,
+            0,
+            0,
+            0
+          ]
+        },
+        {
+          "assignment_identity": "a_34901",
+          "session_count": 0,
+          "weekly_sessions": [
+            0,
+            0,
+            0,
+            0
+          ]
+        }
+      ],
+      "artifact_digest": "ab6d3a07b9fc4768e2e5341583f9a8e49c8e03e0520b26cf3daa9d7372e03e9a",
+      "configuration_status": "SYNTHETIC_DEMO_ONLY_NOT_PRODUCTION",
+      "error_message": null,
+      "error_type": null,
+      "failure_reasons": [],
+      "method": "nn",
+      "model_identity": "040c2af6327e413c71769c29f5fd27802dba65bd18d970d92e68930af70c7679",
+      "model_mode": "model_a_strict",
+      "outcome": "target_achieved",
+      "predicted_marks": [
+        {
+          "assignment_identity": "a_34899",
+          "predicted_mark": 87.16266632080078,
+          "target_mark": 60.0
+        },
+        {
+          "assignment_identity": "a_34900",
+          "predicted_mark": 77.97303771972656,
+          "target_mark": 60.0
+        },
+        {
+          "assignment_identity": "a_34901",
+          "predicted_mark": 76.26139831542969,
+          "target_mark": 60.0
+        }
+      ],
+      "search_complete": false,
+      "seed": 42,
+      "status": "feasible",
+      "student_id": "683403",
+      "weekly_timetable": [
+        {
+          "assignment_identity": "a_34899",
+          "sessions": []
+        },
+        {
+          "assignment_identity": "a_34900",
+          "sessions": []
+        },
+        {
+          "assignment_identity": "a_34901",
+          "sessions": []
+        }
+      ]
+    },
+    {
+      "allocations": [
+        {
+          "assignment_identity": "a_34899",
+          "session_count": 0,
+          "weekly_sessions": [
+            0,
+            0,
+            0,
+            0
+          ]
+        },
+        {
+          "assignment_identity": "a_34900",
+          "session_count": 0,
+          "weekly_sessions": [
+            0,
+            0,
+            0,
+            0
+          ]
+        },
+        {
+          "assignment_identity": "a_34901",
+          "session_count": 0,
+          "weekly_sessions": [
+            0,
+            0,
+            0,
+            0
+          ]
+        }
+      ],
+      "artifact_digest": "674e212ec06c3233bcb6010af907ec33ba6c68e3a9a867a8fed589866d8682c8",
+      "configuration_status": "SYNTHETIC_DEMO_ONLY_NOT_PRODUCTION",
+      "error_message": null,
+      "error_type": null,
+      "failure_reasons": [],
+      "method": "average",
+      "model_identity": "0b3325d145d56a8aad8a48df2203b6db4d47bdf70b4e8256db00e312d09457a0",
+      "model_mode": "simple_average_mark_baseline",
+      "outcome": "target_achieved",
+      "predicted_marks": [
+        {
+          "assignment_identity": "a_34899",
+          "predicted_mark": 78.76094970074121,
+          "target_mark": 60.0
+        },
+        {
+          "assignment_identity": "a_34900",
+          "predicted_mark": 78.76094970074121,
+          "target_mark": 60.0
+        },
+        {
+          "assignment_identity": "a_34901",
+          "predicted_mark": 78.76094970074121,
+          "target_mark": 60.0
+        }
+      ],
+      "search_complete": false,
+      "seed": 42,
+      "status": "feasible",
+      "student_id": "683403",
+      "weekly_timetable": [
+        {
+          "assignment_identity": "a_34899",
+          "sessions": []
+        },
+        {
+          "assignment_identity": "a_34900",
+          "sessions": []
+        },
+        {
+          "assignment_identity": "a_34901",
+          "sessions": []
+        }
+      ]
+    },
+    {
+      "allocations": [
+        {
+          "assignment_identity": "a_34899",
+          "session_count": 0,
+          "weekly_sessions": [
+            0,
+            0,
+            0,
+            0
+          ]
+        },
+        {
+          "assignment_identity": "a_34900",
+          "session_count": 0,
+          "weekly_sessions": [
+            0,
+            0,
+            0,
+            0
+          ]
+        },
+        {
+          "assignment_identity": "a_34901",
+          "session_count": 0,
+          "weekly_sessions": [
+            0,
+            0,
+            0,
+            0
+          ]
+        }
+      ],
+      "artifact_digest": "ab6d3a07b9fc4768e2e5341583f9a8e49c8e03e0520b26cf3daa9d7372e03e9a",
+      "configuration_status": "SYNTHETIC_DEMO_ONLY_NOT_PRODUCTION",
+      "error_message": null,
+      "error_type": null,
+      "failure_reasons": [],
+      "method": "nn",
+      "model_identity": "040c2af6327e413c71769c29f5fd27802dba65bd18d970d92e68930af70c7679",
+      "model_mode": "model_a_strict",
+      "outcome": "target_achieved",
+      "predicted_marks": [
+        {
+          "assignment_identity": "a_34899",
+          "predicted_mark": 73.91011047363281,
+          "target_mark": 60.0
+        },
+        {
+          "assignment_identity": "a_34900",
+          "predicted_mark": 67.54292297363281,
+          "target_mark": 60.0
+        },
+        {
+          "assignment_identity": "a_34901",
+          "predicted_mark": 69.11002349853516,
+          "target_mark": 60.0
+        }
+      ],
+      "search_complete": false,
+      "seed": 42,
+      "status": "feasible",
+      "student_id": "696659",
+      "weekly_timetable": [
+        {
+          "assignment_identity": "a_34899",
+          "sessions": []
+        },
+        {
+          "assignment_identity": "a_34900",
+          "sessions": []
+        },
+        {
+          "assignment_identity": "a_34901",
+          "sessions": []
+        }
+      ]
+    },
+    {
+      "allocations": [
+        {
+          "assignment_identity": "a_34899",
+          "session_count": 0,
+          "weekly_sessions": [
+            0,
+            0,
+            0,
+            0
+          ]
+        },
+        {
+          "assignment_identity": "a_34900",
+          "session_count": 0,
+          "weekly_sessions": [
+            0,
+            0,
+            0,
+            0
+          ]
+        },
+        {
+          "assignment_identity": "a_34901",
+          "session_count": 0,
+          "weekly_sessions": [
+            0,
+            0,
+            0,
+            0
+          ]
+        }
+      ],
+      "artifact_digest": "674e212ec06c3233bcb6010af907ec33ba6c68e3a9a867a8fed589866d8682c8",
+      "configuration_status": "SYNTHETIC_DEMO_ONLY_NOT_PRODUCTION",
+      "error_message": null,
+      "error_type": null,
+      "failure_reasons": [],
+      "method": "average",
+      "model_identity": "0b3325d145d56a8aad8a48df2203b6db4d47bdf70b4e8256db00e312d09457a0",
+      "model_mode": "simple_average_mark_baseline",
+      "outcome": "target_achieved",
+      "predicted_marks": [
+        {
+          "assignment_identity": "a_34899",
+          "predicted_mark": 78.76094970074121,
+          "target_mark": 60.0
+        },
+        {
+          "assignment_identity": "a_34900",
+          "predicted_mark": 78.76094970074121,
+          "target_mark": 60.0
+        },
+        {
+          "assignment_identity": "a_34901",
+          "predicted_mark": 78.76094970074121,
+          "target_mark": 60.0
+        }
+      ],
+      "search_complete": false,
+      "seed": 42,
+      "status": "feasible",
+      "student_id": "696659",
+      "weekly_timetable": [
+        {
+          "assignment_identity": "a_34899",
+          "sessions": []
+        },
+        {
+          "assignment_identity": "a_34900",
+          "sessions": []
+        },
+        {
+          "assignment_identity": "a_34901",
+          "sessions": []
+        }
+      ]
+    }
+  ],
+  "plans_are_deterministic_across_seeds": true,
+  "profile_count": 30,
+  "run_seeds": [
+    42,
+    123,
+    2025,
+    31415,
+    271828
+  ],
+  "slot_catalog": [
+    {
+      "local_end": "10:00",
+      "local_start": "09:00",
+      "relative_windows": {
+        "a_34899": 4
+      },
+      "slot_id": "synthetic-demo-slots-W03-D1-T0540-0600",
+      "timezone": "UTC",
+      "week_index": 3,
+      "weekday_iso": 1
+    },
+    {
+      "local_end": "10:00",
+      "local_start": "09:00",
+      "relative_windows": {
+        "a_34900": 4
+      },
+      "slot_id": "synthetic-demo-slots-W07-D1-T0540-0600",
+      "timezone": "UTC",
+      "week_index": 7,
+      "weekday_iso": 1
+    },
+    {
+      "local_end": "10:00",
+      "local_start": "09:00",
+      "relative_windows": {
+        "a_34901": 4
+      },
+      "slot_id": "synthetic-demo-slots-W13-D1-T0540-0600",
+      "timezone": "UTC",
+      "week_index": 13,
+      "weekday_iso": 1
+    }
+  ]
+}
