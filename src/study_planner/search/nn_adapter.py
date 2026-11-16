@@ -60,10 +60,11 @@ class EvaluationStatus(str, Enum):
 
 
 class NNModelMode(str, Enum):
-    """Supported model schemas, retained as separate inference modes."""
+    """Supported prediction model modes, kept distinct for result provenance."""
 
     MODEL_A_STRICT = "model_a_strict"
     MODEL_B_PREVIOUS_MARKS = "model_b_previous_marks_proxy"
+    SIMPLE_AVERAGE_BASELINE = "simple_average_mark_baseline"
 
 
 class CspVerificationStatus(str, Enum):
@@ -337,6 +338,26 @@ class StrictPredictor(Protocol):
         """Predict marks from a strict-schema feature batch."""
 
 
+def verify_predictor_integrity(
+    predictor: object, expected_digest: str | None = None
+) -> str:
+    """Verify a fitted NN artifact or explicitly fitted average baseline."""
+    if getattr(predictor, "prediction_family", None) == "simple_average_mark":
+        verifier = getattr(predictor, "verify_integrity", None)
+        digest = verifier() if callable(verifier) else None
+        if (
+            not isinstance(digest, str)
+            or digest != getattr(predictor, "artifact_digest", None)
+            or (expected_digest is not None and digest != expected_digest)
+        ):
+            raise ValueError("average predictor provenance is invalid or changed")
+        return digest
+    provenance = verify_trusted_artifact_integrity(predictor)
+    if expected_digest is not None and provenance.digest != expected_digest:
+        raise ValueError("loaded model digest differs from expected provenance")
+    return provenance.digest
+
+
 @dataclass(frozen=True, slots=True)
 class CandidatePredictionResult:
     """Prediction and immutable audit data bound to one candidate identity."""
@@ -391,7 +412,9 @@ class CandidatePredictionResult:
         if predictor is None:
             return False
         try:
-            provenance = verify_trusted_artifact_integrity(predictor)
+            fitted_digest = verify_predictor_integrity(
+                predictor, self.fitted_artifact_digest
+            )
         except (TypeError, ValueError, RuntimeError):
             return False
         return (
@@ -413,7 +436,7 @@ class CandidatePredictionResult:
             and model_mode is self.model_mode
             and feature_schema_identity is not None
             and feature_schema_identity == self.feature_schema_identity
-            and provenance.digest == self.fitted_artifact_digest
+            and fitted_digest == self.fitted_artifact_digest
             and self.prediction_identity == _prediction_identity_for_result(self)
         )
 
@@ -524,17 +547,29 @@ class SessionNNAdapter:
     fitted_artifact_digest: str = field(init=False)
     feature_schema_identity: str = field(init=False)
     model_provenance_identity: str = field(init=False)
-    _artifact_provenance: _TrustedArtifactProvenance = field(init=False, repr=False)
+    _artifact_provenance: _TrustedArtifactProvenance = field(
+        init=False, repr=False
+    )
     _monotonicity_observations: dict[
         MonotonicityContext, IncrementalMonotonicityReporter
     ] = field(default_factory=dict, init=False, repr=False)
 
     def __post_init__(self) -> None:
         feature_names = tuple(self.predictor.feature_names)
-        if feature_names == STRICT_FFF_FEATURE_NAMES:
-            object.__setattr__(self, "model_mode", NNModelMode.MODEL_A_STRICT)
+        family = getattr(self.predictor, "prediction_family", "neural_network")
+        if family == "simple_average_mark":
+            if feature_names != STRICT_FFF_FEATURE_NAMES:
+                raise CandidateEvaluationError(
+                    "the average-mark baseline requires the Model A strict schema"
+                )
+            model_mode = NNModelMode.SIMPLE_AVERAGE_BASELINE
+            artifact_provenance = None
+        elif feature_names == STRICT_FFF_FEATURE_NAMES:
+            model_mode = NNModelMode.MODEL_A_STRICT
+            artifact_provenance = trusted_artifact_provenance(self.predictor)
         elif _is_previous_marks_schema(feature_names):
-            object.__setattr__(self, "model_mode", NNModelMode.MODEL_B_PREVIOUS_MARKS)
+            model_mode = NNModelMode.MODEL_B_PREVIOUS_MARKS
+            artifact_provenance = trusted_artifact_provenance(self.predictor)
         else:
             raise CandidateEvaluationError(
                 "predictor schema/order differs from Model A and Model B schemas"
@@ -556,7 +591,9 @@ class SessionNNAdapter:
         except ValueError as error:
             raise CandidateEvaluationError(str(error)) from error
         expected_mode = (
-            "strict" if self.model_mode is NNModelMode.MODEL_A_STRICT else "proxy"
+            "strict"
+            if self.model_mode is NNModelMode.MODEL_A_STRICT
+            else "proxy"
         )
         if artifact_provenance.mode != expected_mode:
             raise CandidateEvaluationError("artifact mode and predictor schema differ")
@@ -576,6 +613,7 @@ class SessionNNAdapter:
             "artifact_digest": artifact_digest,
             "feature_schema_identity": schema_identity,
             "mode": self.model_mode.value,
+            "prediction_family": family,
         }
         provenance_identity = hashlib.sha256(
             json.dumps(
@@ -586,6 +624,7 @@ class SessionNNAdapter:
         object.__setattr__(self, "feature_schema_identity", schema_identity)
         object.__setattr__(self, "model_provenance_identity", provenance_identity)
         object.__setattr__(self, "_artifact_provenance", artifact_provenance)
+        object.__setattr__(self, "prediction_family", family)
 
     @property
     def model_identity(self) -> str:
@@ -655,7 +694,9 @@ class SessionNNAdapter:
         if expected_model_provenance_identity != self.model_provenance_identity:
             raise CandidateEvaluationError("model provenance identity mismatch")
         try:
-            verify_trusted_artifact_integrity(self.predictor, self._artifact_provenance)
+            verify_trusted_artifact_integrity(
+                self.predictor, self._artifact_provenance
+            )
         except ValueError as error:
             raise CandidateEvaluationError(str(error)) from error
         expected_identity = self.candidate_identity(allocation, context)
@@ -787,7 +828,9 @@ class SessionNNAdapter:
         verification_policy_version: str | None = None,
     ) -> CandidatePredictionResult:
         try:
-            verify_trusted_artifact_integrity(self.predictor, self._artifact_provenance)
+            verify_trusted_artifact_integrity(
+                self.predictor, self._artifact_provenance
+            )
         except ValueError as error:
             raise CandidateEvaluationError(str(error)) from error
         snapshot = MappingEvaluationSnapshot.from_mapping(mapping)
@@ -846,9 +889,23 @@ class SessionNNAdapter:
             _predictor_reference=weakref.ref(self.predictor),
         )
         try:
-            verify_trusted_artifact_integrity(self.predictor, self._artifact_provenance)
+            verify_trusted_artifact_integrity(
+                self.predictor, self._artifact_provenance
+            )
         except ValueError as error:
             raise CandidateEvaluationError(str(error)) from error
         return replace(
             result, prediction_identity=_prediction_identity_for_result(result)
         )
+
+
+@dataclass(frozen=True)
+class SessionAverageMarkAdapter(SessionNNAdapter):
+    """Planner adapter for a fitted, training-only average-mark baseline."""
+
+    def __post_init__(self) -> None:
+        if getattr(self.predictor, "prediction_family", None) != "simple_average_mark":
+            raise CandidateEvaluationError(
+                "SessionAverageMarkAdapter requires the simple-average predictor"
+            )
+        super().__post_init__()

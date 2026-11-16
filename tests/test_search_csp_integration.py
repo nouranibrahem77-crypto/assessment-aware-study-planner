@@ -31,6 +31,7 @@ from study_planner.csp.backtracking import (
     BacktrackingValueOrder,
     BacktrackingVariableOrder,
 )
+from study_planner.eval.baseline import SimpleAverageMarkPredictor
 from study_planner.integration import (
     AssignmentTarget,
     CspAlgorithm,
@@ -380,6 +381,42 @@ def test_successful_planning_preserves_model_schema_and_zero_allocations(
         repeated.search_statistics.csp.nodes_visited
         == result.search_statistics.csp.nodes_visited
     )
+
+
+def test_simple_average_baseline_runs_through_search_nn_csp_planner_path() -> None:
+    predictor = SimpleAverageMarkPredictor.fit([70.0, 80.0])
+    adapter = predictor.create_session_adapter(
+        SessionClickMappingConfig(ClickScenario.LOW)
+    )
+    candidate = _candidate(adapter, "average-baseline", count=0)
+
+    result = integrated_uniform_cost_search(
+        _AllocationSpace("average-baseline", {}),
+        lambda _state: candidate,
+        adapter,
+        csp_algorithm=CspAlgorithm.BT_FC,
+    )
+
+    assert result.status is PlannerStatus.FEASIBLE
+    assert result.prediction_family == "simple_average_mark"
+    assert result.nn_model_mode is NNModelMode.SIMPLE_AVERAGE_BASELINE
+    assert [mark.predicted_mark for mark in result.predicted_marks] == [75.0] * 3
+    assert all(
+        mark.fitted_artifact_digest == predictor.artifact_digest
+        for mark in result.predicted_marks
+    )
+
+    nn_adapter = _adapter()
+    nn_candidate = _candidate(nn_adapter, "average-baseline", count=0)
+    nn_result = integrated_uniform_cost_search(
+        _AllocationSpace("average-baseline", {}),
+        lambda _state: nn_candidate,
+        nn_adapter,
+        csp_algorithm=CspAlgorithm.BT_FC,
+    )
+    assert nn_result.status is PlannerStatus.FEASIBLE
+    assert result.allocations == nn_result.allocations
+    assert result.weekly_timetable == nn_result.weekly_timetable
 
 
 def test_rejected_allocation_is_followed_by_a_valid_candidate() -> None:

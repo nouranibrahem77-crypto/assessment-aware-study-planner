@@ -81,6 +81,8 @@ python run_demo.py VERIFICATION_REJECTED
 
 The default uses the local Model A Strict artifact. To run against the separate
 Model B proxy artifact and feature schema, append `--model proxy` to any command.
+If the fitted artifact is in a different directory, pass it with
+`--artifact-directory PATH`; the artifact must match the selected model schema.
 All scenarios use labeled TEST targets, slot rules, and ordering. The
 `NN_ACCEPTS_CSP_INFEASIBLE` case meets provisional targets but requests two
 sessions from one eligible slot, so the real all-different CSP constraint
@@ -96,6 +98,18 @@ the current predictions against 70 and fails rather than claiming acceptance
 if a future artifact does not meet it.
 Each run prints the planner status, three assignments, allocations, timetable,
 predicted marks when available, and the Search/CSP counters.
+
+To generate per-student allocations, verified timetables, and predicted marks
+for all 30 profiles under both predictors, run the synthetic experiment bundle:
+
+```bash
+python scripts/run_demo_experiments.py
+```
+
+The detailed plans are written to
+`reports/experiment_results/demo/prediction_plans.csv` and
+`reports/experiment_results/demo/prediction_plans.json`. These use synthetic
+planning settings and are not production recommendations.
 
 Results distinguish a verified target-reaching schedule, an exhaustively
 unreachable target with the best verified final predictions, no feasible

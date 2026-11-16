@@ -57,3 +57,19 @@ CLICK_WINDOW_OFFSETS: tuple[tuple[int, int], ...] = (
 def click_feature_name(group: str, week: int) -> str:
     """Return the stable name for a group's 7-day click-count feature."""
     return f"click_{group}_week_{week}"
+
+
+STRICT_FFF_FEATURE_NAMES: tuple[str, ...] = (
+    "assessment_type_cma",
+    "assessment_type_exam",
+    "assessment_type_tma",
+    "assessment_weight",
+    "assessment_weight_available",
+    "assessment_deadline_day",
+    "weeks_since_course_start",
+    *(
+        click_feature_name(group, week)
+        for group in ACTIVITY_GROUPS
+        for week in range(1, 5)
+    ),
+)

@@ -19,6 +19,7 @@ import pandas as pd
 from study_planner.data.feature_engineering.constants import (
     ACTIVITY_GROUPS,
     IDENTIFIER_COLUMNS,
+    STRICT_FFF_FEATURE_NAMES,
     TARGET_COLUMN,
     click_feature_name,
 )
@@ -98,22 +99,6 @@ TRAINING_CLICK_SUPPORT: Mapping[str, ClickSupportBoundary] = MappingProxyType(
 CLICK_FEATURE_NAMES: tuple[str, ...] = tuple(TRAINING_CLICK_SUPPORT)
 ALLOWED_ACTIVITY_GROUPS = frozenset(ACTIVITY_GROUPS)
 WINDOWS = frozenset({1, 2, 3, 4})
-STRICT_FFF_FEATURE_NAMES = (
-    "assessment_type_cma",
-    "assessment_type_exam",
-    "assessment_type_tma",
-    "assessment_weight",
-    "assessment_weight_available",
-    "assessment_deadline_day",
-    "weeks_since_course_start",
-    *(
-        click_feature_name(group, week)
-        for group in ACTIVITY_GROUPS
-        for week in range(1, 5)
-    ),
-)
-
-
 @dataclass(frozen=True, slots=True)
 class SessionClickMappingConfig:
     """Select one synthetic click scenario and an existing activity group."""

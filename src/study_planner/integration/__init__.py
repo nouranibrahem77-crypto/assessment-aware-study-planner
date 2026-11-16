@@ -20,6 +20,7 @@ from study_planner.integration.application_inputs import (
     build_synthetic_weekly_slot_catalog,
     load_application_inputs,
     load_session_nn_adapter,
+    load_simple_average_adapter,
 )
 from study_planner.integration.application_planning import (
     AddStudySession,
@@ -70,6 +71,7 @@ __all__ = [
     "build_application_inputs",
     "build_application_planning_problem",
     "load_application_inputs",
+    "load_simple_average_adapter",
     "load_session_nn_adapter",
     "AddStudySession",
     "ApplicationAllocationSpace",

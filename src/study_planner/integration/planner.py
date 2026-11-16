@@ -261,6 +261,7 @@ class FinalPlannerResult:
     best_plan_comparison_rule: str
     search_state_path: tuple[Hashable, ...] = ()
     search_action_path: tuple[object, ...] = ()
+    prediction_family: str = "neural_network"
 
 
 BEST_PLAN_COMPARISON_RULE = (
@@ -654,6 +655,7 @@ class _Controller(Generic[StateT, ActionT]):
             solution_cost=None,
             search_complete=search_complete,
             best_plan_comparison_rule=BEST_PLAN_COMPARISON_RULE,
+            prediction_family=self.adapter.prediction_family,
         )
 
 

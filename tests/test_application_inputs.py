@@ -334,6 +334,21 @@ def test_builds_three_assignment_inputs_with_exact_model_schema(tmp_path, mode: 
     )
 
 
+def test_accepts_weeks_feature_rounded_for_csv_serialization(tmp_path):
+    adapter = _adapter(tmp_path)
+    rows = _feature_rows()
+    rows["weeks_since_course_start"] = rows["weeks_since_course_start"].round(11)
+
+    inputs = build_application_inputs(
+        _config(adapter),
+        student_identity="student-1",
+        feature_rows=rows,
+        adapter=adapter,
+    )
+
+    assert inputs.assignment_ids == ASSIGNMENT_IDS
+
+
 def test_rejects_wrong_split_duplicate_source_and_mismatched_deadline(tmp_path):
     adapter = _adapter(tmp_path)
     config = _config(adapter)
