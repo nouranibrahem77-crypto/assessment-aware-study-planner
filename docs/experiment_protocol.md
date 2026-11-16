@@ -82,8 +82,9 @@ Best-First Search compare in search effort and returned allocation cost?
   when it completes; Greedy cost is descriptive and is not assumed optimal.
 - **Outputs:**
   `reports/experiment_results/search_runs.csv`,
-  `reports/experiment_results/search_summary.csv`, and
-  `reports/experiment_results/search_comparison.png`.
+  `reports/experiment_results/search_summary.csv`,
+  `reports/experiment_results/search_runs.json`, and
+  `reports/experiment_results/search_comparison.svg`.
 
 ## Experiment 2 — CSP comparison
 
@@ -105,8 +106,9 @@ weekly scheduling capacities?
   runtime. Do not treat an incomplete run as an infeasible result.
 - **Outputs:**
   `reports/experiment_results/csp_runs.csv`,
-  `reports/experiment_results/csp_summary.csv`, and
-  `reports/experiment_results/csp_comparison.png`.
+  `reports/experiment_results/csp_summary.csv`,
+  `reports/experiment_results/csp_runs.json`, and
+  `reports/experiment_results/csp_comparison.svg`.
 
 ## Experiment 3 — Prediction model comparison
 
@@ -132,8 +134,27 @@ Predictor when each is used to evaluate the same planner scenarios?
   planner's target rule.
 - **Outputs:**
   `reports/experiment_results/prediction_runs.csv`,
-  `reports/experiment_results/prediction_summary.csv`, and
-  `reports/experiment_results/prediction_comparison.png`.
+  `reports/experiment_results/prediction_summary.csv`,
+  `reports/experiment_results/prediction_runs.json`, and
+  `reports/experiment_results/prediction_comparison.svg`.
+
+The experiment evaluation entry points are `run_search_comparison`,
+`run_csp_comparison`, and `run_prediction_comparison` in
+`study_planner.eval.experiments`. They use the shared five-seed runner and
+preserve incomplete/error rows. `write_experiment_bundle` writes the run CSV,
+summary CSV, JSON records, and a dependency-free SVG mean-comparison plot.
+Callers provide explicit scenario objects: search scenarios contain the shared
+search problem and heuristic; CSP scenarios contain the shared problem and
+verification policy; prediction scenarios bind one profile to a callback
+that constructs matched NN and baseline planner runs.
+
+These evaluation APIs are implemented. Since the production template still has
+required values, `scripts/run_demo_experiments.py` provides an explicitly
+synthetic configuration and writes results to
+`reports/experiment_results/demo/`. The demo uses the real OULAD profile rows,
+strict NN and training-only mean baseline adapters, and real Search/CSP code.
+Its target marks, slot calendar, capacities, and support disposition are
+illustrative only; outputs must not be described as production results.
 
 ## Monotonicity diagnostic
 
@@ -192,7 +213,7 @@ Store generated deliverables under `reports/experiment_results/`:
   seed, status, metrics, provenance, and error details where applicable.
 - `*_summary.csv` — grouped sample count, mean, standard deviation, and status
   counts for each reported metric.
-- `*_comparison.png` — plots generated from the saved run-level data.
+- `*_comparison.svg` — plots generated from the saved run-level data.
 - `experiment_report.md` — protocols followed, approved/pending inputs,
   aggregate tables, plots, exceptions/incomplete counts, limitations, and exact
   reproduction commands.
@@ -205,6 +226,17 @@ selection. Plots and Markdown reports must be reproducible from these saved
 files and must not contain manually transcribed metrics.
 
 ## Reproduction commands
+
+Run all three synthetic demo experiments, training one small Model A Strict
+demo artifact if needed, with:
+
+```powershell
+python scripts/run_demo_experiments.py --train-demo-nn --max-epochs 20
+```
+
+The command keeps demo outputs under `reports/experiment_results/demo/` and
+the demo model under `data/processed/nn_demo/`. These are not production
+results. Omit `--train-demo-nn` to reuse an existing artifact in that location.
 
 The profile manifest can currently be generated with:
 
