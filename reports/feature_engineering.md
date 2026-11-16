@@ -13,8 +13,8 @@ Target submissions after their own deadline and banked results are dropped.
 The target score and submission date are stored separately from model
 features.
 
-Strict mode excludes all previous-assessment-score features. No prior-score
-availability assumption is used. No scaling or imputation parameters are fit.
+Strict mode excludes all previous-assessment-score features. No prior-score availability assumption is used.
+No scaling or imputation parameters are fit.
 Assessment type categories and the number of prior-score lag slots are
 derived only from the 2013B/2013J training assessment metadata.
 

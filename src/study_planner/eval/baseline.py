@@ -33,7 +33,10 @@ class SimpleAverageMarkPredictor:
 
     @classmethod
     def fit(
-        cls, training_marks: Sequence[float], *, identity: str = "simple-average-mark-v1"
+        cls,
+        training_marks: Sequence[float],
+        *,
+        identity: str = "simple-average-mark-v1",
     ) -> SimpleAverageMarkPredictor:
         """Fit the baseline from finite training marks in the score range."""
         if len(training_marks) == 0:
