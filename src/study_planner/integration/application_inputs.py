@@ -60,6 +60,9 @@ class OutOfSupportAction(str, Enum):
     REJECT = "reject"
 
 
+SYNTHETIC_DEADLINE_BOUNDARY_IDENTITY = "course-day-start-exclusive-v1"
+
+
 @dataclass(frozen=True, slots=True)
 class OuladPresentationSplit:
     """The established one-course chronological OULAD model split."""
@@ -282,9 +285,9 @@ class ApplicationSlot:
         assignment_ids = tuple(
             assignment_id for assignment_id, _ in self.relative_windows
         )
-        if len(assignment_ids) != 3 or len(set(assignment_ids)) != 3:
+        if len(set(assignment_ids)) != len(assignment_ids):
             raise ApplicationInputError(
-                "each slot needs one relative-window entry for all three assignments"
+                "slot relative-window assignment identities must be unique"
             )
         if any(
             not isinstance(assignment_id, str)
@@ -314,6 +317,8 @@ class WeeklySlotCatalog:
     deadline_policy_identity: str
     deadline_policy_version: str
     slots: tuple[ApplicationSlot, ...]
+    course_start_weekday_iso: int = 1
+    deadline_boundary_identity: str = SYNTHETIC_DEADLINE_BOUNDARY_IDENTITY
 
     def __post_init__(self) -> None:
         if not all(
@@ -345,12 +350,22 @@ class WeeklySlotCatalog:
         slot_ids = tuple(item.slot.slot_id for item in self.slots)
         if len(slot_ids) != len(set(slot_ids)):
             raise ApplicationInputError("slot catalog IDs must be unique")
-        assignment_ids = set(item[0] for item in self.slots[0].relative_windows)
-        if any(
-            set(item[0] for item in slot.relative_windows) != assignment_ids
-            for slot in self.slots
+        if len({slot.time_window.timezone_identity for slot in self.slots}) != 1:
+            raise ApplicationInputError(
+                "all slots in one catalog must use the same timezone identity"
+            )
+        if (
+            isinstance(self.course_start_weekday_iso, bool)
+            or not isinstance(self.course_start_weekday_iso, int)
+            or not 1 <= self.course_start_weekday_iso <= 7
         ):
-            raise ApplicationInputError("all slots must map the same three assignments")
+            raise ApplicationInputError(
+                "course start weekday must use ISO values 1 through 7"
+            )
+        if self.deadline_boundary_identity != SYNTHETIC_DEADLINE_BOUNDARY_IDENTITY:
+            raise ApplicationInputError(
+                "unsupported deadline boundary; use strict course-day-start cutoff"
+            )
 
     @property
     def configuration_identity(self) -> str:
@@ -361,6 +376,8 @@ class WeeklySlotCatalog:
             "weekly_capacity": self.weekly_capacity,
             "deadline_policy_identity": self.deadline_policy_identity,
             "deadline_policy_version": self.deadline_policy_version,
+            "course_start_weekday_iso": self.course_start_weekday_iso,
+            "deadline_boundary_identity": self.deadline_boundary_identity,
             "slots": [
                 {
                     "slot_id": item.slot.slot_id,
@@ -383,7 +400,11 @@ class WeeklySlotCatalog:
     ) -> tuple[tuple[str, tuple[tuple[str, int], ...]], ...]:
         """Return canonical assignment-specific slot-to-window mappings."""
         assignment_ids = sorted(
-            self.slots[0].relative_windows[index][0] for index in range(3)
+            {
+                assignment_id
+                for slot in self.slots
+                for assignment_id, _ in slot.relative_windows
+            }
         )
         return tuple(
             (
@@ -395,11 +416,189 @@ class WeeklySlotCatalog:
                             dict(slot.relative_windows)[assignment_id],
                         )
                         for slot in self.slots
+                        if assignment_id in dict(slot.relative_windows)
                     )
                 ),
             )
             for assignment_id in assignment_ids
         )
+
+
+@dataclass(frozen=True, slots=True)
+class SyntheticWeeklySlotPattern:
+    """Explicit generated weekly pattern, not a claim about learner availability."""
+
+    weekdays_iso: tuple[int, ...]
+    start_minute_local: int
+    end_minute_local: int
+    timezone_identity: str
+    course_start_weekday_iso: int = 1
+
+    def __post_init__(self) -> None:
+        if (
+            not isinstance(self.weekdays_iso, tuple)
+            or not self.weekdays_iso
+            or len(set(self.weekdays_iso)) != len(self.weekdays_iso)
+        ):
+            raise ApplicationInputError(
+                "synthetic weekdays must be unique and non-empty"
+            )
+        for weekday in self.weekdays_iso:
+            WeeklyTimeWindow(
+                weekday,
+                self.start_minute_local,
+                self.end_minute_local,
+                self.timezone_identity,
+            )
+        if (
+            isinstance(self.course_start_weekday_iso, bool)
+            or not isinstance(self.course_start_weekday_iso, int)
+            or not 1 <= self.course_start_weekday_iso <= 7
+        ):
+            raise ApplicationInputError(
+                "course start weekday must use ISO values 1 through 7"
+            )
+
+
+def _slot_click_window(
+    slot: ApplicationSlot, deadline_day: int, course_start_weekday_iso: int
+) -> int | None:
+    """Return the four-week NN click-history window containing the whole slot."""
+    weekday_offset = (slot.time_window.weekday_iso - course_start_weekday_iso) % 7
+    week_minutes = 7 * 24 * 60
+    start = (
+        slot.slot.week_index * week_minutes
+        + weekday_offset * 24 * 60
+        + slot.time_window.start_minute_local
+    )
+    end = (
+        slot.slot.week_index * week_minutes
+        + weekday_offset * 24 * 60
+        + slot.time_window.end_minute_local
+    )
+    for window_index in range(4):
+        lower = (deadline_day - 28 + 7 * window_index) * 24 * 60
+        upper = lower + 7 * 24 * 60
+        if start >= lower and end <= upper:
+            return window_index + 1
+    return None
+
+
+def _slot_is_before_deadline(
+    slot: ApplicationSlot, deadline_day: int, course_start_weekday_iso: int
+) -> bool:
+    """Apply the implementation's strict start-of-deadline-day cutoff.
+
+    The professor requires a session before its assignment deadline but does
+    not specify whether the deadline day is inclusive. This implementation
+    conservatively treats the deadline as the start of course-relative day D.
+    """
+    weekday_offset = (slot.time_window.weekday_iso - course_start_weekday_iso) % 7
+    week_minutes = 7 * 24 * 60
+    end = (
+        slot.slot.week_index * week_minutes
+        + weekday_offset * 24 * 60
+        + slot.time_window.end_minute_local
+    )
+    return end < deadline_day * 24 * 60
+
+
+def build_synthetic_weekly_slot_catalog(
+    *,
+    identity: str,
+    version: str,
+    weekly_capacity: int,
+    deadline_policy_identity: str,
+    deadline_policy_version: str,
+    assignment_deadlines: tuple[tuple[str, int], ...],
+    week_indices: tuple[int, ...],
+    pattern: SyntheticWeeklySlotPattern,
+) -> tuple[WeeklySlotCatalog, tuple[tuple[str, tuple[str, ...]], ...]]:
+    """Expand a synthetic weekly pattern and derive each assignment's eligible IDs.
+
+    A generated slot is eligible when its complete interval ends before the
+    configured deadline boundary. The four-window mapping is computed
+    independently for NN click-history feature preparation. The strict
+    start-of-deadline-day boundary is an implementation assumption, not a
+    professor-specified interpretation. The course-week anchor is explicit.
+    """
+    if not isinstance(pattern, SyntheticWeeklySlotPattern):
+        raise ApplicationInputError("a typed synthetic weekly pattern is required")
+    if (
+        not isinstance(assignment_deadlines, tuple)
+        or len(assignment_deadlines) != 3
+        or len({identity for identity, _ in assignment_deadlines}) != 3
+        or any(
+            not isinstance(identity, str)
+            or not identity
+            or isinstance(day, bool)
+            or not isinstance(day, int)
+            or day < 0
+            for identity, day in assignment_deadlines
+        )
+    ):
+        raise ApplicationInputError("three unique assignment deadlines are required")
+    if (
+        not isinstance(week_indices, tuple)
+        or not week_indices
+        or len(set(week_indices)) != len(week_indices)
+        or any(
+            isinstance(week, bool) or not isinstance(week, int) or week < 0
+            for week in week_indices
+        )
+    ):
+        raise ApplicationInputError(
+            "course-week indices must be unique non-negative integers"
+        )
+    identities = tuple(
+        sorted(assignment_id for assignment_id, _ in assignment_deadlines)
+    )
+    deadlines = dict(assignment_deadlines)
+    generated: list[ApplicationSlot] = []
+    eligible: dict[str, list[str]] = {assignment_id: [] for assignment_id in identities}
+    for week_index in sorted(week_indices):
+        for weekday in sorted(pattern.weekdays_iso):
+            slot_id = (
+                f"{identity}-W{week_index:02d}-D{weekday}-"
+                f"T{pattern.start_minute_local:04d}-{pattern.end_minute_local:04d}"
+            )
+            weekly_slot = WeeklySlot(slot_id, week_index)
+            window = WeeklyTimeWindow(
+                weekday,
+                pattern.start_minute_local,
+                pattern.end_minute_local,
+                pattern.timezone_identity,
+            )
+            mappings: list[tuple[str, int]] = []
+            for assignment_id in identities:
+                candidate_slot = ApplicationSlot(weekly_slot, window, ())
+                if _slot_is_before_deadline(
+                    candidate_slot,
+                    deadlines[assignment_id],
+                    pattern.course_start_weekday_iso,
+                ):
+                    eligible[assignment_id].append(slot_id)
+                relative_window = _slot_click_window(
+                    candidate_slot,
+                    deadlines[assignment_id],
+                    pattern.course_start_weekday_iso,
+                )
+                if relative_window is not None:
+                    mappings.append((assignment_id, relative_window))
+            generated.append(ApplicationSlot(weekly_slot, window, tuple(mappings)))
+    catalog = WeeklySlotCatalog(
+        identity,
+        version,
+        weekly_capacity,
+        deadline_policy_identity,
+        deadline_policy_version,
+        tuple(generated),
+        pattern.course_start_weekday_iso,
+    )
+    return catalog, tuple(
+        (assignment_id, tuple(sorted(eligible[assignment_id])))
+        for assignment_id in identities
+    )
 
 
 @dataclass(frozen=True, slots=True)
@@ -533,12 +732,37 @@ class ApplicationInputConfig:
             raise ApplicationInputError(
                 "slot windows must cover exactly the three configured assignments"
             )
+        slots_by_id = {slot.slot.slot_id: slot for slot in self.slot_catalog.slots}
         for rule in self.assignment_rules:
             unknown = set(rule.eligible_slot_ids) - known_slots
             if unknown:
                 raise ApplicationInputError(
                     f"assignment {rule.assignment_identity} references unknown slots"
                 )
+            windows = dict(self.slot_catalog.windows_by_assignment).get(
+                rule.assignment_identity, ()
+            )
+            mapped_windows = dict(windows)
+            for slot_id in rule.eligible_slot_ids:
+                slot = slots_by_id[slot_id]
+                if not _slot_is_before_deadline(
+                    slot,
+                    rule.deadline_day,
+                    self.slot_catalog.course_start_weekday_iso,
+                ):
+                    raise ApplicationInputError(
+                        f"slot {slot_id} is not strictly before assignment "
+                        f"{rule.assignment_identity} deadline"
+                    )
+            for slot_id, slot in slots_by_id.items():
+                relative_window = _slot_click_window(
+                    slot, rule.deadline_day, self.slot_catalog.course_start_weekday_iso
+                )
+                if mapped_windows.get(slot_id) != relative_window:
+                    raise ApplicationInputError(
+                        f"slot {slot_id} has an incorrect click window for "
+                        f"assignment {rule.assignment_identity}"
+                    )
 
     @property
     def targets(self) -> tuple[AssignmentTarget, ...]:

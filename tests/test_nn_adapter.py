@@ -280,7 +280,12 @@ def verified_result(
     slots = tuple(
         sorted(
             {
-                WeeklySlot(session.slot_id, session.relative_window - 1)
+                WeeklySlot(
+                    session.slot_id,
+                    0
+                    if session.relative_window is None
+                    else session.relative_window - 1,
+                )
                 for session in effective_schedule.sessions
             }
             or {WeeklySlot("unused", 0)}
@@ -336,7 +341,12 @@ def verified_result(
         tuple(
             AssignmentEntry(
                 SessionVariable(context.assignment_identity, index),
-                WeeklySlot(session.slot_id, session.relative_window - 1),
+                WeeklySlot(
+                    session.slot_id,
+                    0
+                    if session.relative_window is None
+                    else session.relative_window - 1,
+                ),
             )
             for index, session in enumerate(effective_schedule.sessions)
         )
@@ -516,6 +526,37 @@ def test_verified_csp_result_allows_final_evaluation_and_preserves_schedule() ->
         ("slot-a", 1),
         ("slot-b", 2),
     )
+
+
+def test_nn_ignores_deadline_eligible_slot_outside_click_windows() -> None:
+    _, adapter, context = setup_adapter()
+    allocation = CandidateSessionAllocation((1, 1, 0, 0))
+    schedule = ScheduleData(
+        (
+            ScheduledSession("old-deadline-eligible-slot", None),
+            ScheduledSession("recent-click-window-slot", 2),
+        )
+    )
+    verification = verified_result(adapter, allocation, context, schedule)
+
+    result = adapter.evaluate_final(
+        allocation,
+        verification,
+        context,
+        expected_whole_plan_identity=verification.whole_plan_identity,
+        expected_problem_identity=verification.problem_identity,
+        expected_policy_identity=verification.verification_policy_identity,
+        expected_policy_version=verification.verification_policy_version,
+        expected_model_provenance_identity=adapter.model_provenance_identity,
+        slot_relative_windows={"recent-click-window-slot": 2},
+    )
+
+    assert result.status is EvaluationStatus.PREDICTED
+    assert result.schedule_identity == (
+        ("old-deadline-eligible-slot", None),
+        ("recent-click-window-slot", 2),
+    )
+    assert result.mapping.weekly_sessions == (0, 1, 0, 0)
 
 
 def test_infeasible_csp_result_is_rejected_for_final_prediction() -> None:

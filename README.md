@@ -66,6 +66,55 @@ python -m pytest
 ruff check .
 ```
 
+## Integration demo
+
+With the local OULAD processed features and fitted artifacts available, run one
+explicitly TEST-configured Search–NN–CSP scenario from the repository root:
+
+```bash
+python run_demo.py NORMAL
+python run_demo.py EDGE
+python run_demo.py IMPOSSIBLE
+python run_demo.py NN_ACCEPTS_CSP_INFEASIBLE
+python run_demo.py VERIFICATION_REJECTED
+```
+
+The default uses the local Model A Strict artifact. To run against the separate
+Model B proxy artifact and feature schema, append `--model proxy` to any command.
+All scenarios use labeled TEST targets, slot rules, and ordering. The
+`NN_ACCEPTS_CSP_INFEASIBLE` case meets provisional targets but requests two
+sessions from one eligible slot, so the real all-different CSP constraint
+exhausts without a schedule. `VERIFICATION_REJECTED` separately injects one
+invalid schedule at the verification boundary and lets the planner continue;
+it is not a CSP-rejection demonstration. Both are TEST scenarios, not
+production evidence.
+The CSP-infeasible scenario uses a positive TEST target of 70 per assignment.
+That shared threshold is based on current artifact-backed provisional results:
+Model A Strict `(79.76, 75.78, 72.89)` and Model B Proxy
+`(81.91, 81.42, 84.57)` for the configured TEST allocation. The runner checks
+the current predictions against 70 and fails rather than claiming acceptance
+if a future artifact does not meet it.
+Each run prints the planner status, three assignments, allocations, timetable,
+predicted marks when available, and the Search/CSP counters.
+
+Results distinguish a verified target-reaching schedule, an exhaustively
+unreachable target with the best verified final predictions, no feasible
+schedule, and incomplete search. Incomplete results show a best verified plan
+found so far, if one exists, and do not claim global optimality. Best-plan
+comparison maximizes the sum of final assignment marks, then the canonical
+per-assignment mark tuple, then minimizes total sessions, then uses the
+lexicographically smallest whole-plan and schedule identities. Provisional NN
+scores are never reported as achievable marks.
+The `IMPOSSIBLE` TEST scenario has feasible schedules but uses TEST targets of
+100, so it demonstrates exhaustive target-unreachable reporting. The separate
+no-feasible-schedule case is covered by the integration regression tests.
+Successful demos print the actual Search solution state/action path returned by
+Search. Exhausted searches have no solution path; the displayed Search counters
+are aggregate statistics, not an expansion-by-expansion trace. The integration
+planner has no NN-disabled mode: every run requires an NN adapter for provisional
+and final predictions. Model A Strict and Model B Proxy remain separate choices
+via `--model strict` and `--model proxy`.
+
 ## Project layout
 
 ```text

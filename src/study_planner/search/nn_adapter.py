@@ -136,11 +136,12 @@ class ScheduleData:
         """Count schedule records in the mapper's four relative windows."""
         counts = [0, 0, 0, 0]
         for session in self.sessions:
-            counts[session.relative_window - 1] += 1
+            if session.relative_window is not None:
+                counts[session.relative_window - 1] += 1
         return tuple(counts)  # type: ignore[return-value]
 
     @property
-    def schedule_identity(self) -> tuple[tuple[str, int], ...]:
+    def schedule_identity(self) -> tuple[tuple[str, int | None], ...]:
         """Return the canonical schedule details used in audit records."""
         return tuple(
             (session.slot_id, session.relative_window) for session in self.sessions
@@ -149,20 +150,25 @@ class ScheduleData:
 
 @dataclass(frozen=True, slots=True)
 class ScheduledSession:
-    """One session placed in an opaque CSP slot and relative feature window."""
+    """One CSP session and its optional NN click-history window."""
 
     slot_id: str
-    relative_window: int
+    relative_window: int | None
 
     def __post_init__(self) -> None:
         if not isinstance(self.slot_id, str) or not self.slot_id:
             raise CandidateEvaluationError("slot_id must be a non-empty string")
         if (
-            isinstance(self.relative_window, bool)
-            or not isinstance(self.relative_window, int)
-            or self.relative_window not in {1, 2, 3, 4}
+            self.relative_window is not None
+            and (
+                isinstance(self.relative_window, bool)
+                or not isinstance(self.relative_window, int)
+                or self.relative_window not in {1, 2, 3, 4}
+            )
         ):
-            raise CandidateEvaluationError("relative_window must be from 1 through 4")
+            raise CandidateEvaluationError(
+                "relative_window must be absent or from 1 through 4"
+            )
 
 
 @dataclass(frozen=True, slots=True, init=False)
@@ -364,7 +370,7 @@ class CandidatePredictionResult:
     status: EvaluationStatus
     mapping: MappingEvaluationSnapshot
     prediction: float | None
-    schedule_identity: tuple[tuple[str, int], ...] | None
+    schedule_identity: tuple[tuple[str, int | None], ...] | None
     csp_verification_identity: str | None
     monotonicity_report: MonotonicityReport | None
     error_type: str | None = None
@@ -392,7 +398,7 @@ class CandidatePredictionResult:
     def usable_for_goal_test(
         self,
         identity: CandidateIdentity,
-        schedule_identity: tuple[tuple[str, int], ...] | None = None,
+        schedule_identity: tuple[tuple[str, int | None], ...] | None = None,
         csp_verification_identity: str | None = None,
         whole_plan_identity: str | None = None,
         problem_identity: str | None = None,
@@ -553,7 +559,9 @@ class SessionNNAdapter:
     _monotonicity_observations: dict[
         MonotonicityContext,
         dict[
-            tuple[tuple[int, int, int, int], tuple[tuple[str, int], ...]],
+            tuple[
+                tuple[int, int, int, int], tuple[tuple[str, int | None], ...]
+            ],
             float,
         ],
     ] = field(default_factory=dict, init=False, repr=False)
@@ -768,7 +776,7 @@ class SessionNNAdapter:
             schedule = ScheduleData(
                 tuple(
                     ScheduledSession(
-                        session.slot_id, slot_relative_windows[session.slot_id]
+                        session.slot_id, slot_relative_windows.get(session.slot_id)
                     )
                     for session in selected.sessions
                 )
@@ -777,11 +785,6 @@ class SessionNNAdapter:
             raise CandidateEvaluationError(
                 "verified schedule lacks a valid relative-window mapping"
             ) from error
-        if sum(schedule.weekly_sessions) != sum(allocation.weekly_sessions):
-            raise CandidateEvaluationError(
-                "verified schedule window counts differ from candidate allocation"
-            )
-
         mapping = self._map(schedule.weekly_sessions, context)
         comparison_context = MonotonicityContext(
             student_id=context.student_identity,
@@ -846,7 +849,7 @@ class SessionNNAdapter:
         phase: EvaluationPhase,
         mapping: SessionClickMappingResult,
         *,
-        schedule_identity: tuple[tuple[str, int], ...] | None,
+        schedule_identity: tuple[tuple[str, int | None], ...] | None,
         csp_verification_identity: str | None,
         monotonicity_report: MonotonicityReport | None,
         whole_plan_identity: str | None = None,

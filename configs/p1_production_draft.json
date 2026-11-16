@@ -1,0 +1,398 @@
+{
+  "draft_status": "NOT_PRODUCTION_READY_REQUIRES_APPROVAL",
+  "classification_key": [
+    "VERIFIED",
+    "APPROVED_DEMO_DECISIONS",
+    "PROPOSED_GENERATED",
+    "REQUIRES_APPROVAL"
+  ],
+  "specification_source_status": "IS Projects(10).pdf was not present in the workspace or connected document sessions during this update; PDF-specific cross-check remains pending.",
+  "VERIFIED": {
+    "course_identity": "FFF",
+    "presentation_split": {
+      "training": [
+        "2013B",
+        "2013J"
+      ],
+      "validation": "2014B",
+      "testing": "2014J"
+    },
+    "feature_data": {
+      "feature_mode": "proxy",
+      "feature_directory": "data/processed/proxy",
+      "feature_manifest_sha256": "49d74a143724141dd7d0606395e366b5b44c12cc64493ce49f2709d62128f724",
+      "source_feature_columns": 29,
+      "click_features": 12,
+      "missing_prior_scores_policy": "Preserve null prior scores and their availability indicators; do not impute or fabricate scores.",
+      "score_release_limitation": "OULAD has no score-release timestamps. Submission-based prior-score features are not verified as available to the student at the prediction cutoff."
+    },
+    "source_dataset_sha256": {
+      "assessments.csv": "9ce92381e4a0ac457f8e251b2eb2c179ed51e023ab30d1d671a0268bd62316ba",
+      "courses.csv": "4f16eee7454b15e109b0a21a0e43be820e6846ed6f9301bb7feb5ab5ad737a75",
+      "studentAssessment.csv": "b1839e17618a5de36b6d189a242d3123f7939a56c8c9ccef0c17b9199c614a6b",
+      "studentVle.csv": "52668253d876c5becbcb72185977152700cecab2942aca807fecc3dd54b937f0",
+      "vle.csv": "d7a146497edd0e47ef536144b58796c07b554002d3753e848b8e4cd8a56f4c38"
+    },
+    "assessment_facts": {
+      "selection_status": "Candidate set specified for this draft; production use still requires approval.",
+      "selection_basis": "Three earliest TMA deadlines in FFF 2014J, as recorded in the original template.",
+      "assignments": [
+        {
+          "assessment_id": "34899",
+          "assessment_type": "TMA",
+          "deadline_day": 24,
+          "assessment_weight": 12.5
+        },
+        {
+          "assessment_id": "34900",
+          "assessment_type": "TMA",
+          "deadline_day": 52,
+          "assessment_weight": 12.5
+        },
+        {
+          "assessment_id": "34901",
+          "assessment_type": "TMA",
+          "deadline_day": 94,
+          "assessment_weight": 25.0
+        }
+      ],
+      "feature_week_conversion": "deadline_day / 7",
+      "click_windows": [
+        {
+          "window": 1,
+          "start_inclusive": "D-28",
+          "end_exclusive": "D-21"
+        },
+        {
+          "window": 2,
+          "start_inclusive": "D-21",
+          "end_exclusive": "D-14"
+        },
+        {
+          "window": 3,
+          "start_inclusive": "D-14",
+          "end_exclusive": "D-7"
+        },
+        {
+          "window": 4,
+          "start_inclusive": "D-7",
+          "end_exclusive": "D"
+        }
+      ]
+    },
+    "demo_profile_candidate_evidence": {
+      "candidate_count_for_three_assessments": 914,
+      "verified_candidate_ids": [
+        "40878",
+        "42552",
+        "56637",
+        "63112",
+        "64427",
+        "74165",
+        "75107",
+        "77692",
+        "79610",
+        "84604",
+        "102854",
+        "105939",
+        "107455",
+        "119310",
+        "119865",
+        "129907",
+        "135280",
+        "139206",
+        "142310",
+        "143755",
+        "149178",
+        "150282",
+        "152524",
+        "155938",
+        "159906",
+        "164148",
+        "170874",
+        "172493",
+        "177492",
+        "194163"
+      ],
+      "student_40878": {
+        "verified_rows_for_assessments": 3,
+        "proxy_prior_score_cells_present": 3,
+        "assessment_34899_prior_scores": "all five lag scores null; availability indicators remain false",
+        "availability_interpretation": "Proxy feature presence only; no score-release timing is verified."
+      }
+    },
+    "verified_model_artifact": {
+      "mode": "MODEL_B_PREVIOUS_MARKS_PROXY",
+      "relative_path": "data/processed/nn_experiment_previous_marks",
+      "feature_directory": "data/processed/proxy",
+      "artifact_digest_sha256": "679a7fdd3cabc8a2322b92d8a4bfb2f2aedfbda364f343d86f02e2adeef8e9a0",
+      "model_provenance_identity": "81b968f89870ffb3fb9b7a779c2088b0e4db5acde4292a8834d7411b438046dd",
+      "feature_schema_identity": "73b30f0bae14551c4c15c71d55c224d693473437ce3e3a748aab843bb19323f4",
+      "seeds": [
+        42,
+        123,
+        2025
+      ],
+      "verification": "Loaded with load_session_nn_adapter using MODEL_B_PREVIOUS_MARKS; digest, provenance, and schema identities came from the loaded adapter."
+    }
+  },
+  "APPROVED_DEMO_DECISIONS": {
+    "scope": "Approved for the illustrative P1 demo only; these are not universal real-world facts.",
+    "course_and_split": {
+      "course": "FFF",
+      "training": [
+        "2013B",
+        "2013J"
+      ],
+      "validation": "2014B",
+      "testing": "2014J"
+    },
+    "candidate_assessment_ids": {
+      "ids": [
+        "34899",
+        "34900",
+        "34901"
+      ],
+      "status": "Approved for the illustrative demo while retaining the documented candidate-set status; business-facing assignment identities remain unset."
+    },
+    "target_marks": {
+      "per_assessment": [
+        {
+          "assessment_id": "34899",
+          "mark": 55
+        },
+        {
+          "assessment_id": "34900",
+          "mark": 55
+        },
+        {
+          "assessment_id": "34901",
+          "mark": 55
+        }
+      ],
+      "scope": "Illustrative generated demo settings, not OULAD-derived targets or universal requirements."
+    },
+    "weekly_slot_capacity": {
+      "sessions_per_week": 3,
+      "scope": "Illustrative generated demo setting, not a measured student capacity."
+    },
+    "model_mode": "MODEL_B_PREVIOUS_MARKS_PROXY",
+    "model_artifact_path": "data/processed/nn_experiment_previous_marks",
+    "matching_feature_directory": "data/processed/proxy",
+    "proxy_limitation": "Submission-based score proxies; OULAD provides no grade-release timestamps, so availability at prediction time is unverified.",
+    "nn_input_requirements": [
+      "previous-score proxy values and availability indicators, with missing values preserved",
+      "recent clicks in the three documented activity groups across four deadline-relative windows",
+      "assessment type",
+      "assessment weight",
+      "weeks since course start"
+    ],
+    "search_algorithms": [
+      "UCS",
+      "Greedy Best-First"
+    ],
+    "csp_algorithms": [
+      "Backtracking",
+      "Forward Checking",
+      "AC-3"
+    ],
+    "scheduling_requirements": [
+      "session ends before the relevant assignment deadline",
+      "at most one session per weekly slot",
+      "sessions for each assignment are ordered"
+    ],
+    "impossible_result_requirement": "Report best achievable predicted marks."
+  },
+  "PROPOSED_GENERATED": {
+    "session_click_mapping": {
+      "activity_group": "content_navigation",
+      "scenario": "central",
+      "clicks_per_hypothetical_session": 62,
+      "basis": "Documented training-only median positive content-navigation weekly total. This is a synthetic increment, not a measured session length or causal effect.",
+      "other_documented_sensitivity_values": {
+        "low": 22,
+        "high": 121
+      },
+      "mapping_rule": "A Search allocation increments only the selected activity group's click feature in its configured assessment-relative window; preserve all other features and source rows."
+    },
+    "allocation_bounds": {
+      "minimum_sessions_per_assignment": null,
+      "maximum_sessions_per_assignment": null,
+      "basis": "No numeric bounds proposed. They need independent justification; do not infer 0..3 from weekly capacity 3."
+    },
+    "slot_catalog_proposal": {
+      "catalog_identity": "P1-SYNTH",
+      "version": "proposal-v1",
+      "status": "PROPOSED_GENERATED_REQUIRES_APPROVAL",
+      "weekly_capacity": 3,
+      "course_week_anchor": "Synthetic week 0 begins Monday 00:00 UTC; this is not an OULAD calendar date.",
+      "deadline_boundary_identity": "course-day-start-exclusive-v1",
+      "week_indices": [
+        0,
+        1,
+        2,
+        3,
+        4,
+        5,
+        6,
+        7,
+        8,
+        9,
+        10,
+        11,
+        12,
+        13
+      ],
+      "slot_id_formula": "P1-SYNTH-W{week:02d}-D{ISO_weekday}-T{start_minute:04d}-{end_minute:04d}",
+      "weekly_time_windows": [
+        {
+          "label": "PROPOSAL-MON-18Z",
+          "weekday_iso": 1,
+          "start_minute_local": 1080,
+          "end_minute_local": 1140,
+          "timezone_identity": "UTC"
+        },
+        {
+          "label": "PROPOSAL-WED-18Z",
+          "weekday_iso": 3,
+          "start_minute_local": 1080,
+          "end_minute_local": 1140,
+          "timezone_identity": "UTC"
+        },
+        {
+          "label": "PROPOSAL-FRI-18Z",
+          "weekday_iso": 5,
+          "start_minute_local": 1080,
+          "end_minute_local": 1140,
+          "timezone_identity": "UTC"
+        }
+      ],
+      "week_index_expansion": "Expand each of the three weekday windows for every listed course week, yielding 42 stable unique slot IDs.",
+      "availability_statement": "Generated slots are a planning scenario, not observed or asserted student calendar availability.",
+      "deadline_eligible_slot_ids": {
+        "34899": [
+          "P1-SYNTH-W00-D1-T1080-1140",
+          "P1-SYNTH-W00-D3-T1080-1140",
+          "P1-SYNTH-W00-D5-T1080-1140",
+          "P1-SYNTH-W01-D1-T1080-1140",
+          "P1-SYNTH-W01-D3-T1080-1140",
+          "P1-SYNTH-W01-D5-T1080-1140",
+          "P1-SYNTH-W02-D1-T1080-1140",
+          "P1-SYNTH-W02-D3-T1080-1140",
+          "P1-SYNTH-W02-D5-T1080-1140",
+          "P1-SYNTH-W03-D1-T1080-1140",
+          "P1-SYNTH-W03-D3-T1080-1140"
+        ],
+        "34900": [
+          "P1-SYNTH-W00-D1-T1080-1140",
+          "P1-SYNTH-W00-D3-T1080-1140",
+          "P1-SYNTH-W00-D5-T1080-1140",
+          "P1-SYNTH-W01-D1-T1080-1140",
+          "P1-SYNTH-W01-D3-T1080-1140",
+          "P1-SYNTH-W01-D5-T1080-1140",
+          "P1-SYNTH-W02-D1-T1080-1140",
+          "P1-SYNTH-W02-D3-T1080-1140",
+          "P1-SYNTH-W02-D5-T1080-1140",
+          "P1-SYNTH-W03-D1-T1080-1140",
+          "P1-SYNTH-W03-D3-T1080-1140",
+          "P1-SYNTH-W03-D5-T1080-1140",
+          "P1-SYNTH-W04-D1-T1080-1140",
+          "P1-SYNTH-W04-D3-T1080-1140",
+          "P1-SYNTH-W04-D5-T1080-1140",
+          "P1-SYNTH-W05-D1-T1080-1140",
+          "P1-SYNTH-W05-D3-T1080-1140",
+          "P1-SYNTH-W05-D5-T1080-1140",
+          "P1-SYNTH-W06-D1-T1080-1140",
+          "P1-SYNTH-W06-D3-T1080-1140",
+          "P1-SYNTH-W06-D5-T1080-1140",
+          "P1-SYNTH-W07-D1-T1080-1140",
+          "P1-SYNTH-W07-D3-T1080-1140"
+        ],
+        "34901": [
+          "P1-SYNTH-W00-D1-T1080-1140",
+          "P1-SYNTH-W00-D3-T1080-1140",
+          "P1-SYNTH-W00-D5-T1080-1140",
+          "P1-SYNTH-W01-D1-T1080-1140",
+          "P1-SYNTH-W01-D3-T1080-1140",
+          "P1-SYNTH-W01-D5-T1080-1140",
+          "P1-SYNTH-W02-D1-T1080-1140",
+          "P1-SYNTH-W02-D3-T1080-1140",
+          "P1-SYNTH-W02-D5-T1080-1140",
+          "P1-SYNTH-W03-D1-T1080-1140",
+          "P1-SYNTH-W03-D3-T1080-1140",
+          "P1-SYNTH-W03-D5-T1080-1140",
+          "P1-SYNTH-W04-D1-T1080-1140",
+          "P1-SYNTH-W04-D3-T1080-1140",
+          "P1-SYNTH-W04-D5-T1080-1140",
+          "P1-SYNTH-W05-D1-T1080-1140",
+          "P1-SYNTH-W05-D3-T1080-1140",
+          "P1-SYNTH-W05-D5-T1080-1140",
+          "P1-SYNTH-W06-D1-T1080-1140",
+          "P1-SYNTH-W06-D3-T1080-1140",
+          "P1-SYNTH-W06-D5-T1080-1140",
+          "P1-SYNTH-W07-D1-T1080-1140",
+          "P1-SYNTH-W07-D3-T1080-1140",
+          "P1-SYNTH-W07-D5-T1080-1140",
+          "P1-SYNTH-W08-D1-T1080-1140",
+          "P1-SYNTH-W08-D3-T1080-1140",
+          "P1-SYNTH-W08-D5-T1080-1140",
+          "P1-SYNTH-W09-D1-T1080-1140",
+          "P1-SYNTH-W09-D3-T1080-1140",
+          "P1-SYNTH-W09-D5-T1080-1140",
+          "P1-SYNTH-W10-D1-T1080-1140",
+          "P1-SYNTH-W10-D3-T1080-1140",
+          "P1-SYNTH-W10-D5-T1080-1140",
+          "P1-SYNTH-W11-D1-T1080-1140",
+          "P1-SYNTH-W11-D3-T1080-1140",
+          "P1-SYNTH-W11-D5-T1080-1140",
+          "P1-SYNTH-W12-D1-T1080-1140",
+          "P1-SYNTH-W12-D3-T1080-1140",
+          "P1-SYNTH-W12-D5-T1080-1140",
+          "P1-SYNTH-W13-D1-T1080-1140",
+          "P1-SYNTH-W13-D3-T1080-1140"
+        ]
+      },
+      "assignment_relative_window_mapping": "Independently of CSP eligibility, map a complete slot interval to one of the four NN click-history windows [D-28,D-21), [D-21,D-14), [D-14,D-7), [D-7,D), when it fits. A deadline-eligible slot outside these windows has no NN click-history mapping."
+    },
+    "deadline_eligibility_proposal": {
+      "rule": "A session slot is eligible only when its complete local-time interval ends before the configured deadline boundary. This is independent of the four NN click-history windows.",
+      "boundary_note": "The professor specifies that a session must come before its assignment deadline but does not define whether the deadline day is inclusive. Current implementation assumption: deadline day D begins at 00:00 on course-relative day D and the whole slot must end strictly before it. A slot ending exactly at D 00:00 is excluded. This conservative boundary is an implementation assumption, not a professor-specified rule. The synthetic week-0 Monday anchor and UTC identity remain proposed generated choices requiring approval."
+    },
+    "same_assignment_ordering": {
+      "policy_identity": "PROPOSAL-strict-week-order",
+      "version": "proposal-v1",
+      "relation": "Successive sessions for the same assignment must be strictly chronological by (course week index, weekday offset from the synthetic week anchor, local start minute).",
+      "implication": "Multiple same-week sessions are allowed only when their start times are strictly ordered; the policy is implemented but its proposed calendar remains subject to approval."
+    },
+    "support_policy": {
+      "reference_identity": "strict-training-click-min-max-v1",
+      "reference_source": "Strict training presentations 2013B and 2013J; existing TRAINING_CLICK_SUPPORT bounds.",
+      "out_of_support_action": "REPORT_ONLY",
+      "joint_support_status": "unassessed",
+      "basis": "Proposed disposition keeps marginal out-of-range predictions visible with warnings; it does not claim joint support."
+    }
+  },
+  "API_READINESS": {
+    "input_and_planning_configuration": "Existing dataclasses/loaders can represent the approved targets, capacity, Model B schema, assignment rules, generated mapping, slots, bounds, support, and ordering without architecture changes.",
+    "search_and_csp_choices": "Existing APIs expose UCS and Greedy Best-First, plus BT, BT+FC, and BT+FC+AC-3.",
+    "best_achievable_impossible_result": "Implemented: complete exhaustive failures retain the best verified feasible schedule and final marks under a deterministic comparison rule; incomplete runs do not claim unreachability.",
+    "json_loading": "The draft is a decision record; no JSON-to-ApplicationInputConfig loader exists. The approved fields can be passed through existing typed APIs after configuration is assembled."
+  },
+  "REQUIRES_APPROVAL": {
+    "configuration_identity_and_version": null,
+    "assignment_identities": "Assign three distinct business-facing identities to the approved candidate assessments.",
+    "target_rule_identity_and_version": "Approve the target rule identity/version and confirm the approved marks are applied per assignment.",
+    "session_click_group_scenario_and_increment": "Approve or replace content_navigation / central / 62 and the generated-session interpretation.",
+    "allocation_bounds": "Choose and approve minimum/maximum sessions per assignment on an independent rationale; weekly capacity 3 does not imply 0..3 allocation bounds.",
+    "slot_catalog_and_time_windows": "Approve or replace the fully enumerated proposal in PROPOSED_GENERATED.slot_catalog_proposal: synthetic Monday/Wednesday/Friday 18:00-19:00 UTC, week indices 0-13, stable slot IDs, and separate eligible-slot sets. These must not be represented as actual student availability without evidence.",
+    "deadline_eligibility": "Approve or replace the synthetic week-0 Monday anchor and UTC local-time identity. Current strict deadline-day-start cutoff is documented as an implementation assumption; it is not attributed to the professor. Computed deadline-eligible slot IDs are shown separately from four-window NN click mappings.",
+    "same_assignment_ordering": "Approve the implemented catalog-chronological relation (course week, weekday offset from week anchor, then local start minute).",
+    "support_policy": "Approve the strict-training reference identity/version and REPORT_ONLY disposition; joint support remains unassessed.",
+    "demo_student": {
+      "proposed_student_id": "40878",
+      "selection_basis": "First numeric ID in the template's verified candidate list; has three validated rows and is a deterministic tie-break, not a claim of superior suitability.",
+      "approval_status": "NOT_APPROVED"
+    },
+    "first_real_student_run": "Do not run until all required configuration choices above are resolved and student 40878 or another verified candidate is approved. Preserve the explicitly accepted proxy limitation."
+  }
+}
