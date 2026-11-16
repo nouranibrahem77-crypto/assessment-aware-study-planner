@@ -1,0 +1,2814 @@
+diff --git a/README.md b/README.md
+index 7d6561d..510812b 100644
+--- a/README.md
++++ b/README.md
+@@ -75,18 +75,46 @@ explicitly TEST-configured Search–NN–CSP scenario from the repository root:
+ python run_demo.py NORMAL
+ python run_demo.py EDGE
+ python run_demo.py IMPOSSIBLE
+-python run_demo.py NN_SUFFICIENT_CSP_REJECTED
++python run_demo.py NN_ACCEPTS_CSP_INFEASIBLE
++python run_demo.py VERIFICATION_REJECTED
+ ```
+ 
+ The default uses the local Model A Strict artifact. To run against the separate
+ Model B proxy artifact and feature schema, append `--model proxy` to any command.
+ All scenarios use labeled TEST targets, slot rules, and ordering. The
+-NN-sufficient/CSP-rejected case injects one deterministic rejection at the
+-existing whole-plan verification boundary, then lets the real planner continue
+-to the next schedule. It is a regression/demo scenario, not production evidence.
++`NN_ACCEPTS_CSP_INFEASIBLE` case meets provisional targets but requests two
++sessions from one eligible slot, so the real all-different CSP constraint
++exhausts without a schedule. `VERIFICATION_REJECTED` separately injects one
++invalid schedule at the verification boundary and lets the planner continue;
++it is not a CSP-rejection demonstration. Both are TEST scenarios, not
++production evidence.
++The CSP-infeasible scenario uses a positive TEST target of 70 per assignment.
++That shared threshold is based on current artifact-backed provisional results:
++Model A Strict `(79.76, 75.78, 72.89)` and Model B Proxy
++`(81.91, 81.42, 84.57)` for the configured TEST allocation. The runner checks
++the current predictions against 70 and fails rather than claiming acceptance
++if a future artifact does not meet it.
+ Each run prints the planner status, three assignments, allocations, timetable,
+ predicted marks when available, and the Search/CSP counters.
+ 
++Results distinguish a verified target-reaching schedule, an exhaustively
++unreachable target with the best verified final predictions, no feasible
++schedule, and incomplete search. Incomplete results show a best verified plan
++found so far, if one exists, and do not claim global optimality. Best-plan
++comparison maximizes the sum of final assignment marks, then the canonical
++per-assignment mark tuple, then minimizes total sessions, then uses the
++lexicographically smallest whole-plan and schedule identities. Provisional NN
++scores are never reported as achievable marks.
++The `IMPOSSIBLE` TEST scenario has feasible schedules but uses TEST targets of
++100, so it demonstrates exhaustive target-unreachable reporting. The separate
++no-feasible-schedule case is covered by the integration regression tests.
++Successful demos print the actual Search solution state/action path returned by
++Search. Exhausted searches have no solution path; the displayed Search counters
++are aggregate statistics, not an expansion-by-expansion trace. The integration
++planner has no NN-disabled mode: every run requires an NN adapter for provisional
++and final predictions. Model A Strict and Model B Proxy remain separate choices
++via `--model strict` and `--model proxy`.
++
+ ## Project layout
+ 
+ ```text
+diff --git a/docs/search_integration_contract.md b/docs/search_integration_contract.md
+index c337d26..79a0c0c 100644
+--- a/docs/search_integration_contract.md
++++ b/docs/search_integration_contract.md
+@@ -365,10 +365,33 @@ all required schedule-specific predictions are valid, and the support policy
+ has defined which candidates count. Report best achievable predicted marks
+ from final predictions for feasible schedules, with the corresponding
+ allocation/schedule and whether it was in support. Keep provisional-only
+-scores out of this statistic. If candidates were unscorable, out of support
+-under a reject policy, or truncated by a resource limit, report an incomplete
+-or indeterminate result rather than a proven no-solution result. CSP rejection
+-counts and prediction target failures must remain separate in summaries.
++scores out of this statistic. If candidates were truncated by a resource limit,
++report `incomplete` rather than a proven no-solution result. If whole-plan
++verification found feasible schedules but SupportPolicy rejected all of them,
++report `no_supported_plan`; this does not imply CSP infeasibility.
++`no_feasible_schedule` is reserved for exhaustive results with no whole-plan
++verification-feasible schedule and no support rejection that prevented a
++supported plan from being evaluated. This is search-wide: if one candidate is
++rejected by provisional support and another exhausts CSP without a feasible
++schedule, the result is `no_supported_plan`, because the rejected candidate's
++supported-plan feasibility was never evaluated. CSP enumeration,
++verification-feasible schedules, verification rejections, support rejections,
++and final-scored supported schedules are reported separately. Prediction
++target failures remain separate from all of these counts.
++
++The planner compares verified feasible schedules by maximizing the sum of
++their final predicted assignment marks; ties maximize the mark tuple in
++canonical assignment order, then minimize total sessions, then choose the
++lexicographically smallest whole-plan and schedule identities. `target_achieved`
++means the returned verified schedule meets all assignment targets;
++`target_unreachable` requires exhaustive search and carries the best schedule
++under that comparison; `no_feasible_schedule` means no whole-plan
++verification-feasible schedule was found and carries no predictions or
++timetable; `no_supported_plan` means support policy rejected candidate
++evaluation before any supported final score was retained; `incomplete` reports
++any best verified schedule found so far without claiming global optimality;
++`error` represents an operational failure. A successful early stop is not an
++exhaustive optimality claim.
+ 
+ ## Testable acceptance criteria
+ 
+diff --git a/pyproject.toml b/pyproject.toml
+index dcc36f2..6035196 100644
+--- a/pyproject.toml
++++ b/pyproject.toml
+@@ -38,7 +38,7 @@ where = ["src"]
+ 
+ [tool.pytest.ini_options]
+ testpaths = ["tests"]
+-pythonpath = ["src"]
++pythonpath = [".", "src"]
+ addopts = "-ra"
+ 
+ [tool.ruff]
+diff --git a/run_demo.py b/run_demo.py
+index 85243d2..6dd595d 100644
+--- a/run_demo.py
++++ b/run_demo.py
+@@ -9,8 +9,7 @@ from typing import Literal
+ from study_planner.csp import (
+     AssignmentEntry,
+     CspAssignment,
+-    SessionPair,
+-    SessionVariable,
++    UniqueSlotConstraint,
+     WeeklySlot,
+ )
+ from study_planner.integration import (
+@@ -18,24 +17,25 @@ from study_planner.integration import (
+     ApplicationAssignmentRule,
+     ApplicationInputConfig,
+     ApplicationPlanningBinding,
+-    ApplicationSlot,
++    CatalogChronologicalOrderingPolicy,
+     CspAlgorithm,
+     FinalPlannerResult,
+     ModelArtifactIdentity,
+     OuladPresentationSplit,
+     OutOfSupportAction,
+     SupportPolicy,
++    SyntheticWeeklySlotPattern,
+     TargetRule,
+     ValidatedApplicationInputs,
+-    WeeklySlotCatalog,
+-    WeeklyTimeWindow,
+     build_application_planning_problem,
++    build_synthetic_weekly_slot_catalog,
+     integrated_uniform_cost_search,
+     load_application_inputs,
+     load_session_nn_adapter,
+ )
+ from study_planner.search.nn_adapter import (
+     CandidateSessionAllocation,
++    EvaluationStatus,
+     NNModelMode,
+     SessionNNAdapter,
+ )
+@@ -48,80 +48,84 @@ ROOT = Path(__file__).resolve().parent
+ ASSIGNMENTS = ("TEST-a1", "TEST-a2", "TEST-a3")
+ ASSESSMENTS = ("34899", "34900", "34901")
+ DEADLINES = (24, 52, 94)
+-Scenario = Literal["NORMAL", "EDGE", "IMPOSSIBLE", "NN_SUFFICIENT_CSP_REJECTED"]
++Scenario = Literal[
++    "NORMAL",
++    "EDGE",
++    "IMPOSSIBLE",
++    "NN_ACCEPTS_CSP_INFEASIBLE",
++    "VERIFICATION_REJECTED",
++]
++CSP_INFEASIBLE_TEST_TARGET = 70.0
+ SCENARIOS: tuple[Scenario, ...] = (
+     "NORMAL",
+     "EDGE",
+     "IMPOSSIBLE",
+-    "NN_SUFFICIENT_CSP_REJECTED",
++    "NN_ACCEPTS_CSP_INFEASIBLE",
++    "VERIFICATION_REJECTED",
+ )
+ 
+ 
+-class _TestOrdering:
+-    """Explicit test-only relation ordering same-assignment sessions by week."""
+-
+-    policy_identity = "TEST-week-order-v1"
+-
+-    def required_pairs(
+-        self, sessions: tuple[SessionVariable, ...]
+-    ) -> tuple[SessionPair, ...]:
+-        grouped: dict[str, list[SessionVariable]] = {}
+-        for session in sessions:
+-            grouped.setdefault(session.assignment_id, []).append(session)
+-        return tuple(
+-            SessionPair(first, second)
+-            for group in grouped.values()
+-            for first, second in zip(group, group[1:], strict=False)
+-        )
+-
+-    def is_ordered(self, earlier: WeeklySlot, later: WeeklySlot) -> bool:
+-        return earlier.week_index < later.week_index
+-
+-
+ def _test_config(
+     adapter: SessionNNAdapter, scenario: Scenario
+ ) -> ApplicationInputConfig:
+     zero_session = scenario == "EDGE"
+     impossible = scenario == "IMPOSSIBLE"
+-    bounds = AllocationBounds(0, 0) if zero_session else AllocationBounds(1, 1)
+-    eligible = () if impossible else ("TEST-slot-1", "TEST-slot-2", "TEST-slot-3")
++    csp_infeasible = scenario == "NN_ACCEPTS_CSP_INFEASIBLE"
++    verification_rejected = scenario == "VERIFICATION_REJECTED"
++    target_mark = (
++        100.0
++        if impossible
++        else CSP_INFEASIBLE_TEST_TARGET
++        if csp_infeasible
++        else 0.0
++    )
++    default_bounds = (
++        AllocationBounds(0, 0) if zero_session else AllocationBounds(1, 1)
++    )
++    catalog, eligible_by_assignment = build_synthetic_weekly_slot_catalog(
++        identity="TEST-P1-SYNTH",
++        version="test-v1",
++        weekly_capacity=3,
++        deadline_policy_identity="TEST-course-day-start-exclusive",
++        deadline_policy_version="test-v1",
++        assignment_deadlines=tuple(
++            zip(ASSIGNMENTS, DEADLINES, strict=True)
++        ),
++        week_indices=(3, 7, 13),
++        pattern=SyntheticWeeklySlotPattern(
++            (1, 3) if verification_rejected else (3,),
++            9 * 60,
++            10 * 60,
++            "TEST/UTC",
++            1,
++        ),
++    )
++    eligible = dict(eligible_by_assignment)
+     rules = tuple(
+         ApplicationAssignmentRule(
+             identity,
+             assessment_id,
+-            0.0,
++            target_mark,
+             deadline,
+-            eligible,
+-            bounds,
++            eligible[identity],
++            (
++                AllocationBounds(2, 2)
++                if csp_infeasible and identity == "TEST-a1"
++                else AllocationBounds(0, 0)
++                if csp_infeasible
++                else default_bounds
++            ),
+         )
+         for identity, assessment_id, deadline in zip(
+             ASSIGNMENTS, ASSESSMENTS, DEADLINES, strict=True
+         )
+     )
+-    relative_windows = tuple(
+-        (identity, index + 1) for index, identity in enumerate(ASSIGNMENTS)
+-    )
+-    slots = tuple(
+-        ApplicationSlot(
+-            WeeklySlot(f"TEST-slot-{index}", index - 1),
+-            WeeklyTimeWindow(1, 9 * 60, 10 * 60, "TEST/UTC"),
+-            relative_windows,
+-        )
+-        for index in range(1, 4)
+-    )
+-    targets = tuple((identity, 0.0) for identity in ASSIGNMENTS)
++    targets = tuple((identity, target_mark) for identity in ASSIGNMENTS)
+     return ApplicationInputConfig(
+         OuladPresentationSplit("FFF", ("2013B", "2013J"), "2014J"),
+         rules,
+-        TargetRule("TEST-zero-targets", "v1", targets),
+-        WeeklySlotCatalog(
+-            "TEST-slot-catalog",
+-            "v1",
+-            2,
+-            "TEST-deadline-policy",
+-            "v1",
+-            slots,
+-        ),
++        TargetRule(f"TEST-targets-{scenario.lower()}", "v1", targets),
++        catalog,
+         SupportPolicy(
+             "TEST-marginal-support",
+             "v1",
+@@ -151,7 +155,9 @@ def _load_binding(
+         feature_path, config, student_identity="40878", adapter=adapter
+     )
+     binding = build_application_planning_problem(
+-        inputs, adapter=adapter, ordering_policy=_TestOrdering()
++        inputs,
++        adapter=adapter,
++        ordering_policy=CatalogChronologicalOrderingPolicy(inputs.config.slot_catalog),
+     )
+     return adapter, inputs, binding
+ 
+@@ -159,6 +165,41 @@ def _load_binding(
+ def _print_result(scenario: Scenario, result: FinalPlannerResult) -> None:
+     print(f"\n=== {scenario} (TEST CONFIGURATION) ===")
+     print(f"Status: {result.status.value}")
++    print(f"Outcome: {result.outcome.value}")
++    if result.targets:
++        print(
++            "Target marks: "
++            + ", ".join(
++                f"{target.assignment_identity}={target.target_mark:.2f}"
++                for target in result.targets
++            )
++        )
++    if result.outcome.value == "target_achieved":
++        print("Result: target achieved by the verified schedule.")
++    elif result.outcome.value == "target_unreachable":
++        if result.search_complete:
++            print(
++                "Result: target unreachable at configured capacity "
++                "(exhaustive search)."
++            )
++        else:
++            print(
++                "Result: target not achieved; search completeness is not "
++                "established."
++            )
++    elif result.outcome.value == "incomplete":
++        print("Result: search incomplete; target reachability is unknown.")
++    elif result.outcome.value == "no_feasible_schedule":
++        print("Result: no verified feasible schedule was found.")
++    if result.predicted_marks:
++        label = (
++            "Best verified marks so far"
++            if result.outcome.value == "incomplete"
++            else "Best verified achievable marks"
++            if result.outcome.value == "target_unreachable"
++            else "Final predicted marks"
++        )
++        print(f"{label} (comparison: {result.best_plan_comparison_rule}).")
+     print("Assignments:")
+     for assignment in ASSIGNMENTS:
+         allocation = next(
+@@ -190,9 +231,15 @@ def _print_result(scenario: Scenario, result: FinalPlannerResult) -> None:
+                 f"  {mark.assignment_identity}: {mark.predicted_mark:.2f} / "
+                 f"target {mark.target_mark:.2f}"
+             )
++        if result.outcome.value in {"target_unreachable", "incomplete"}:
++            print("Target shortfall:")
++            for mark in result.predicted_marks:
++                shortfall = max(0.0, mark.target_mark - mark.predicted_mark)
++                print(f"  {mark.assignment_identity}: {shortfall:.2f}")
+     else:
+-        print("  none (NN was not run for an infeasible allocation)")
++        print("  none (no final predictions from a verified feasible schedule)")
+     stats = result.search_statistics
++    print(f"Search complete: {result.search_complete}")
+     print(
+         "Search: "
+         f"generated={stats.search.nodes_generated}, "
+@@ -212,6 +259,29 @@ def _print_result(scenario: Scenario, result: FinalPlannerResult) -> None:
+     )
+     if stats.terminal_csp_outcomes:
+         print(f"CSP terminal: {stats.terminal_csp_outcomes[-1].status.value}")
++    if result.search_state_path:
++        print("Search solution path (actual SearchResult path):")
++        for state in result.search_state_path:
++            allocations = getattr(state, "allocations", state)
++            print(f"  state: {allocations}")
++        print(
++            "  actions: "
++            + repr(
++                tuple(
++                    (
++                        getattr(action, "assignment_identity", None),
++                        getattr(action, "relative_window", None),
++                    )
++                    for action in result.search_action_path
++                )
++            )
++        )
++    else:
++        print(
++            "Search solution path: none (SearchResult returns no path after "
++            "exhaustion)."
++        )
++    print("Search expansion trace: not available; Search counters above are aggregate.")
+     if result.failure_reasons:
+         print(f"Reasons: {', '.join(result.failure_reasons)}")
+ 
+@@ -223,7 +293,123 @@ def run_scenario(
+     if scenario not in SCENARIOS:
+         raise ValueError(f"unknown scenario: {scenario}")
+     adapter, inputs, binding = _load_binding(scenario, model)
+-    if scenario == "NN_SUFFICIENT_CSP_REJECTED":
++    if scenario == "NN_ACCEPTS_CSP_INFEASIBLE":
++        state = binding.allocation_space.initial_state
++        for _ in range(2):
++            action = next(
++                action
++                for action in binding.allocation_space.actions(state)
++                if action.assignment_identity == "TEST-a1"
++            )
++            state = binding.allocation_space.transition(state, action)
++        candidate = binding.candidate_factory(state)
++        allocations = {
++            plan.assignment_identity:
++                plan.candidate_identity.canonical_allocation_identity
++            for plan in candidate.problem.manifest.canonical_assignments
++        }
++        provisional = tuple(
++            adapter.evaluate_provisional(
++                CandidateSessionAllocation(
++                    allocations[context.assignment_identity]
++                ),
++                context,
++            )
++            for context in inputs.feature_contexts
++        )
++        targets = {
++            target.assignment_identity: target.target_mark
++            for target in candidate.targets
++        }
++        if any(
++            result.status is not EvaluationStatus.PREDICTED
++            or result.prediction is None
++            or result.prediction < targets[context.assignment_identity]
++            for context, result in zip(
++                inputs.feature_contexts, provisional, strict=True
++            )
++        ):
++            raise RuntimeError("TEST NN provisional target was not accepted")
++        requested_allocations = tuple(
++            (
++                plan.assignment_identity,
++                plan.candidate_identity.canonical_allocation_identity,
++            )
++            for plan in candidate.problem.manifest.canonical_assignments
++        )
++        print(f"CSP proposal allocations: {requested_allocations}")
++        provisional_targets = tuple(
++            targets[item.assignment_identity] for item in inputs.feature_contexts
++        )
++        print(
++            "NN provisional target: ACCEPTED "
++            f"(predictions={tuple(round(item.prediction, 2) for item in provisional)}, "
++            f"targets={provisional_targets})"
++        )
++        a1_domains = tuple(
++            domain
++            for domain in candidate.problem.domains
++            if domain.variable.assignment_id == "TEST-a1"
++        )
++        unique_constraints = tuple(
++            constraint
++            for constraint in candidate.problem.constraints
++            if isinstance(constraint, UniqueSlotConstraint)
++            and all(item.assignment_id == "TEST-a1" for item in constraint.scope)
++        )
++        if len(a1_domains) != 2 or not unique_constraints:
++            raise RuntimeError("TEST CSP conflict was not constructed as expected")
++        distinct_slots = {
++            slot.slot_id for slot in a1_domains[0].values
++        }
++        if (
++            len(distinct_slots) != 1
++            or len(a1_domains[1].values) != 1
++            or a1_domains[0].values[0] != a1_domains[1].values[0]
++        ):
++            raise RuntimeError("TEST CSP conflict must have exactly one eligible slot")
++        only_slot = a1_domains[0].values[0]
++        conflict = unique_constraints[0]
++        rejects_reuse = not conflict.is_compatible(
++            a1_domains[0].variable,
++            only_slot,
++            a1_domains[1].variable,
++            only_slot,
++        )
++        print(
++            "CSP infeasibility setup: TEST-a1 requests 2 sessions, but its "
++            f"eligible domain has {len(distinct_slots)} distinct slot; "
++            f"{conflict.constraint_id} rejects reuse={rejects_reuse}."
++        )
++        result = integrated_uniform_cost_search(
++            binding.allocation_space,
++            binding.candidate_factory,
++            adapter,
++            csp_algorithm=CspAlgorithm.BT_FC,
++        )
++        if (
++            result.outcome.value != "no_feasible_schedule"
++            or result.status.value != "infeasible"
++            or len(result.search_statistics.terminal_csp_outcomes) != 1
++            or any(
++                outcome.status.value != "exhausted_no_feasible"
++                for outcome in result.search_statistics.terminal_csp_outcomes
++            )
++            or result.search_statistics.verification_rejections
++            or result.search_statistics.schedules_examined
++            or result.weekly_timetable is not None
++            or result.whole_plan_verification is not None
++            or result.predicted_marks
++            or not result.search_complete
++        ):
++            raise RuntimeError(
++                "real CSP did not report one exhaustive no-feasible outcome"
++            )
++        print(
++            "CSP result: exhausted with no feasible schedule; verification "
++            "rejections=0. Search then exhausted the remaining TEST allocation graph."
++        )
++    elif scenario == "VERIFICATION_REJECTED":
+         provisional_marks = tuple(
+             adapter.evaluate_provisional(
+                 CandidateSessionAllocation((1, 0, 0, 0)), context
+@@ -237,9 +423,8 @@ def run_scenario(
+             f"(predictions={tuple(round(mark, 2) for mark in provisional_marks)}, "
+             "targets=(0, 0, 0))"
+         )
+-        # Keep this demonstration deterministic: reject the first schedule at
+-        # the existing verification boundary, then delegate subsequent ones to
+-        # the real whole-plan verifier. This is an explicit TEST fault injection.
++        # Explicitly named TEST fault injection at the verification boundary;
++        # this is not a CSP constraint rejection.
+         import study_planner.integration.schedule_bridge as bridge_module
+ 
+         real_verify = bridge_module.verify_whole_plan
+@@ -272,7 +457,7 @@ def run_scenario(
+         if not rejected_once:
+             raise RuntimeError("TEST rejection scenario did not reach verification")
+         print(
+-            "NN_SUFFICIENT_CSP_REJECTED: TEST-injected first verification "
++            "VERIFICATION_REJECTED: TEST-injected first verification "
+             "rejection; planner continued to the next schedule."
+         )
+     else:
+diff --git a/src/study_planner/integration/__init__.py b/src/study_planner/integration/__init__.py
+index 34c85d4..a76e54b 100644
+--- a/src/study_planner/integration/__init__.py
++++ b/src/study_planner/integration/__init__.py
+@@ -10,12 +10,14 @@ from study_planner.integration.application_inputs import (
+     OuladPresentationSplit,
+     OutOfSupportAction,
+     SupportPolicy,
++    SyntheticWeeklySlotPattern,
+     TargetRule,
+     ValidatedApplicationInputs,
+     WeeklySlotCatalog,
+     WeeklyTimeWindow,
+     build_application_inputs,
+     build_application_planning_problem,
++    build_synthetic_weekly_slot_catalog,
+     load_application_inputs,
+     load_session_nn_adapter,
+ )
+@@ -24,6 +26,7 @@ from study_planner.integration.application_planning import (
+     ApplicationAllocationSpace,
+     ApplicationAllocationState,
+     ApplicationPlanningBinding,
++    CatalogChronologicalOrderingPolicy,
+ )
+ from study_planner.integration.planner import (
+     AllocationSpace,
+@@ -31,6 +34,7 @@ from study_planner.integration.planner import (
+     AssignmentMark,
+     AssignmentTarget,
+     FinalPlannerResult,
++    PlannerOutcome,
+     PlannerStatistics,
+     PlannerStatus,
+     WholePlanPlanningCandidate,
+@@ -57,10 +61,12 @@ __all__ = [
+     "OuladPresentationSplit",
+     "OutOfSupportAction",
+     "SupportPolicy",
++    "SyntheticWeeklySlotPattern",
+     "TargetRule",
+     "ValidatedApplicationInputs",
+     "WeeklySlotCatalog",
+     "WeeklyTimeWindow",
++    "build_synthetic_weekly_slot_catalog",
+     "build_application_inputs",
+     "build_application_planning_problem",
+     "load_application_inputs",
+@@ -69,6 +75,7 @@ __all__ = [
+     "ApplicationAllocationSpace",
+     "ApplicationAllocationState",
+     "ApplicationPlanningBinding",
++    "CatalogChronologicalOrderingPolicy",
+     "CspAlgorithm",
+     "CspEnumerationStatistics",
+     "ScheduleBridgeStatus",
+@@ -81,6 +88,7 @@ __all__ = [
+     "AssignmentMark",
+     "AssignmentTarget",
+     "FinalPlannerResult",
++    "PlannerOutcome",
+     "PlannerStatistics",
+     "PlannerStatus",
+     "WholePlanPlanningCandidate",
+diff --git a/src/study_planner/integration/application_inputs.py b/src/study_planner/integration/application_inputs.py
+index 18187e8..bb173c0 100644
+--- a/src/study_planner/integration/application_inputs.py
++++ b/src/study_planner/integration/application_inputs.py
+@@ -55,6 +55,9 @@ class OutOfSupportAction(str, Enum):
+     REJECT = "reject"
+ 
+ 
++SYNTHETIC_DEADLINE_BOUNDARY_IDENTITY = "course-day-start-exclusive-v1"
++
++
+ @dataclass(frozen=True, slots=True)
+ class OuladPresentationSplit:
+     """The established one-course chronological OULAD model split."""
+@@ -277,9 +280,9 @@ class ApplicationSlot:
+         assignment_ids = tuple(
+             assignment_id for assignment_id, _ in self.relative_windows
+         )
+-        if len(assignment_ids) != 3 or len(set(assignment_ids)) != 3:
++        if len(set(assignment_ids)) != len(assignment_ids):
+             raise ApplicationInputError(
+-                "each slot needs one relative-window entry for all three assignments"
++                "slot relative-window assignment identities must be unique"
+             )
+         if any(
+             not isinstance(assignment_id, str)
+@@ -309,6 +312,8 @@ class WeeklySlotCatalog:
+     deadline_policy_identity: str
+     deadline_policy_version: str
+     slots: tuple[ApplicationSlot, ...]
++    course_start_weekday_iso: int = 1
++    deadline_boundary_identity: str = SYNTHETIC_DEADLINE_BOUNDARY_IDENTITY
+ 
+     def __post_init__(self) -> None:
+         if not all(
+@@ -340,12 +345,22 @@ class WeeklySlotCatalog:
+         slot_ids = tuple(item.slot.slot_id for item in self.slots)
+         if len(slot_ids) != len(set(slot_ids)):
+             raise ApplicationInputError("slot catalog IDs must be unique")
+-        assignment_ids = set(item[0] for item in self.slots[0].relative_windows)
+-        if any(
+-            set(item[0] for item in slot.relative_windows) != assignment_ids
+-            for slot in self.slots
++        if len({slot.time_window.timezone_identity for slot in self.slots}) != 1:
++            raise ApplicationInputError(
++                "all slots in one catalog must use the same timezone identity"
++            )
++        if (
++            isinstance(self.course_start_weekday_iso, bool)
++            or not isinstance(self.course_start_weekday_iso, int)
++            or not 1 <= self.course_start_weekday_iso <= 7
+         ):
+-            raise ApplicationInputError("all slots must map the same three assignments")
++            raise ApplicationInputError(
++                "course start weekday must use ISO values 1 through 7"
++            )
++        if self.deadline_boundary_identity != SYNTHETIC_DEADLINE_BOUNDARY_IDENTITY:
++            raise ApplicationInputError(
++                "unsupported deadline boundary; use strict course-day-start cutoff"
++            )
+ 
+     @property
+     def configuration_identity(self) -> str:
+@@ -356,6 +371,8 @@ class WeeklySlotCatalog:
+             "weekly_capacity": self.weekly_capacity,
+             "deadline_policy_identity": self.deadline_policy_identity,
+             "deadline_policy_version": self.deadline_policy_version,
++            "course_start_weekday_iso": self.course_start_weekday_iso,
++            "deadline_boundary_identity": self.deadline_boundary_identity,
+             "slots": [
+                 {
+                     "slot_id": item.slot.slot_id,
+@@ -378,7 +395,11 @@ class WeeklySlotCatalog:
+     ) -> tuple[tuple[str, tuple[tuple[str, int], ...]], ...]:
+         """Return canonical assignment-specific slot-to-window mappings."""
+         assignment_ids = sorted(
+-            self.slots[0].relative_windows[index][0] for index in range(3)
++            {
++                assignment_id
++                for slot in self.slots
++                for assignment_id, _ in slot.relative_windows
++            }
+         )
+         return tuple(
+             (
+@@ -390,6 +411,7 @@ class WeeklySlotCatalog:
+                             dict(slot.relative_windows)[assignment_id],
+                         )
+                         for slot in self.slots
++                        if assignment_id in dict(slot.relative_windows)
+                     )
+                 ),
+             )
+@@ -397,6 +419,183 @@ class WeeklySlotCatalog:
+         )
+ 
+ 
++@dataclass(frozen=True, slots=True)
++class SyntheticWeeklySlotPattern:
++    """Explicit generated weekly pattern, not a claim about learner availability."""
++
++    weekdays_iso: tuple[int, ...]
++    start_minute_local: int
++    end_minute_local: int
++    timezone_identity: str
++    course_start_weekday_iso: int = 1
++
++    def __post_init__(self) -> None:
++        if (
++            not isinstance(self.weekdays_iso, tuple)
++            or not self.weekdays_iso
++            or len(set(self.weekdays_iso)) != len(self.weekdays_iso)
++        ):
++            raise ApplicationInputError(
++                "synthetic weekdays must be unique and non-empty"
++            )
++        for weekday in self.weekdays_iso:
++            WeeklyTimeWindow(
++                weekday,
++                self.start_minute_local,
++                self.end_minute_local,
++                self.timezone_identity,
++            )
++        if (
++            isinstance(self.course_start_weekday_iso, bool)
++            or not isinstance(self.course_start_weekday_iso, int)
++            or not 1 <= self.course_start_weekday_iso <= 7
++        ):
++            raise ApplicationInputError(
++                "course start weekday must use ISO values 1 through 7"
++            )
++
++
++def _slot_click_window(
++    slot: ApplicationSlot, deadline_day: int, course_start_weekday_iso: int
++) -> int | None:
++    """Return the four-week NN click-history window containing the whole slot."""
++    weekday_offset = (slot.time_window.weekday_iso - course_start_weekday_iso) % 7
++    week_minutes = 7 * 24 * 60
++    start = (
++        slot.slot.week_index * week_minutes
++        + weekday_offset * 24 * 60
++        + slot.time_window.start_minute_local
++    )
++    end = (
++        slot.slot.week_index * week_minutes
++        + weekday_offset * 24 * 60
++        + slot.time_window.end_minute_local
++    )
++    for window_index in range(4):
++        lower = (deadline_day - 28 + 7 * window_index) * 24 * 60
++        upper = lower + 7 * 24 * 60
++        if start >= lower and end <= upper:
++            return window_index + 1
++    return None
++
++
++def _slot_is_before_deadline(
++    slot: ApplicationSlot, deadline_day: int, course_start_weekday_iso: int
++) -> bool:
++    """Apply the implementation's strict start-of-deadline-day cutoff.
++
++    The professor requires a session before its assignment deadline but does
++    not specify whether the deadline day is inclusive. This implementation
++    conservatively treats the deadline as the start of course-relative day D.
++    """
++    weekday_offset = (slot.time_window.weekday_iso - course_start_weekday_iso) % 7
++    week_minutes = 7 * 24 * 60
++    end = (
++        slot.slot.week_index * week_minutes
++        + weekday_offset * 24 * 60
++        + slot.time_window.end_minute_local
++    )
++    return end < deadline_day * 24 * 60
++
++
++def build_synthetic_weekly_slot_catalog(
++    *,
++    identity: str,
++    version: str,
++    weekly_capacity: int,
++    deadline_policy_identity: str,
++    deadline_policy_version: str,
++    assignment_deadlines: tuple[tuple[str, int], ...],
++    week_indices: tuple[int, ...],
++    pattern: SyntheticWeeklySlotPattern,
++) -> tuple[WeeklySlotCatalog, tuple[tuple[str, tuple[str, ...]], ...]]:
++    """Expand a synthetic weekly pattern and derive each assignment's eligible IDs.
++
++    A generated slot is eligible when its complete interval ends before the
++    configured deadline boundary. The four-window mapping is computed
++    independently for NN click-history feature preparation. The strict
++    start-of-deadline-day boundary is an implementation assumption, not a
++    professor-specified interpretation. The course-week anchor is explicit.
++    """
++    if not isinstance(pattern, SyntheticWeeklySlotPattern):
++        raise ApplicationInputError("a typed synthetic weekly pattern is required")
++    if (
++        not isinstance(assignment_deadlines, tuple)
++        or len(assignment_deadlines) != 3
++        or len({identity for identity, _ in assignment_deadlines}) != 3
++        or any(
++            not isinstance(identity, str)
++            or not identity
++            or isinstance(day, bool)
++            or not isinstance(day, int)
++            or day < 0
++            for identity, day in assignment_deadlines
++        )
++    ):
++        raise ApplicationInputError("three unique assignment deadlines are required")
++    if (
++        not isinstance(week_indices, tuple)
++        or not week_indices
++        or len(set(week_indices)) != len(week_indices)
++        or any(
++            isinstance(week, bool) or not isinstance(week, int) or week < 0
++            for week in week_indices
++        )
++    ):
++        raise ApplicationInputError(
++            "course-week indices must be unique non-negative integers"
++        )
++    identities = tuple(
++        sorted(assignment_id for assignment_id, _ in assignment_deadlines)
++    )
++    deadlines = dict(assignment_deadlines)
++    generated: list[ApplicationSlot] = []
++    eligible: dict[str, list[str]] = {assignment_id: [] for assignment_id in identities}
++    for week_index in sorted(week_indices):
++        for weekday in sorted(pattern.weekdays_iso):
++            slot_id = (
++                f"{identity}-W{week_index:02d}-D{weekday}-"
++                f"T{pattern.start_minute_local:04d}-{pattern.end_minute_local:04d}"
++            )
++            weekly_slot = WeeklySlot(slot_id, week_index)
++            window = WeeklyTimeWindow(
++                weekday,
++                pattern.start_minute_local,
++                pattern.end_minute_local,
++                pattern.timezone_identity,
++            )
++            mappings: list[tuple[str, int]] = []
++            for assignment_id in identities:
++                candidate_slot = ApplicationSlot(weekly_slot, window, ())
++                if _slot_is_before_deadline(
++                    candidate_slot,
++                    deadlines[assignment_id],
++                    pattern.course_start_weekday_iso,
++                ):
++                    eligible[assignment_id].append(slot_id)
++                relative_window = _slot_click_window(
++                    candidate_slot,
++                    deadlines[assignment_id],
++                    pattern.course_start_weekday_iso,
++                )
++                if relative_window is not None:
++                    mappings.append((assignment_id, relative_window))
++            generated.append(ApplicationSlot(weekly_slot, window, tuple(mappings)))
++    catalog = WeeklySlotCatalog(
++        identity,
++        version,
++        weekly_capacity,
++        deadline_policy_identity,
++        deadline_policy_version,
++        tuple(generated),
++        pattern.course_start_weekday_iso,
++    )
++    return catalog, tuple(
++        (assignment_id, tuple(sorted(eligible[assignment_id])))
++        for assignment_id in identities
++    )
++
++
+ @dataclass(frozen=True, slots=True)
+ class SupportPolicy:
+     """Explicit disposition for training-reference marginal support flags."""
+@@ -528,12 +727,37 @@ class ApplicationInputConfig:
+             raise ApplicationInputError(
+                 "slot windows must cover exactly the three configured assignments"
+             )
++        slots_by_id = {slot.slot.slot_id: slot for slot in self.slot_catalog.slots}
+         for rule in self.assignment_rules:
+             unknown = set(rule.eligible_slot_ids) - known_slots
+             if unknown:
+                 raise ApplicationInputError(
+                     f"assignment {rule.assignment_identity} references unknown slots"
+                 )
++            windows = dict(self.slot_catalog.windows_by_assignment).get(
++                rule.assignment_identity, ()
++            )
++            mapped_windows = dict(windows)
++            for slot_id in rule.eligible_slot_ids:
++                slot = slots_by_id[slot_id]
++                if not _slot_is_before_deadline(
++                    slot,
++                    rule.deadline_day,
++                    self.slot_catalog.course_start_weekday_iso,
++                ):
++                    raise ApplicationInputError(
++                        f"slot {slot_id} is not strictly before assignment "
++                        f"{rule.assignment_identity} deadline"
++                    )
++            for slot_id, slot in slots_by_id.items():
++                relative_window = _slot_click_window(
++                    slot, rule.deadline_day, self.slot_catalog.course_start_weekday_iso
++                )
++                if mapped_windows.get(slot_id) != relative_window:
++                    raise ApplicationInputError(
++                        f"slot {slot_id} has an incorrect click window for "
++                        f"assignment {rule.assignment_identity}"
++                    )
+ 
+     @property
+     def targets(self) -> tuple[AssignmentTarget, ...]:
+diff --git a/src/study_planner/integration/application_planning.py b/src/study_planner/integration/application_planning.py
+index 46e21d6..a1ca17c 100644
+--- a/src/study_planner/integration/application_planning.py
++++ b/src/study_planner/integration/application_planning.py
+@@ -13,13 +13,18 @@ from study_planner.csp.core import (
+     AssignmentPlan,
+     CspProblem,
+     SessionOrderingPolicy,
++    SessionPair,
++    SessionVariable,
+     VariableDomain,
++    WeeklySlot,
+     WholePlanManifest,
+ )
+ from study_planner.csp.verification import WholePlanVerificationPolicy
+ from study_planner.integration.application_inputs import (
+     ApplicationInputError,
++    ApplicationSlot,
+     ValidatedApplicationInputs,
++    WeeklySlotCatalog,
+ )
+ from study_planner.integration.planner import WholePlanPlanningCandidate
+ from study_planner.search.nn_adapter import (
+@@ -29,6 +34,56 @@ from study_planner.search.nn_adapter import (
+ Allocation = tuple[int, int, int, int]
+ 
+ 
++@dataclass(frozen=True, slots=True)
++class CatalogChronologicalOrderingPolicy:
++    """Order same-assignment sessions by their synthetic catalog chronology."""
++
++    catalog: WeeklySlotCatalog
++
++    @property
++    def policy_identity(self) -> str:
++        return (
++            f"catalog-chronological-v1:{self.catalog.configuration_identity}"
++        )
++
++    def required_pairs(
++        self, sessions: tuple[SessionVariable, ...]
++    ) -> tuple[SessionPair, ...]:
++        by_assignment: dict[str, list[SessionVariable]] = {}
++        for session in sessions:
++            by_assignment.setdefault(session.assignment_id, []).append(session)
++        return tuple(
++            SessionPair(earlier, later)
++            for assignment_sessions in by_assignment.values()
++            for earlier, later in zip(
++                sorted(assignment_sessions),
++                sorted(assignment_sessions)[1:],
++                strict=False,
++            )
++        )
++
++    def is_ordered(self, earlier: WeeklySlot, later: WeeklySlot) -> bool:
++        by_id = {slot.slot.slot_id: slot for slot in self.catalog.slots}
++        if earlier.slot_id not in by_id or later.slot_id not in by_id:
++            raise ApplicationInputError(
++                "ordering references a slot outside the catalog"
++            )
++        return self._chronology_key(by_id[earlier.slot_id]) < self._chronology_key(
++            by_id[later.slot_id]
++        )
++
++    def _chronology_key(self, slot: ApplicationSlot) -> tuple[int, int, int]:
++        return (
++            slot.slot.week_index,
++            (
++                slot.time_window.weekday_iso
++                - self.catalog.course_start_weekday_iso
++            )
++            % 7,
++            slot.time_window.start_minute_local,
++        )
++
++
+ @dataclass(frozen=True, slots=True, order=True)
+ class AddStudySession:
+     """One Search action adding a session in a provisional NN click window."""
+@@ -92,6 +147,7 @@ class ApplicationAllocationSpace:
+                     {
+                         slot_windows[slot_id][assignment_id]
+                         for slot_id in rule.eligible_slot_ids
++                        if assignment_id in slot_windows[slot_id]
+                     }
+                 )
+             )
+@@ -304,6 +360,7 @@ class ApplicationPlanningBinding:
+ 
+ __all__ = [
+     "AddStudySession",
++    "CatalogChronologicalOrderingPolicy",
+     "ApplicationAllocationSpace",
+     "ApplicationAllocationState",
+     "ApplicationPlanningBinding",
+diff --git a/src/study_planner/integration/planner.py b/src/study_planner/integration/planner.py
+index 35135ef..b5ddf84 100644
+--- a/src/study_planner/integration/planner.py
++++ b/src/study_planner/integration/planner.py
+@@ -46,6 +46,17 @@ class PlannerStatus(str, Enum):
+     ERROR = "error"
+ 
+ 
++class PlannerOutcome(str, Enum):
++    """Detailed distinction between goal success and terminal failure modes."""
++
++    TARGET_ACHIEVED = "target_achieved"
++    TARGET_UNREACHABLE = "target_unreachable"
++    NO_FEASIBLE_SCHEDULE = "no_feasible_schedule"
++    NO_SUPPORTED_PLAN = "no_supported_plan"
++    INCOMPLETE = "incomplete"
++    ERROR = "error"
++
++
+ StateT = TypeVar("StateT", bound=Hashable)
+ ActionT = TypeVar("ActionT")
+ 
+@@ -128,9 +139,16 @@ class WholePlanPlanningCandidate:
+                 raise ValueError(
+                     "feature context does not match the whole-plan manifest"
+                 )
+-        slot_ids = {
+-            slot.slot_id for domain in self.problem.domains for slot in domain.values
+-        }
++        slot_ids_by_assignment: dict[str, set[str]] = {}
++        for domain in self.problem.domains:
++            slot_ids_by_assignment.setdefault(
++                domain.variable.assignment_id, set()
++            ).update(
++                slot.slot_id for slot in domain.values
++            )
++        slot_ids = set().union(*slot_ids_by_assignment.values()) if (
++            slot_ids_by_assignment
++        ) else set()
+         if self.slot_relative_windows_by_assignment:
+             mapping_ids = tuple(
+                 assignment_id
+@@ -148,7 +166,6 @@ class WholePlanPlanningCandidate:
+                 windows = dict(entries)
+                 if (
+                     len(windows) != len(entries)
+-                    or not slot_ids.issubset(windows)
+                     or any(
+                         isinstance(window, bool)
+                         or not isinstance(window, int)
+@@ -191,6 +208,13 @@ class AssignmentMark:
+ 
+ @dataclass(frozen=True, slots=True)
+ class PlannerStatistics:
++    """Search counters at allocation, schedule, and support-evaluation levels.
++
++    ``schedules_examined`` counts CSP schedules handed to whole-plan
++    verification. Provisional support rejections count rejected assignment
++    mappings; final support rejections count rejected verified schedules.
++    """
++
+     search: SearchStatistics
+     candidate_proposals: int
+     provisional_predictions: int
+@@ -201,14 +225,30 @@ class PlannerStatistics:
+     csp: CspEnumerationStatistics
+     terminal_csp_outcomes: tuple[WholePlanSearchOutcome, ...]
+     orchestration_time_seconds: float
++    verification_feasible_schedules: int = 0
++    provisional_support_rejections: int = 0
++    final_support_rejections: int = 0
++    final_scored_supported_schedules: int = 0
++
++    @property
++    def csp_schedules_enumerated(self) -> int:
++        """Number of CSP schedules passed to whole-plan verification."""
++        return self.schedules_examined
++
++    @property
++    def support_policy_rejections(self) -> int:
++        """Total provisional and final evaluations rejected by support policy."""
++        return self.provisional_support_rejections + self.final_support_rejections
+ 
+ 
+ @dataclass(frozen=True, slots=True)
+ class FinalPlannerResult:
+     status: PlannerStatus
++    outcome: PlannerOutcome
+     allocations: tuple[AssignmentAllocation, ...]
+     weekly_timetable: tuple[AssignmentSchedule, ...] | None
+     predicted_marks: tuple[AssignmentMark, ...]
++    targets: tuple[AssignmentTarget, ...]
+     nn_model_identity: str
+     nn_model_mode: NNModelMode
+     nn_fitted_artifact_digest: str
+@@ -217,6 +257,17 @@ class FinalPlannerResult:
+     search_statistics: PlannerStatistics
+     failure_reasons: tuple[str, ...]
+     solution_cost: float | None
++    search_complete: bool
++    best_plan_comparison_rule: str
++    search_state_path: tuple[Hashable, ...] = ()
++    search_action_path: tuple[object, ...] = ()
++
++
++BEST_PLAN_COMPARISON_RULE = (
++    "maximize sum of final predicted marks; then maximize the per-assignment "
++    "mark tuple in canonical assignment order; then minimize total sessions; "
++    "then choose the lexicographically smallest whole-plan and schedule identities"
++)
+ 
+ 
+ class _Controller(Generic[StateT, ActionT]):
+@@ -246,11 +297,15 @@ class _Controller(Generic[StateT, ActionT]):
+         self.provisional_predictions = 0
+         self.final_predictions = 0
+         self.schedules_examined = 0
++        self.verification_feasible_schedules = 0
+         self.verification_rejections = 0
++        self.provisional_support_rejections = 0
++        self.final_support_rejections = 0
++        self.final_scored_supported_schedules = 0
+         self.target_failures = 0
+         self.csp_stats = CspEnumerationStatistics(0, 0, 0, 0, 0, 0, 0.0, 0.0)
+         self.last_candidate: WholePlanPlanningCandidate | None = None
+-        self.last_scored: (
++        self.best_scored: (
+             tuple[
+                 WholePlanPlanningCandidate,
+                 WholePlanVerificationResult,
+@@ -302,6 +357,8 @@ class _Controller(Generic[StateT, ActionT]):
+         targets = {
+             item.assignment_identity: item.target_mark for item in candidate.targets
+         }
++        candidate_target_failures = 0
++        candidate_final_support_rejections = 0
+         for plan in manifest.canonical_assignments:
+             provisional = self.adapter.evaluate_provisional(
+                 CandidateSessionAllocation(
+@@ -318,6 +375,7 @@ class _Controller(Generic[StateT, ActionT]):
+                     provisional.mapping.marginal_status
+                 )
+             ):
++                self.provisional_support_rejections += 1
+                 self.failure_reasons.append("provisional_mapping_out_of_support")
+                 return False
+ 
+@@ -338,6 +396,7 @@ class _Controller(Generic[StateT, ActionT]):
+                         self.verification_rejections += 1
+                         self.failure_reasons.extend(verification.rejection_reasons)
+                         continue
++                    self.verification_feasible_schedules += 1
+                     marks: list[AssignmentMark] = []
+                     predictions = []
+                     windows_by_assignment = dict(
+@@ -395,10 +454,15 @@ class _Controller(Generic[StateT, ActionT]):
+                         )
+                         for prediction in predictions
+                     ):
++                        self.final_support_rejections += 1
++                        candidate_final_support_rejections += 1
+                         self.failure_reasons.append("final_schedule_out_of_support")
+                         continue
+                     marks_tuple = tuple(marks)
+-                    self.last_scored = (candidate, verification, marks_tuple)
++                    self.final_scored_supported_schedules += 1
++                    scored = (candidate, verification, marks_tuple)
++                    if self._is_better_scored_plan(scored, self.best_scored):
++                        self.best_scored = scored
+                     if all(
+                         mark.predicted_mark >= mark.target_mark for mark in marks_tuple
+                     ):
+@@ -421,13 +485,16 @@ class _Controller(Generic[StateT, ActionT]):
+                             )
+                         self.found = self._result(
+                             PlannerStatus.FEASIBLE,
++                            PlannerOutcome.TARGET_ACHIEVED,
+                             candidate,
+                             verification,
+                             marks_tuple,
+                             None,
++                            search_complete=False,
+                         )
+                         return True
+                     self.target_failures += 1
++                    candidate_target_failures += 1
+                     self.failure_reasons.append("final_target_failed")
+                     continue
+                 if step.status is ScheduleBridgeStatus.INCOMPLETE:
+@@ -450,7 +517,8 @@ class _Controller(Generic[StateT, ActionT]):
+                 elif (
+                     step.outcome.status
+                     is WholePlanEnumerationStatus.EXHAUSTED_WITH_FEASIBLE
+-                    and self.target_failures
++                    and candidate_target_failures
++                    and not candidate_final_support_rejections
+                 ):
+                     self.failure_reasons.append(
+                         "all_verified_schedules_missed_nn_target"
+@@ -460,6 +528,55 @@ class _Controller(Generic[StateT, ActionT]):
+             self._add_csp_statistics(bridge.statistics)
+         return False
+ 
++    @staticmethod
++    def _score_key(
++        scored: tuple[
++            WholePlanPlanningCandidate,
++            WholePlanVerificationResult,
++            tuple[AssignmentMark, ...],
++        ],
++    ) -> tuple[tuple[float, tuple[float, ...], int], tuple[str, str]]:
++        candidate, verification, marks = scored
++        by_assignment = {mark.assignment_identity: mark for mark in marks}
++        ordered_marks = tuple(
++            by_assignment[plan.assignment_identity].predicted_mark
++            for plan in candidate.problem.manifest.canonical_assignments
++        )
++        session_count = sum(
++            plan.session_count
++            for plan in candidate.problem.manifest.canonical_assignments
++        )
++        quality = (math.fsum(ordered_marks), ordered_marks, -session_count)
++        stable_identity = (
++            candidate.problem.manifest.canonical_identity,
++            verification.schedule_identity,
++        )
++        return quality, stable_identity
++
++    @classmethod
++    def _is_better_scored_plan(
++        cls,
++        candidate: tuple[
++            WholePlanPlanningCandidate,
++            WholePlanVerificationResult,
++            tuple[AssignmentMark, ...],
++        ],
++        incumbent: tuple[
++            WholePlanPlanningCandidate,
++            WholePlanVerificationResult,
++            tuple[AssignmentMark, ...],
++        ]
++        | None,
++    ) -> bool:
++        """Compare only verified, final-scored schedules with a stable tie-break."""
++        if incumbent is None:
++            return True
++        candidate_quality, candidate_identity = cls._score_key(candidate)
++        incumbent_quality, incumbent_identity = cls._score_key(incumbent)
++        if candidate_quality != incumbent_quality:
++            return candidate_quality > incumbent_quality
++        return candidate_identity < incumbent_identity
++
+     def _add_csp_statistics(self, value: CspEnumerationStatistics) -> None:
+         current = self.csp_stats
+         self.csp_stats = CspEnumerationStatistics(
+@@ -476,24 +593,27 @@ class _Controller(Generic[StateT, ActionT]):
+     def _result(
+         self,
+         status: PlannerStatus,
++        outcome: PlannerOutcome,
+         candidate: WholePlanPlanningCandidate | None,
+         verification: WholePlanVerificationResult | None,
+         marks: tuple[AssignmentMark, ...],
+         search: SearchStatistics | None,
++        *,
++        search_complete: bool,
+     ) -> FinalPlannerResult:
+         if not self.adapter.fitted_artifact_digest:
+             raise RuntimeError("final planner provenance requires a fitted artifact")
+         if candidate is None:
+             candidate = self.last_candidate
+-        if verification is None and self.last_scored is not None:
+-            scored_candidate, scored_verification, scored_marks = self.last_scored
++        if verification is None and self.best_scored is not None:
++            scored_candidate, scored_verification, scored_marks = self.best_scored
+             candidate = scored_candidate
+             verification = scored_verification
+             if not marks:
+                 marks = scored_marks
+         allocations = (
+             ()
+-            if candidate is None
++            if candidate is None or verification is None
+             else tuple(
+                 AssignmentAllocation(
+                     plan.assignment_identity,
+@@ -503,16 +623,18 @@ class _Controller(Generic[StateT, ActionT]):
+             )
+         )
+         return FinalPlannerResult(
+-            status,
+-            allocations,
+-            None if verification is None else verification.schedule,
+-            marks,
+-            self.adapter.model_provenance_identity,
+-            self.adapter.model_mode,
+-            self.adapter.fitted_artifact_digest,
+-            self.adapter.feature_schema_identity,
+-            verification,
+-            PlannerStatistics(
++            status=status,
++            outcome=outcome,
++            allocations=allocations,
++            weekly_timetable=None if verification is None else verification.schedule,
++            predicted_marks=marks,
++            targets=() if candidate is None else candidate.targets,
++            nn_model_identity=self.adapter.model_provenance_identity,
++            nn_model_mode=self.adapter.model_mode,
++            nn_fitted_artifact_digest=self.adapter.fitted_artifact_digest,
++            nn_feature_schema_identity=self.adapter.feature_schema_identity,
++            whole_plan_verification=verification,
++            search_statistics=PlannerStatistics(
+                 search or SearchStatistics(0, 0, 0.0),
+                 self.candidate_proposals,
+                 self.provisional_predictions,
+@@ -523,9 +645,15 @@ class _Controller(Generic[StateT, ActionT]):
+                 self.csp_stats,
+                 tuple(self.terminal_csp_outcomes),
+                 perf_counter() - self.started,
++                self.verification_feasible_schedules,
++                self.provisional_support_rejections,
++                self.final_support_rejections,
++                self.final_scored_supported_schedules,
+             ),
+-            tuple(sorted(set(self.failure_reasons))),
+-            None,
++            failure_reasons=tuple(sorted(set(self.failure_reasons))),
++            solution_cost=None,
++            search_complete=search_complete,
++            best_plan_comparison_rule=BEST_PLAN_COMPARISON_RULE,
+         )
+ 
+ 
+@@ -601,8 +729,14 @@ def _run(
+                 controller.csp_stats,
+                 tuple(controller.terminal_csp_outcomes),
+                 perf_counter() - controller.started,
++                controller.verification_feasible_schedules,
++                controller.provisional_support_rejections,
++                controller.final_support_rejections,
++                controller.final_scored_supported_schedules,
+             ),
+             solution_cost=search_result.solution_cost,
++            search_state_path=search_result.state_path,
++            search_action_path=search_result.action_path,
+         )
+     status = (
+         PlannerStatus.ERROR
+@@ -611,7 +745,32 @@ def _run(
+         if controller.incomplete
+         else PlannerStatus.INFEASIBLE
+     )
+-    return controller._result(status, None, None, (), search_result.statistics)
++    outcome = (
++        PlannerOutcome.ERROR
++        if controller.error
++        else PlannerOutcome.INCOMPLETE
++        if controller.incomplete
++        else PlannerOutcome.TARGET_UNREACHABLE
++        if controller.best_scored is not None
++        else PlannerOutcome.NO_SUPPORTED_PLAN
++        if controller.provisional_support_rejections
++        or controller.final_support_rejections
++        else PlannerOutcome.NO_FEASIBLE_SCHEDULE
++    )
++    result = controller._result(
++        status,
++        outcome,
++        None,
++        None,
++        (),
++        search_result.statistics,
++        search_complete=not controller.error and not controller.incomplete,
++    )
++    return replace(
++        result,
++        search_state_path=search_result.state_path,
++        search_action_path=search_result.action_path,
++    )
+ 
+ 
+ def integrated_uniform_cost_search(
+diff --git a/src/study_planner/search/nn_adapter.py b/src/study_planner/search/nn_adapter.py
+index d164068..bcd0419 100644
+--- a/src/study_planner/search/nn_adapter.py
++++ b/src/study_planner/search/nn_adapter.py
+@@ -135,11 +135,12 @@ class ScheduleData:
+         """Count schedule records in the mapper's four relative windows."""
+         counts = [0, 0, 0, 0]
+         for session in self.sessions:
+-            counts[session.relative_window - 1] += 1
++            if session.relative_window is not None:
++                counts[session.relative_window - 1] += 1
+         return tuple(counts)  # type: ignore[return-value]
+ 
+     @property
+-    def schedule_identity(self) -> tuple[tuple[str, int], ...]:
++    def schedule_identity(self) -> tuple[tuple[str, int | None], ...]:
+         """Return the canonical schedule details used in audit records."""
+         return tuple(
+             (session.slot_id, session.relative_window) for session in self.sessions
+@@ -148,20 +149,25 @@ class ScheduleData:
+ 
+ @dataclass(frozen=True, slots=True)
+ class ScheduledSession:
+-    """One session placed in an opaque CSP slot and relative feature window."""
++    """One CSP session and its optional NN click-history window."""
+ 
+     slot_id: str
+-    relative_window: int
++    relative_window: int | None
+ 
+     def __post_init__(self) -> None:
+         if not isinstance(self.slot_id, str) or not self.slot_id:
+             raise CandidateEvaluationError("slot_id must be a non-empty string")
+         if (
+-            isinstance(self.relative_window, bool)
+-            or not isinstance(self.relative_window, int)
+-            or self.relative_window not in {1, 2, 3, 4}
++            self.relative_window is not None
++            and (
++                isinstance(self.relative_window, bool)
++                or not isinstance(self.relative_window, int)
++                or self.relative_window not in {1, 2, 3, 4}
++            )
+         ):
+-            raise CandidateEvaluationError("relative_window must be from 1 through 4")
++            raise CandidateEvaluationError(
++                "relative_window must be absent or from 1 through 4"
++            )
+ 
+ 
+ @dataclass(frozen=True, slots=True, init=False)
+@@ -343,7 +349,7 @@ class CandidatePredictionResult:
+     status: EvaluationStatus
+     mapping: MappingEvaluationSnapshot
+     prediction: float | None
+-    schedule_identity: tuple[tuple[str, int], ...] | None
++    schedule_identity: tuple[tuple[str, int | None], ...] | None
+     csp_verification_identity: str | None
+     monotonicity_report: MonotonicityReport | None
+     error_type: str | None = None
+@@ -371,7 +377,7 @@ class CandidatePredictionResult:
+     def usable_for_goal_test(
+         self,
+         identity: CandidateIdentity,
+-        schedule_identity: tuple[tuple[str, int], ...] | None = None,
++        schedule_identity: tuple[tuple[str, int | None], ...] | None = None,
+         csp_verification_identity: str | None = None,
+         whole_plan_identity: str | None = None,
+         problem_identity: str | None = None,
+@@ -529,7 +535,9 @@ class SessionNNAdapter:
+     _monotonicity_observations: dict[
+         MonotonicityContext,
+         dict[
+-            tuple[tuple[int, int, int, int], tuple[tuple[str, int], ...]],
++            tuple[
++                tuple[int, int, int, int], tuple[tuple[str, int | None], ...]
++            ],
+             float,
+         ],
+     ] = field(default_factory=dict, init=False, repr=False)
+@@ -720,7 +728,7 @@ class SessionNNAdapter:
+             schedule = ScheduleData(
+                 tuple(
+                     ScheduledSession(
+-                        session.slot_id, slot_relative_windows[session.slot_id]
++                        session.slot_id, slot_relative_windows.get(session.slot_id)
+                     )
+                     for session in selected.sessions
+                 )
+@@ -729,11 +737,6 @@ class SessionNNAdapter:
+             raise CandidateEvaluationError(
+                 "verified schedule lacks a valid relative-window mapping"
+             ) from error
+-        if sum(schedule.weekly_sessions) != sum(allocation.weekly_sessions):
+-            raise CandidateEvaluationError(
+-                "verified schedule window counts differ from candidate allocation"
+-            )
+-
+         mapping = self._map(schedule.weekly_sessions, context)
+         comparison_context = MonotonicityContext(
+             student_id=context.student_identity,
+@@ -798,7 +801,7 @@ class SessionNNAdapter:
+         phase: EvaluationPhase,
+         mapping: SessionClickMappingResult,
+         *,
+-        schedule_identity: tuple[tuple[str, int], ...] | None,
++        schedule_identity: tuple[tuple[str, int | None], ...] | None,
+         csp_verification_identity: str | None,
+         monotonicity_report: MonotonicityReport | None,
+         whole_plan_identity: str | None = None,
+diff --git a/tests/test_application_inputs.py b/tests/test_application_inputs.py
+index 20c6273..824f22a 100644
+--- a/tests/test_application_inputs.py
++++ b/tests/test_application_inputs.py
+@@ -4,6 +4,7 @@ from __future__ import annotations
+ 
+ import json
+ from dataclasses import dataclass, replace
++from types import SimpleNamespace
+ 
+ import joblib
+ import numpy as np
+@@ -15,7 +16,18 @@ from sklearn.impute import SimpleImputer
+ from sklearn.pipeline import Pipeline
+ from sklearn.preprocessing import OneHotEncoder, StandardScaler
+ 
+-from study_planner.csp import SessionPair, SessionVariable, WeeklySlot
++from study_planner.csp import (
++    AssignmentEntry,
++    ConstraintCheckStatus,
++    CspAssignment,
++    OrderingPolicySnapshot,
++    SameAssignmentOrderingConstraint,
++    SessionPair,
++    SessionVariable,
++    WeeklySlot,
++    WholePlanVerificationStatus,
++    verify_whole_plan,
++)
+ from study_planner.integration import (
+     AllocationBounds,
+     ApplicationAssignmentRule,
+@@ -23,20 +35,23 @@ from study_planner.integration import (
+     ApplicationInputError,
+     ApplicationSlot,
+     AssignmentTarget,
++    CatalogChronologicalOrderingPolicy,
+     ModelArtifactIdentity,
+     OuladPresentationSplit,
+     OutOfSupportAction,
+     PlannerStatus,
+     SupportPolicy,
++    SyntheticWeeklySlotPattern,
+     TargetRule,
+-    WeeklySlotCatalog,
+     WeeklyTimeWindow,
+     build_application_inputs,
+     build_application_planning_problem,
++    build_synthetic_weekly_slot_catalog,
+     integrated_uniform_cost_search,
+     load_application_inputs,
+     load_session_nn_adapter,
+ )
++from study_planner.integration.application_inputs import _slot_click_window
+ from study_planner.nn.inference import PreviousMarksRegressionPredictor
+ from study_planner.nn.models import MLPRegressor
+ from study_planner.search.nn_adapter import (
+@@ -223,30 +238,34 @@ def _write_processed_features(directory, mode: str) -> None:
+ 
+ 
+ def _config(adapter, *, mode: str = "strict") -> ApplicationInputConfig:
++    catalog, eligible_by_assignment = build_synthetic_weekly_slot_catalog(
++        identity="test-catalog",
++        version="v1",
++        weekly_capacity=2,
++        deadline_policy_identity="approved-deadline-input",
++        deadline_policy_version="v1",
++        assignment_deadlines=tuple(
++            zip(ASSIGNMENT_IDS, DEADLINES, strict=True)
++        ),
++        week_indices=tuple(range(13)),
++        pattern=SyntheticWeeklySlotPattern(
++            (1,), 9 * 60, 10 * 60, "approved-local-timezone"
++        ),
++    )
++    eligible = dict(eligible_by_assignment)
+     rules = tuple(
+         ApplicationAssignmentRule(
+             assignment_identity=assignment_id,
+             assessment_id=assessment_id,
+             target_mark=target,
+             deadline_day=deadline,
+-            eligible_slot_ids=(f"slot-{index}",),
++            eligible_slot_ids=eligible[assignment_id],
+             allocation_bounds=AllocationBounds(0, 3),
+         )
+         for index, (assignment_id, assessment_id, target, deadline) in enumerate(
+             zip(ASSIGNMENT_IDS, ASSESSMENT_IDS, TARGETS, DEADLINES, strict=True)
+         )
+     )
+-    assignment_windows = {
+-        assignment_id: index + 1 for index, assignment_id in enumerate(ASSIGNMENT_IDS)
+-    }
+-    slots = tuple(
+-        ApplicationSlot(
+-            WeeklySlot(f"slot-{index}", index),
+-            WeeklyTimeWindow(1, 9 * 60, 10 * 60, "approved-local-timezone"),
+-            tuple(assignment_windows.items()),
+-        )
+-        for index in range(3)
+-    )
+     mapping = SessionClickMappingConfig(ClickScenario.CENTRAL)
+     return ApplicationInputConfig(
+         presentation_split=OuladPresentationSplit("FFF", ("2013B", "2013J"), "2014J"),
+@@ -254,14 +273,7 @@ def _config(adapter, *, mode: str = "strict") -> ApplicationInputConfig:
+         target_rule=TargetRule(
+             "explicit-targets", "v1", tuple(zip(ASSIGNMENT_IDS, TARGETS, strict=True))
+         ),
+-        slot_catalog=WeeklySlotCatalog(
+-            "test-catalog",
+-            "v1",
+-            weekly_capacity=2,
+-            deadline_policy_identity="approved-deadline-input",
+-            deadline_policy_version="v1",
+-            slots=slots,
+-        ),
++        slot_catalog=catalog,
+         support_policy=SupportPolicy(
+             "marginal-training-range",
+             "v1",
+@@ -315,8 +327,10 @@ def test_builds_three_assignment_inputs_with_exact_model_schema(tmp_path, mode:
+         if mode == "proxy"
+         else NNModelMode.MODEL_A_STRICT
+     )
+-    assert dict(config.slot_catalog.windows_by_assignment)["a1"] == tuple(
+-        (f"slot-{index}", 1) for index in range(3)
++    a1_mappings = dict(config.slot_catalog.windows_by_assignment)["a1"]
++    assert a1_mappings
++    assert set(slot for slot, _ in a1_mappings) == set(
++        config.assignment_rules[0].eligible_slot_ids
+     )
+ 
+ 
+@@ -430,13 +444,482 @@ def test_validates_explicit_weekly_time_windows():
+         WeeklyTimeWindow(1, 10 * 60, 10 * 60, "local")
+     with pytest.raises(ApplicationInputError, match="timezone identity"):
+         WeeklyTimeWindow(1, 9 * 60, 10 * 60, "")
++    with pytest.raises(ApplicationInputError, match="positive duration"):
++        SyntheticWeeklySlotPattern((1, 3), 10 * 60, 10 * 60, "UTC")
++
++
++def _synthetic_catalog(
++    *, deadlines=None
++):
++    if deadlines is None:
++        deadlines = tuple(zip(ASSIGNMENT_IDS, (24, 52, 94), strict=True))
++    return build_synthetic_weekly_slot_catalog(
++        identity="TEST-weekly-slots",
++        version="test-v1",
++        weekly_capacity=3,
++        deadline_policy_identity="TEST-course-day-cutoff",
++        deadline_policy_version="test-v1",
++        assignment_deadlines=deadlines,
++        week_indices=tuple(range(14)),
++        pattern=SyntheticWeeklySlotPattern(
++            (1, 3, 5), 18 * 60, 19 * 60, "TEST/UTC", 1
++        ),
++    )
++
++
++def test_synthetic_weekly_expansion_has_stable_unique_slot_ids():
++    first, eligible = _synthetic_catalog()
++    repeated, _ = _synthetic_catalog()
++
++    assert len(first.slots) == 42
++    assert first.slots == repeated.slots
++    assert len({slot.slot.slot_id for slot in first.slots}) == 42
++    assert {slot.slot.week_index for slot in first.slots} == set(range(14))
++    assert first.slots[0].slot.slot_id == "TEST-weekly-slots-W00-D1-T1080-1140"
++    mappings = dict(first.windows_by_assignment)
++    for assignment_id, slot_ids in eligible:
++        assignment_map = mappings[assignment_id]
++        assert {slot_id for slot_id, _ in assignment_map} <= set(slot_ids)
++        assert set(slot_ids) > {slot_id for slot_id, _ in assignment_map}
++        assert {window for _, window in assignment_map} <= {1, 2, 3, 4}
++
++
++def test_synthetic_deadline_cutoff_is_strict_and_slots_are_eligible_per_assignment():
++    pattern = SyntheticWeeklySlotPattern((1,), 23 * 60, 24 * 60, "TEST/UTC", 1)
++    catalog, eligible = build_synthetic_weekly_slot_catalog(
++        identity="TEST-boundary",
++        version="v1",
++        weekly_capacity=3,
++        deadline_policy_identity="TEST-deadline",
++        deadline_policy_version="v1",
++        assignment_deadlines=(("a1", 1), ("a2", 7), ("a3", 15)),
++        week_indices=(0, 1, 2),
++        pattern=pattern,
++    )
++    slot_id = catalog.slots[0].slot.slot_id
++    assert slot_id not in dict(eligible)["a1"]  # ends exactly at deadline day
++    assert slot_id in dict(eligible)["a2"]
++    assert dict(catalog.slots[0].relative_windows)["a2"] == 4
++    assert "TEST-boundary-W02-D1-T1380-1440" not in dict(eligible)["a3"]
++
++    _, real_deadline_eligibility = _synthetic_catalog()
++    eligibility = dict(real_deadline_eligibility)
++    assert eligibility["a1"] != eligibility["a2"]
++    assert eligibility["a2"] != eligibility["a3"]
++
++
++def test_wednesday_course_start_controls_week_order_and_deadline_windows():
++    catalog, eligible_by_assignment = build_synthetic_weekly_slot_catalog(
++        identity="TEST-wednesday-start",
++        version="synthetic-v1",
++        weekly_capacity=3,
++        deadline_policy_identity="TEST-course-day-start",
++        deadline_policy_version="v1",
++        assignment_deadlines=(("a1", 28), ("a2", 28), ("a3", 28)),
++        week_indices=(0, 1, 2, 3),
++        pattern=SyntheticWeeklySlotPattern(
++            (2, 3, 4), 9 * 60, 10 * 60, "TEST/local-clock", 3
++        ),
++    )
++
++    slots_by_id = {item.slot.slot_id: item.slot for item in catalog.slots}
++    assert {slot.week_index for slot in slots_by_id.values()} == {0, 1, 2, 3}
++    week_zero_wednesday = slots_by_id["TEST-wednesday-start-W00-D3-T0540-0600"]
++    week_zero_thursday = slots_by_id["TEST-wednesday-start-W00-D4-T0540-0600"]
++    week_zero_tuesday = slots_by_id["TEST-wednesday-start-W00-D2-T0540-0600"]
++    week_one_wednesday = slots_by_id["TEST-wednesday-start-W01-D3-T0540-0600"]
++    ordering = CatalogChronologicalOrderingPolicy(catalog)
++
++    assert ordering.is_ordered(week_zero_wednesday, week_zero_thursday)
++    assert ordering.is_ordered(week_zero_thursday, week_zero_tuesday)
++    assert ordering.is_ordered(week_zero_tuesday, week_one_wednesday)
++    assert not ordering.is_ordered(week_one_wednesday, week_zero_tuesday)
++
++    mappings = dict(dict(catalog.windows_by_assignment)["a1"])
++    assert mappings["TEST-wednesday-start-W00-D3-T0540-0600"] == 1
++    assert mappings["TEST-wednesday-start-W01-D3-T0540-0600"] == 2
++    assert mappings["TEST-wednesday-start-W02-D3-T0540-0600"] == 3
++    assert mappings["TEST-wednesday-start-W03-D3-T0540-0600"] == 4
++    assert set(dict(eligible_by_assignment)["a1"]) == set(mappings)
++
++
++def test_whole_slot_crossing_deadline_is_excluded_and_model_rejects_overnight_window():
++    # The catalog model only permits same-day windows. Exercise the cutoff
++    # helper with a structural crossing interval, then verify such an interval
++    # cannot be admitted as an application catalog slot.
++    crossing_slot = SimpleNamespace(
++        slot=WeeklySlot("TEST-crossing-deadline", 0),
++        time_window=SimpleNamespace(
++            weekday_iso=3,
++            start_minute_local=23 * 60,
++            end_minute_local=25 * 60,
++        ),
++    )
++    assert (
++        _slot_click_window(
++            crossing_slot, deadline_day=1, course_start_weekday_iso=3
++        )
++        is None
++    )
++    with pytest.raises(
++        ApplicationInputError, match="end minute must be in \\[0, 1440\\]"
++    ):
++        WeeklyTimeWindow(3, 23 * 60, 25 * 60, "TEST/local-clock")
++
++
++def test_slot_ending_exactly_at_deadline_is_strictly_excluded():
++    catalog, eligible = build_synthetic_weekly_slot_catalog(
++        identity="TEST-exact-deadline",
++        version="synthetic-v1",
++        weekly_capacity=1,
++        deadline_policy_identity="TEST-course-day-start",
++        deadline_policy_version="v1",
++        assignment_deadlines=(("a1", 1), ("a2", 1), ("a3", 1)),
++        week_indices=(0,),
++        pattern=SyntheticWeeklySlotPattern(
++            (3,), 23 * 60, 24 * 60, "TEST/local-clock", 3
++        ),
++    )
++
++    slot_id = catalog.slots[0].slot.slot_id
++    assert slot_id not in dict(eligible)["a1"]
++    # NN window assignment is independent: this interval is in window 4 even
++    # though its end equals the conservative deadline boundary.
++    assert dict(catalog.slots[0].relative_windows)["a1"] == 4
++
++
++def test_deadline_eligibility_is_independent_of_four_nn_click_windows():
++    catalog, eligible = build_synthetic_weekly_slot_catalog(
++        identity="TEST-deadline-vs-click-history",
++        version="synthetic-v1",
++        weekly_capacity=3,
++        deadline_policy_identity="TEST-course-day-start",
++        deadline_policy_version="v1",
++        assignment_deadlines=(("a1", 42), ("a2", 42), ("a3", 42)),
++        week_indices=(0, 5, 6, 7),
++        pattern=SyntheticWeeklySlotPattern(
++            (1,), 9 * 60, 10 * 60, "TEST/local-clock", 1
++        ),
++    )
++
++    eligible_ids = set(dict(eligible)["a1"])
++    mappings = dict(dict(catalog.windows_by_assignment)["a1"])
++    old_slot = "TEST-deadline-vs-click-history-W00-D1-T0540-0600"
++    recent_slot = "TEST-deadline-vs-click-history-W05-D1-T0540-0600"
++    deadline_day_slot = "TEST-deadline-vs-click-history-W06-D1-T0540-0600"
++    after_deadline_slot = "TEST-deadline-vs-click-history-W07-D1-T0540-0600"
++
++    assert old_slot in eligible_ids
++    assert old_slot not in mappings
++    assert recent_slot in eligible_ids
++    assert mappings[recent_slot] == 4
++    assert deadline_day_slot not in eligible_ids
++    assert after_deadline_slot not in eligible_ids
++
++
++def test_catalog_rejects_mixed_timezone_identities_without_conversion():
++    catalog, _ = _synthetic_catalog()
++    first, second, *rest = catalog.slots
++    changed_timezone = replace(
++        second,
++        time_window=replace(
++            second.time_window, timezone_identity="TEST/another-local-clock"
++        ),
++    )
++
++    with pytest.raises(ApplicationInputError, match="same timezone identity"):
++        replace(catalog, slots=(first, changed_timezone, *rest))
++
++
++def test_assignment_specific_mappings_reject_missing_and_extra_slots(tmp_path):
++    adapter = _adapter(tmp_path)
++    config = _config(adapter)
++    a1_rule = config.assignment_rules[0]
++    missing_slot_id = a1_rule.eligible_slot_ids[0]
++    slots_missing_mapping = tuple(
++        replace(
++            slot,
++            relative_windows=tuple(
++                (assignment_id, window)
++                for assignment_id, window in slot.relative_windows
++                if not (slot.slot.slot_id == missing_slot_id and assignment_id == "a1")
++            ),
++        )
++        for slot in config.slot_catalog.slots
++    )
++    with pytest.raises(ApplicationInputError, match="incorrect click window"):
++        replace(
++            config,
++            slot_catalog=replace(config.slot_catalog, slots=slots_missing_mapping),
++        )
++
++    extra_slot = next(
++        slot
++        for slot in config.slot_catalog.slots
++        if slot.slot.slot_id not in a1_rule.eligible_slot_ids
++        and slot.relative_windows
++    )
++    existing_window = extra_slot.relative_windows[0][1]
++    slots_with_extra_mapping = tuple(
++        replace(
++            slot,
++            relative_windows=(*slot.relative_windows, ("a1", existing_window)),
++        )
++        if slot.slot.slot_id == extra_slot.slot.slot_id
++        else slot
++        for slot in config.slot_catalog.slots
++    )
++    with pytest.raises(ApplicationInputError, match="incorrect click window"):
++        replace(
++            config,
++            slot_catalog=replace(config.slot_catalog, slots=slots_with_extra_mapping),
++        )
++
++
++def test_catalog_boundary_identity_is_currently_restricted_to_synthetic_rule(
++    tmp_path,
++):
++    """TEST-only check that records the current production-catalog limitation."""
++    adapter = _adapter(tmp_path)
++    config = _config(adapter)
++
++    assert config.slot_catalog.deadline_boundary_identity == (
++        "course-day-start-exclusive-v1"
++    )
++    with pytest.raises(ApplicationInputError, match="unsupported deadline boundary"):
++        replace(
++            config.slot_catalog,
++            deadline_boundary_identity="TEST/alternate-boundary-identity",
++        )
++
++
++def test_catalog_rejects_duplicate_slot_ids_and_config_rejects_late_eligible_slot(
++    tmp_path,
++):
++    adapter = _adapter(tmp_path)
++    config = _config(adapter)
++    duplicate = config.slot_catalog.slots[0]
++    with pytest.raises(ApplicationInputError, match="IDs must be unique"):
++        replace(config.slot_catalog, slots=(duplicate, duplicate))
++
++    late = ApplicationSlot(
++        WeeklySlot("late-slot", 20),
++        WeeklyTimeWindow(1, 9 * 60, 10 * 60, "approved-local-timezone"),
++        (("a1", 4),),
++    )
++    altered_catalog = replace(
++        config.slot_catalog,
++        slots=config.slot_catalog.slots + (late,),
++    )
++    altered_rules = tuple(
++        replace(rule, eligible_slot_ids=rule.eligible_slot_ids + ("late-slot",))
++        if rule.assignment_identity == "a1"
++        else rule
++        for rule in config.assignment_rules
++    )
++    with pytest.raises(ApplicationInputError, match="strictly before"):
++        replace(config, slot_catalog=altered_catalog, assignment_rules=altered_rules)
++
++    assignment_id = "a1"
++    eligible_id = config.assignment_rules[0].eligible_slot_ids[0]
++    altered_slots = tuple(
++        replace(
++            slot,
++            relative_windows=tuple(
++                (
++                    identity,
++                    4 if window != 4 else 3,
++                )
++                if identity == assignment_id
++                else (identity, window)
++                for identity, window in slot.relative_windows
++            ),
++        )
++        if slot.slot.slot_id == eligible_id
++        else slot
++        for slot in config.slot_catalog.slots
++    )
++    altered_mapping_catalog = replace(config.slot_catalog, slots=altered_slots)
++    with pytest.raises(ApplicationInputError, match="incorrect click window"):
++        replace(config, slot_catalog=altered_mapping_catalog)
++
++
++def test_catalog_ordering_policy_uses_weekday_and_clock_order():
++    catalog, _ = _synthetic_catalog()
++    policy = CatalogChronologicalOrderingPolicy(catalog)
++    earlier = catalog.slots[0].slot
++    later_same_week = catalog.slots[1].slot
++    later_week = catalog.slots[3].slot
++
++    pairs = policy.required_pairs(
++        (SessionVariable("a1", 1), SessionVariable("a1", 0), SessionVariable("a2", 0))
++    )
++    assert len(pairs) == 1
++    assert pairs[0].earlier.session_index == 0
++    assert pairs[0].later.session_index == 1
++    assert policy.is_ordered(earlier, later_same_week)
++    assert policy.is_ordered(later_same_week, later_week)
++    assert not policy.is_ordered(later_same_week, earlier)
++
++    same_day_slots = (
++        ApplicationSlot(
++            WeeklySlot("clock-early", 0),
++            WeeklyTimeWindow(1, 9 * 60, 10 * 60, "TEST/UTC"),
++            (("a1", 1),),
++        ),
++        ApplicationSlot(
++            WeeklySlot("clock-late", 0),
++            WeeklyTimeWindow(1, 11 * 60, 12 * 60, "TEST/UTC"),
++            (("a1", 1),),
++        ),
++    )
++    clock_catalog = replace(catalog, slots=same_day_slots)
++    clock_policy = CatalogChronologicalOrderingPolicy(clock_catalog)
++    assert clock_policy.is_ordered(same_day_slots[0].slot, same_day_slots[1].slot)
++    assert not clock_policy.is_ordered(same_day_slots[1].slot, same_day_slots[0].slot)
++
++
++def test_catalog_chronological_ordering_integrates_with_csp_and_verification(
++    tmp_path,
++):
++    """TEST/SYNTHETIC: exercise real catalog ordering end to end."""
++    adapter = _adapter(tmp_path, mode="proxy")
++    config = _config(adapter, mode="proxy")
++    catalog, eligible_by_assignment = build_synthetic_weekly_slot_catalog(
++        identity="TEST-ordering-catalog",
++        version="synthetic-v1",
++        weekly_capacity=config.slot_catalog.weekly_capacity,
++        deadline_policy_identity="TEST-course-day-boundary",
++        deadline_policy_version="synthetic-v1",
++        assignment_deadlines=tuple(
++            zip(ASSIGNMENT_IDS, DEADLINES, strict=True)
++        ),
++        week_indices=tuple(range(13)),
++        pattern=SyntheticWeeklySlotPattern(
++            (1, 3, 5), 9 * 60, 10 * 60, "TEST/UTC", 1
++        ),
++    )
++    eligible = dict(eligible_by_assignment)
++    assignment_rules = tuple(
++        replace(
++            rule,
++            eligible_slot_ids=eligible[rule.assignment_identity],
++            allocation_bounds=(
++                AllocationBounds(2, 2)
++                if rule.assignment_identity == "a1"
++                else AllocationBounds(0, 0)
++            ),
++        )
++        for rule in config.assignment_rules
++    )
++    config = replace(config, slot_catalog=catalog, assignment_rules=assignment_rules)
++    inputs = build_application_inputs(
++        config,
++        student_identity="student-1",
++        feature_rows=_feature_rows("proxy"),
++        adapter=adapter,
++    )
++    ordering_policy = CatalogChronologicalOrderingPolicy(catalog)
++    binding = build_application_planning_problem(
++        inputs, adapter=adapter, ordering_policy=ordering_policy
++    )
++
++    state = binding.allocation_space.initial_state
++    eligible_windows = dict(catalog.windows_by_assignment)["a1"]
++    window_counts: dict[int, int] = {}
++    for _, window in eligible_windows:
++        window_counts[window] = window_counts.get(window, 0) + 1
++    allocation_window = next(
++        window for window, count in sorted(window_counts.items()) if count >= 2
++    )
++    action = next(
++        action
++        for action in binding.allocation_space.actions(state)
++        if action.assignment_identity == "a1"
++        and action.relative_window == allocation_window
++    )
++    state = binding.allocation_space.transition(state, action)
++    state = binding.allocation_space.transition(state, action)
++    candidate = binding.candidate_factory(state)
++
++    problem = candidate.problem
++    assert isinstance(problem.ordering_policy, OrderingPolicySnapshot)
++    earlier_variable = SessionVariable("a1", 0)
++    later_variable = SessionVariable("a1", 1)
++    expected_pair = SessionPair(earlier_variable, later_variable)
++    assert problem.ordering_policy.required_session_pairs == (expected_pair,)
++    ordering_constraints = tuple(
++        constraint
++        for constraint in problem.constraints
++        if isinstance(constraint, SameAssignmentOrderingConstraint)
++    )
++    assert len(ordering_constraints) == 1
++    ordering_constraint = ordering_constraints[0]
++    assert ordering_constraint.scope == (earlier_variable, later_variable)
++
++    mapped_slots = dict(eligible_windows)
++    assignment_domain = next(
++        domain.values
++        for domain in problem.domains
++        if domain.variable == earlier_variable
++    )
++    allocation_slots = tuple(
++        slot
++        for slot in assignment_domain
++        if mapped_slots[slot.slot_id] == allocation_window
++    )
++    chronological_pair = next(
++        (earlier, later)
++        for earlier in allocation_slots
++        for later in allocation_slots
++        if ordering_policy.is_ordered(earlier, later)
++    )
++    early_slot, late_slot = chronological_pair
++    valid_schedule = CspAssignment(
++        (
++            AssignmentEntry(earlier_variable, early_slot),
++            AssignmentEntry(later_variable, late_slot),
++        )
++    )
++    assert ordering_constraint.is_satisfied(valid_schedule)
++    valid_result = verify_whole_plan(
++        problem, valid_schedule, candidate.verification_policy
++    )
++    assert valid_result.status is WholePlanVerificationStatus.FEASIBLE
++
++    reversed_schedule = CspAssignment(
++        (
++            AssignmentEntry(earlier_variable, late_slot),
++            AssignmentEntry(later_variable, early_slot),
++        )
++    )
++    assert not ordering_constraint.is_satisfied(reversed_schedule)
++    invalid_result = verify_whole_plan(
++        problem, reversed_schedule, candidate.verification_policy
++    )
++    failed_evidence = {
++        item.constraint_id: item.status for item in invalid_result.constraint_checks
++    }
++    assert invalid_result.status is WholePlanVerificationStatus.INFEASIBLE
++    assert failed_evidence[ordering_constraint.constraint_id] is (
++        ConstraintCheckStatus.FAILED
++    )
++    assert (
++        f"constraint_failed:{ordering_constraint.constraint_id}"
++        in invalid_result.rejection_reasons
++    )
+ 
+ 
+ def test_requires_three_distinct_assessment_inputs(tmp_path):
+     adapter = _adapter(tmp_path, mode="strict")
+     config = _config(adapter)
+     duplicate_rule = ApplicationAssignmentRule(
+-        "a2", "34860", 75, 47, ("slot-1",), AllocationBounds(0, 3)
++        "a2",
++        "34860",
++        75,
++        47,
++        config.assignment_rules[1].eligible_slot_ids,
++        AllocationBounds(0, 3),
+     )
+     with pytest.raises(ApplicationInputError, match="assessment IDs must be unique"):
+         ApplicationInputConfig(
+@@ -589,15 +1072,11 @@ def test_application_candidate_uses_bounds_eligible_slots_and_catalog_capacity(
+     assert candidate.slot_relative_windows_by_assignment == (
+         config.slot_catalog.windows_by_assignment
+     )
+-    assert (
+-        len(
+-            {
+-                windows[0][1]
+-                for _, windows in candidate.slot_relative_windows_by_assignment
+-            }
+-        )
+-        == 3
+-    )
++    assert {
++        window
++        for _, windows in candidate.slot_relative_windows_by_assignment
++        for _, window in windows
++    } == {1, 2, 3, 4}
+     for domain in candidate.problem.domains:
+         assignment_rule = next(
+             rule
+diff --git a/tests/test_nn_adapter.py b/tests/test_nn_adapter.py
+index 185e53b..47b6c70 100644
+--- a/tests/test_nn_adapter.py
++++ b/tests/test_nn_adapter.py
+@@ -518,6 +518,37 @@ def test_verified_csp_result_allows_final_evaluation_and_preserves_schedule() ->
+     )
+ 
+ 
++def test_final_nn_mapping_ignores_deadline_eligible_slot_outside_click_windows() -> None:
++    _, adapter, context = setup_adapter()
++    allocation = CandidateSessionAllocation((1, 1, 0, 0))
++    schedule = ScheduleData(
++        (
++            ScheduledSession("old-deadline-eligible-slot", None),
++            ScheduledSession("recent-click-window-slot", 2),
++        )
++    )
++    verification = verified_result(adapter, allocation, context, schedule)
++
++    result = adapter.evaluate_final(
++        allocation,
++        verification,
++        context,
++        expected_whole_plan_identity=verification.whole_plan_identity,
++        expected_problem_identity=verification.problem_identity,
++        expected_policy_identity=verification.verification_policy_identity,
++        expected_policy_version=verification.verification_policy_version,
++        expected_model_provenance_identity=adapter.model_provenance_identity,
++        slot_relative_windows={"recent-click-window-slot": 2},
++    )
++
++    assert result.status is EvaluationStatus.PREDICTED
++    assert result.schedule_identity == (
++        ("old-deadline-eligible-slot", None),
++        ("recent-click-window-slot", 2),
++    )
++    assert result.mapping.weekly_sessions == (0, 1, 0, 0)
++
++
+ def test_infeasible_csp_result_is_rejected_for_final_prediction() -> None:
+     _, adapter, context = setup_adapter()
+     allocation = CandidateSessionAllocation((1, 0, 0, 0))
+diff --git a/tests/test_run_demo.py b/tests/test_run_demo.py
+index 22cdc75..605614f 100644
+--- a/tests/test_run_demo.py
++++ b/tests/test_run_demo.py
+@@ -1,10 +1,16 @@
+-"""Focused coverage for the four explicitly TEST-configured demo scenarios."""
++"""Focused coverage for explicitly TEST-configured demo scenarios."""
+ 
+ from __future__ import annotations
+ 
++import pytest
+ from run_demo import run_scenario
+ 
+-from study_planner.integration import PlannerStatus
++from study_planner.integration import PlannerOutcome, PlannerStatus
++from study_planner.search.nn_adapter import (
++    EvaluationStatus,
++    NNModelMode,
++    SessionNNAdapter,
++)
+ 
+ 
+ def test_normal_demo_returns_feasible_three_assignment_plan(capsys) -> None:
+@@ -17,6 +23,9 @@ def test_normal_demo_returns_feasible_three_assignment_plan(capsys) -> None:
+     assert "=== NORMAL (TEST CONFIGURATION) ===" in output
+     assert "Timetable:" in output
+     assert "Search:" in output and "CSP:" in output
++    assert len(result.search_state_path) == len(result.search_action_path) + 1
++    assert "Search solution path (actual SearchResult path):" in output
++    assert "Search expansion trace: not available" in output
+ 
+ 
+ def test_edge_demo_returns_valid_zero_session_plan(capsys) -> None:
+@@ -28,20 +37,102 @@ def test_edge_demo_returns_valid_zero_session_plan(capsys) -> None:
+     assert "=== EDGE (TEST CONFIGURATION) ===" in output
+ 
+ 
+-def test_impossible_demo_reports_infeasibility_without_predictions(capsys) -> None:
++def test_impossible_demo_reports_best_feasible_plan_after_exhaustion(capsys) -> None:
+     result = run_scenario("IMPOSSIBLE")
+ 
+     output = capsys.readouterr().out
+     assert result.status is PlannerStatus.INFEASIBLE
+-    assert result.predicted_marks == ()
++    assert result.outcome.value == "target_unreachable"
++    assert result.search_complete
++    assert len(result.allocations) == 3
++    assert result.weekly_timetable is not None
++    assert len(result.predicted_marks) == 3
++    assert all(
++        mark.predicted_mark < mark.target_mark for mark in result.predicted_marks
++    )
++    assert result.search_statistics.schedules_examined > 0
++    assert (
++        result.search_statistics.final_predictions
++        == 3 * result.search_statistics.schedules_examined
++    )
+     assert "Status: infeasible" in output
+-    assert "none (NN was not run" in output
++    assert "Outcome: target_unreachable" in output
++    assert "Target marks:" in output
++    assert "Best verified achievable marks" in output
++    assert "Target shortfall:" in output
++    assert "Search complete: True" in output
++    assert "Timetable:" in output
++    assert "CSP: schedules=" in output
++    assert result.search_statistics.verification_rejections == 0
++    assert (
++        result.search_statistics.terminal_csp_outcomes[-1].status.value
++        == "exhausted_with_feasible"
++    )
+ 
+ 
+-def test_nn_sufficient_csp_rejection_is_recorded_then_planner_continues(
+-    capsys,
++@pytest.mark.parametrize("model", ["strict", "proxy"])
++def test_nn_accepts_target_but_real_csp_proves_slot_conflict_infeasible(
++    capsys, monkeypatch, model: str
+ ) -> None:
+-    result = run_scenario("NN_SUFFICIENT_CSP_REJECTED")
++    provisional_evaluations = []
++    real_evaluate_provisional = SessionNNAdapter.evaluate_provisional
++
++    def record_provisional(adapter, allocation, context):
++        evaluation = real_evaluate_provisional(adapter, allocation, context)
++        provisional_evaluations.append((context.assignment_identity, evaluation))
++        return evaluation
++
++    monkeypatch.setattr(
++        SessionNNAdapter, "evaluate_provisional", record_provisional
++    )
++    result = run_scenario("NN_ACCEPTS_CSP_INFEASIBLE", model)
++
++    output = capsys.readouterr().out
++    expected_mode = (
++        NNModelMode.MODEL_A_STRICT
++        if model == "strict"
++        else NNModelMode.MODEL_B_PREVIOUS_MARKS
++    )
++    assert result.nn_model_mode is expected_mode
++    assert result.status is PlannerStatus.INFEASIBLE
++    assert result.outcome is PlannerOutcome.NO_FEASIBLE_SCHEDULE
++    assert result.search_complete
++    assert result.search_statistics.provisional_predictions == 3
++    assert result.search_statistics.schedules_examined == 0
++    assert result.search_statistics.verification_rejections == 0
++    outcomes = result.search_statistics.terminal_csp_outcomes
++    assert len(outcomes) == 1
++    assert all(item.status.value == "exhausted_no_feasible" for item in outcomes)
++    assert result.weekly_timetable is None
++    assert result.whole_plan_verification is None
++    assert result.predicted_marks == ()
++    assert len(provisional_evaluations) == 6
++    targets = {
++        target.assignment_identity: target.target_mark for target in result.targets
++    }
++    assert all(target > 0 for target in targets.values())
++    assert all(
++        evaluation.status is EvaluationStatus.PREDICTED
++        and evaluation.prediction is not None
++        and evaluation.prediction >= targets[assignment_identity]
++        for assignment_identity, evaluation in provisional_evaluations
++    )
++    assert result.search_statistics.csp.constraint_checks > 0
++    assert result.search_statistics.csp.domain_prunings > 0
++    assert result.search_statistics.csp.backtracks > 0
++    assert "NN provisional target: ACCEPTED" in output
++    assert "targets=(70.0, 70.0, 70.0)" in output
++    assert "CSP infeasibility setup" in output
++    assert "CSP proposal allocations:" in output
++    assert "weekly_slot_unique" in output
++    assert "reuse=True" in output
++    assert "CSP result: exhausted with no feasible schedule" in output
++    assert "verification rejections=0" in output
++    assert "Search then exhausted" in output
++
++
++def test_verification_fault_injection_remains_distinct_and_continues(capsys) -> None:
++    result = run_scenario("VERIFICATION_REJECTED")
+ 
+     output = capsys.readouterr().out
+     assert result.status is PlannerStatus.FEASIBLE
+@@ -52,7 +143,14 @@ def test_nn_sufficient_csp_rejection_is_recorded_then_planner_continues(
+     assert "assignment_contains_out_of_domain_values" in result.failure_reasons
+     assert "NN provisional target: ACCEPTED" in output
+     assert "TEST-injected first verification rejection" in output
++    assert "VERIFICATION_REJECTED:" in output
++    assert "CSP rejection" not in output
+     assert "assignment_contains_out_of_domain_values" in output
+     assert output.index("NN provisional target: ACCEPTED") < output.index(
+         "TEST-injected first verification rejection"
+     )
++
++
++def test_old_csp_rejection_scenario_name_is_no_longer_exposed():
++    with pytest.raises(ValueError, match="unknown scenario"):
++        run_scenario("NN_SUFFICIENT_CSP_REJECTED")
+diff --git a/tests/test_search_csp_integration.py b/tests/test_search_csp_integration.py
+index f5a08d5..5df0043 100644
+--- a/tests/test_search_csp_integration.py
++++ b/tests/test_search_csp_integration.py
+@@ -2,7 +2,7 @@
+ 
+ from __future__ import annotations
+ 
+-from dataclasses import dataclass
++from dataclasses import dataclass, replace
+ from types import SimpleNamespace
+ 
+ import numpy as np
+@@ -34,7 +34,10 @@ from study_planner.csp.backtracking import (
+ from study_planner.integration import (
+     AssignmentTarget,
+     CspAlgorithm,
++    OutOfSupportAction,
++    PlannerOutcome,
+     PlannerStatus,
++    SupportPolicy,
+     WholePlanEnumerationStatus,
+     WholePlanPlanningCandidate,
+     WholePlanScheduleEnumerator,
+@@ -54,6 +57,7 @@ from study_planner.search.nn_adapter import (
+ from study_planner.search.session_mapping import (
+     STRICT_FFF_FEATURE_NAMES,
+     ClickScenario,
++    MarginalSupportStatus,
+     SessionClickMappingConfig,
+ )
+ 
+@@ -91,10 +95,17 @@ def _row(feature_names: tuple[str, ...]) -> pd.DataFrame:
+ class _Predictor:
+     assessment_type_columns = _TYPE_COLUMNS
+ 
+-    def __init__(self, *, model_b: bool = False, score_by_window: bool = False) -> None:
++    def __init__(
++        self,
++        *,
++        model_b: bool = False,
++        score_by_window: bool = False,
++        scores_by_weight: dict[float, float] | None = None,
++    ) -> None:
+         self.feature_names = _MODEL_B_FEATURES if model_b else STRICT_FFF_FEATURE_NAMES
+         self.calls = 0
+         self.score_by_window = score_by_window
++        self.scores_by_weight = scores_by_weight
+         mode = "proxy" if model_b else "strict"
+         self.artifact_digest = artifact_digest_from_files(
+             {
+@@ -110,6 +121,9 @@ class _Predictor:
+         if self.score_by_window:
+             week_two = features["click_content_navigation_week_2"].iloc[0]
+             return np.asarray([80.0 if week_two > 0 else 60.0])
++        if self.scores_by_weight is not None:
++            weight = float(features["assessment_weight"].iloc[0])
++            return np.asarray([self.scores_by_weight[weight]])
+         return np.asarray([60.0])
+ 
+ 
+@@ -197,15 +211,17 @@ def _candidate(
+     empty_domain: bool = False,
+     include_second_slot: bool = True,
+     target: float = 0.0,
++    assignment_weights: tuple[float, float, float] | None = None,
+ ) -> WholePlanPlanningCandidate:
+     allocation = (count, 0, 0, 0)
+     ids = ("a1", "a2", "a3")
+-    contexts = tuple(
+-        CandidateFeatureContext(
+-            "student-1", assignment_id, _row(adapter.predictor.feature_names)
+-        )
+-        for assignment_id in ids
+-    )
++    weights = assignment_weights or (10.0, 10.0, 10.0)
++    contexts = []
++    for assignment_id, weight in zip(ids, weights, strict=True):
++        features = _row(adapter.predictor.feature_names)
++        features.loc[0, "assessment_weight"] = weight
++        contexts.append(CandidateFeatureContext("student-1", assignment_id, features))
++    contexts = tuple(contexts)
+     context_map = {context.assignment_identity: context for context in contexts}
+     plans = tuple(
+         AssignmentPlan(
+@@ -269,10 +285,17 @@ def _candidate(
+ 
+ 
+ def _adapter(
+-    *, model_b: bool = False, score_by_window: bool = False
++    *,
++    model_b: bool = False,
++    score_by_window: bool = False,
++    scores_by_weight: dict[float, float] | None = None,
+ ) -> SessionNNAdapter:
+     return SessionNNAdapter(
+-        _Predictor(model_b=model_b, score_by_window=score_by_window),
++        _Predictor(
++            model_b=model_b,
++            score_by_window=score_by_window,
++            scores_by_weight=scores_by_weight,
++        ),
+         SessionClickMappingConfig(ClickScenario.LOW),
+     )
+ 
+@@ -321,6 +344,8 @@ def test_successful_planning_preserves_model_schema_and_zero_allocations(
+     )
+ 
+     assert result.status is PlannerStatus.FEASIBLE
++    assert result.outcome is PlannerOutcome.TARGET_ACHIEVED
++    assert not result.search_complete
+     assert result.nn_model_mode is (
+         NNModelMode.MODEL_B_PREVIOUS_MARKS if model_b else NNModelMode.MODEL_A_STRICT
+     )
+@@ -390,6 +415,7 @@ def test_target_failure_tries_next_schedule_before_searching_next_allocation() -
+     )
+ 
+     assert result.status is PlannerStatus.FEASIBLE
++    assert result.outcome is PlannerOutcome.TARGET_ACHIEVED
+     assert result.allocations[0].weekly_sessions == (1, 0, 0, 0)
+     assert result.weekly_timetable is not None
+     assert result.weekly_timetable[0].sessions[0].week_index == 1
+@@ -398,6 +424,66 @@ def test_target_failure_tries_next_schedule_before_searching_next_allocation() -
+     assert result.search_statistics.final_predictions == 9
+ 
+ 
++def test_best_verified_plan_uses_later_candidate_with_higher_total_marks() -> None:
++    adapter = _adapter(score_by_window=True)
++    first = _candidate(adapter, "zero", count=0, target=90)
++    later = _candidate(adapter, "one", count=1, target=90)
++    candidates = {"zero": first, "one": later}
++
++    result = integrated_uniform_cost_search(
++        _AllocationSpace("zero", {"zero": ("one",)}),
++        candidates.__getitem__,
++        adapter,
++        csp_options=BacktrackingOptions(
++            variable_order=BacktrackingVariableOrder.CANONICAL,
++            value_order=BacktrackingValueOrder.CANONICAL,
++        ),
++    )
++
++    assert result.status is PlannerStatus.INFEASIBLE
++    assert result.outcome is PlannerOutcome.TARGET_UNREACHABLE
++    assert result.search_complete
++    assert result.allocations[0].weekly_sessions == (1, 0, 0, 0)
++    assert result.weekly_timetable is not None
++    assert result.weekly_timetable[0].sessions[0].week_index == 1
++    assert tuple(mark.predicted_mark for mark in result.predicted_marks) == (
++        80.0,
++        60.0,
++        60.0,
++    )
++    assert tuple(target.target_mark for target in result.targets) == (90, 0, 0)
++    assert "all_verified_schedules_missed_nn_target" in result.failure_reasons
++    assert result.best_plan_comparison_rule
++    assert all(
++        mark.model_provenance_identity == adapter.model_provenance_identity
++        and mark.fitted_artifact_digest == adapter.fitted_artifact_digest
++        for mark in result.predicted_marks
++    )
++
++
++def test_best_plan_reports_different_final_marks_for_each_assignment() -> None:
++    adapter = _adapter(scores_by_weight={10.0: 45.0, 20.0: 70.0, 30.0: 85.0})
++    candidate = _candidate(
++        adapter,
++        "different-marks",
++        count=0,
++        target=55,
++        assignment_weights=(10.0, 20.0, 30.0),
++    )
++
++    result = integrated_uniform_cost_search(
++        _AllocationSpace("different-marks", {}), lambda _state: candidate, adapter
++    )
++
++    assert result.outcome is PlannerOutcome.TARGET_UNREACHABLE
++    assert tuple(
++        (mark.assignment_identity, mark.predicted_mark, mark.target_mark)
++        for mark in result.predicted_marks
++    ) == (("a1", 45.0, 55), ("a2", 70.0, 0), ("a3", 85.0, 0))
++    assert result.weekly_timetable is not None
++    assert result.whole_plan_verification is not None
++
++
+ def test_exhaustive_infeasibility_and_csp_resource_limit_are_distinct() -> None:
+     adapter = _adapter()
+     impossible = _candidate(adapter, "impossible", empty_domain=True)
+@@ -405,7 +491,15 @@ def test_exhaustive_infeasibility_and_csp_resource_limit_are_distinct() -> None:
+         _AllocationSpace("impossible", {}), lambda _state: impossible, adapter
+     )
+     assert exhausted.status is PlannerStatus.INFEASIBLE
++    assert exhausted.outcome is PlannerOutcome.NO_FEASIBLE_SCHEDULE
++    assert exhausted.search_complete
+     assert exhausted.search_statistics.schedules_examined == 0
++    assert exhausted.search_statistics.csp_schedules_enumerated == 0
++    assert exhausted.search_statistics.verification_feasible_schedules == 0
++    assert exhausted.predicted_marks == ()
++    assert exhausted.allocations == ()
++    assert exhausted.weekly_timetable is None
++    assert len(exhausted.targets) == 3
+     assert exhausted.failure_reasons == ("csp_exhausted_without_feasible_schedule",)
+     assert len(exhausted.search_statistics.terminal_csp_outcomes) == 1
+     assert (
+@@ -421,11 +515,86 @@ def test_exhaustive_infeasibility_and_csp_resource_limit_are_distinct() -> None:
+         csp_options=BacktrackingOptions(max_nodes=0),
+     )
+     assert incomplete.status is PlannerStatus.INCOMPLETE
++    assert incomplete.outcome is PlannerOutcome.INCOMPLETE
++    assert not incomplete.search_complete
+     assert "csp_enumeration_incomplete" in incomplete.failure_reasons
+     assert incomplete.search_statistics.terminal_csp_outcomes[0].status.value == (
+         "incomplete"
+     )
+ 
++    search_limited = integrated_uniform_cost_search(
++        _AllocationSpace("limited-first", {"limited-first": ("limited-next",)}),
++        lambda _state: _candidate(adapter, "limited", target=90),
++        adapter,
++        max_candidates=1,
++    )
++    assert search_limited.outcome is PlannerOutcome.INCOMPLETE
++    assert not search_limited.search_complete
++    assert search_limited.predicted_marks
++    assert "candidate_limit" in search_limited.failure_reasons
++
++
++def test_support_rejected_candidate_precedes_another_candidates_csp_infeasibility():
++    adapter = _adapter()
++    candidate_a = _candidate(adapter, "candidate-a", count=1)
++    candidate_b = _candidate(adapter, "candidate-b", count=1, empty_domain=True)
++
++    class RejectProvisionalSupport:
++        def permits(self, _status: MarginalSupportStatus) -> bool:
++            return False
++
++    candidate_a = replace(candidate_a, support_policy=RejectProvisionalSupport())
++    candidates = {"candidate-a": candidate_a, "candidate-b": candidate_b}
++    result = integrated_uniform_cost_search(
++        _AllocationSpace("candidate-a", {"candidate-a": ("candidate-b",)}),
++        candidates.__getitem__,
++        adapter,
++    )
++
++    assert result.search_complete
++    assert result.search_statistics.candidate_proposals == 2
++    assert result.search_statistics.provisional_support_rejections == 1
++    assert result.search_statistics.csp_schedules_enumerated == 0
++    assert len(result.search_statistics.terminal_csp_outcomes) == 1
++    assert result.search_statistics.terminal_csp_outcomes[0].status is (
++        WholePlanEnumerationStatus.EXHAUSTED_NO_FEASIBLE
++    )
++    assert "provisional_mapping_out_of_support" in result.failure_reasons
++    assert "csp_exhausted_without_feasible_schedule" in result.failure_reasons
++    # Any support rejection with no supported final score makes the search-wide
++    # outcome indeterminate as to supported-plan availability.
++    assert result.outcome is PlannerOutcome.NO_SUPPORTED_PLAN
++
++
++def test_operational_failure_remains_error_even_after_support_rejection(monkeypatch):
++    adapter = _adapter()
++    candidate = replace(
++        _candidate(adapter, "error-after-support", count=1),
++        support_policy=SupportPolicy(
++            "test-support-policy",
++            "1",
++            "test-reference",
++            OutOfSupportAction.REJECT,
++        ),
++    )
++
++    def fail_provisional(*_args, **_kwargs):
++        raise RuntimeError("synthetic inference failure")
++
++    monkeypatch.setattr(SessionNNAdapter, "evaluate_provisional", fail_provisional)
++    result = integrated_uniform_cost_search(
++        _AllocationSpace("error-after-support", {}),
++        lambda _state: candidate,
++        adapter,
++    )
++
++    assert result.status is PlannerStatus.ERROR
++    assert result.outcome is PlannerOutcome.ERROR
++    assert not result.search_complete
++    assert "operational_error:RuntimeError:synthetic inference failure" in (
++        result.failure_reasons
++    )
++
+ 
+ def test_all_verified_schedules_missing_target_has_specific_reason() -> None:
+     adapter = _adapter()
+@@ -435,8 +604,17 @@ def test_all_verified_schedules_missing_target_has_specific_reason() -> None:
+     )
+ 
+     assert result.status is PlannerStatus.INFEASIBLE
++    assert result.outcome is PlannerOutcome.TARGET_UNREACHABLE
++    assert result.search_complete
++    assert tuple(mark.predicted_mark for mark in result.predicted_marks) == (
++        60.0,
++        60.0,
++        60.0,
++    )
+     assert result.search_statistics.schedules_examined == 2
+     assert result.search_statistics.target_failures == 2
++    assert result.search_statistics.verification_feasible_schedules == 2
++    assert result.search_statistics.final_scored_supported_schedules == 2
+     assert result.failure_reasons == (
+         "all_verified_schedules_missed_nn_target",
+         "final_target_failed",
+@@ -474,6 +652,9 @@ def test_all_schedules_rejected_by_verification_has_specific_reason(
+     assert result.status is PlannerStatus.INFEASIBLE
+     assert result.search_statistics.schedules_examined == 2
+     assert result.search_statistics.verification_rejections == 2
++    assert result.search_statistics.verification_feasible_schedules == 0
++    assert result.search_statistics.support_policy_rejections == 0
++    assert result.outcome is PlannerOutcome.NO_FEASIBLE_SCHEDULE
+     assert result.failure_reasons == (
+         "all_schedules_rejected_by_verification",
+         "assignment_contains_out_of_domain_values",
+@@ -484,6 +665,156 @@ def test_all_schedules_rejected_by_verification_has_specific_reason(
+     )
+ 
+ 
++def test_verification_feasible_schedules_rejected_by_support_are_not_csp_infeasible(
++    monkeypatch,
++) -> None:
++    adapter = _adapter()
++    candidate = _candidate(adapter, "support-rejected", count=1)
++    policy = SupportPolicy(
++        "test-support-policy",
++        "1",
++        "test-reference",
++        OutOfSupportAction.REJECT,
++    )
++    candidate = replace(candidate, support_policy=policy)
++    original_evaluate_final = SessionNNAdapter.evaluate_final
++
++    def out_of_support_final(self, *args, **kwargs):
++        prediction = original_evaluate_final(self, *args, **kwargs)
++        if self is adapter:
++            prediction = replace(
++                prediction,
++                mapping=replace(
++                    prediction.mapping,
++                    marginal_status=MarginalSupportStatus.OUT_OF_RANGE,
++                ),
++            )
++        return prediction
++
++    monkeypatch.setattr(SessionNNAdapter, "evaluate_final", out_of_support_final)
++    result = integrated_uniform_cost_search(
++        _AllocationSpace("support-rejected", {}), lambda _state: candidate, adapter
++    )
++
++    assert result.outcome is PlannerOutcome.NO_SUPPORTED_PLAN
++    assert result.status is PlannerStatus.INFEASIBLE
++    assert result.search_complete
++    assert result.search_statistics.csp_schedules_enumerated == 2
++    assert result.search_statistics.verification_feasible_schedules == 2
++    assert result.search_statistics.verification_rejections == 0
++    assert result.search_statistics.final_support_rejections == 2
++    assert result.search_statistics.provisional_support_rejections == 0
++    assert result.search_statistics.support_policy_rejections == 2
++    assert result.search_statistics.final_scored_supported_schedules == 0
++    assert result.predicted_marks == ()
++    assert result.weekly_timetable is None
++    assert result.search_statistics.terminal_csp_outcomes[0].status is (
++        WholePlanEnumerationStatus.EXHAUSTED_WITH_FEASIBLE
++    )
++    assert "final_schedule_out_of_support" in result.failure_reasons
++
++
++def test_target_failure_reasons_are_candidate_local(monkeypatch) -> None:
++    from study_planner.integration.planner import _Controller
++
++    adapter = _adapter()
++    first = _candidate(adapter, "first", count=0, target=90)
++    second = _candidate(adapter, "second", count=1)
++    second = replace(
++        second,
++        support_policy=SupportPolicy(
++            "test-support-policy",
++            "1",
++            "test-reference",
++            OutOfSupportAction.REJECT,
++        ),
++    )
++    original_evaluate_final = SessionNNAdapter.evaluate_final
++    reject_second = False
++
++    def out_of_support_final(self, *args, **kwargs):
++        prediction = original_evaluate_final(self, *args, **kwargs)
++        if self is adapter and reject_second:
++            prediction = replace(
++                prediction,
++                mapping=replace(
++                    prediction.mapping,
++                    marginal_status=MarginalSupportStatus.OUT_OF_RANGE,
++                ),
++            )
++        return prediction
++
++    monkeypatch.setattr(SessionNNAdapter, "evaluate_final", out_of_support_final)
++    controller = _Controller(
++        _AllocationSpace("first", {}),
++        lambda _state: first,
++        adapter,
++        CspAlgorithm.BT,
++        None,
++        None,
++    )
++    controller._evaluate(first)
++    assert controller.target_failures > 0
++    assert controller.failure_reasons.count(
++        "all_verified_schedules_missed_nn_target"
++    ) == 1
++
++    controller.failure_reasons.clear()
++    reject_second = True
++    controller._evaluate(second)
++    assert controller.target_failures > 0
++    assert "final_schedule_out_of_support" in controller.failure_reasons
++    assert "all_verified_schedules_missed_nn_target" not in controller.failure_reasons
++
++
++def test_support_rejection_suppresses_all_schedules_missed_target_reason(
++    monkeypatch,
++) -> None:
++    adapter = _adapter()
++    candidate = _candidate(adapter, "mixed-support-and-target-failures", target=90)
++    candidate = replace(
++        candidate,
++        support_policy=SupportPolicy(
++            "test-support-policy",
++            "1",
++            "test-reference",
++            OutOfSupportAction.REJECT,
++        ),
++    )
++    original_evaluate_final = SessionNNAdapter.evaluate_final
++    final_evaluations = 0
++
++    def reject_first_schedule(self, *args, **kwargs):
++        nonlocal final_evaluations
++        prediction = original_evaluate_final(self, *args, **kwargs)
++        final_evaluations += 1
++        if self is adapter and final_evaluations <= 3:
++            prediction = replace(
++                prediction,
++                mapping=replace(
++                    prediction.mapping,
++                    marginal_status=MarginalSupportStatus.OUT_OF_RANGE,
++                ),
++            )
++        return prediction
++
++    monkeypatch.setattr(SessionNNAdapter, "evaluate_final", reject_first_schedule)
++    result = integrated_uniform_cost_search(
++        _AllocationSpace("mixed-support-and-target-failures", {}),
++        lambda _state: candidate,
++        adapter,
++    )
++
++    assert result.search_complete
++    assert result.search_statistics.verification_feasible_schedules == 2
++    assert result.search_statistics.final_support_rejections == 1
++    assert result.search_statistics.target_failures == 1
++    assert result.search_statistics.final_scored_supported_schedules == 1
++    assert "final_schedule_out_of_support" in result.failure_reasons
++    assert "final_target_failed" in result.failure_reasons
++    assert "all_verified_schedules_missed_nn_target" not in result.failure_reasons
++
++
+ def test_greedy_integration_and_candidate_limit() -> None:
+     adapter = _adapter()
+     candidate = _candidate(adapter, "state")

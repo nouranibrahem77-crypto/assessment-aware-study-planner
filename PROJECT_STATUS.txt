@@ -1,0 +1,29 @@
+On branch integration-demo
+Your branch is up to date with 'origin/integration-demo'.
+
+Changes not staged for commit:
+  (use "git add <file>..." to update what will be committed)
+  (use "git restore <file>..." to discard changes in working directory)
+	modified:   README.md
+	modified:   docs/search_integration_contract.md
+	modified:   pyproject.toml
+	modified:   run_demo.py
+	modified:   src/study_planner/integration/__init__.py
+	modified:   src/study_planner/integration/application_inputs.py
+	modified:   src/study_planner/integration/application_planning.py
+	modified:   src/study_planner/integration/planner.py
+	modified:   src/study_planner/search/nn_adapter.py
+	modified:   tests/test_application_inputs.py
+	modified:   tests/test_nn_adapter.py
+	modified:   tests/test_run_demo.py
+	modified:   tests/test_search_csp_integration.py
+
+Untracked files:
+  (use "git add <file>..." to include in what will be committed)
+	CHANGE_SUMMARY.txt
+	PROJECT_STATUS.txt
+	WORKING_CHANGES.patch
+	configs/p1_production_draft.json
+	docs/production_configuration_decisions.md
+
+no changes added to commit (use "git add" and/or "git commit -a")

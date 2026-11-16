@@ -46,6 +46,17 @@ class PlannerStatus(str, Enum):
     ERROR = "error"
 
 
+class PlannerOutcome(str, Enum):
+    """Detailed distinction between goal success and terminal failure modes."""
+
+    TARGET_ACHIEVED = "target_achieved"
+    TARGET_UNREACHABLE = "target_unreachable"
+    NO_FEASIBLE_SCHEDULE = "no_feasible_schedule"
+    NO_SUPPORTED_PLAN = "no_supported_plan"
+    INCOMPLETE = "incomplete"
+    ERROR = "error"
+
+
 StateT = TypeVar("StateT", bound=Hashable)
 ActionT = TypeVar("ActionT")
 
@@ -128,9 +139,16 @@ class WholePlanPlanningCandidate:
                 raise ValueError(
                     "feature context does not match the whole-plan manifest"
                 )
-        slot_ids = {
-            slot.slot_id for domain in self.problem.domains for slot in domain.values
-        }
+        slot_ids_by_assignment: dict[str, set[str]] = {}
+        for domain in self.problem.domains:
+            slot_ids_by_assignment.setdefault(
+                domain.variable.assignment_id, set()
+            ).update(
+                slot.slot_id for slot in domain.values
+            )
+        slot_ids = set().union(*slot_ids_by_assignment.values()) if (
+            slot_ids_by_assignment
+        ) else set()
         if self.slot_relative_windows_by_assignment:
             mapping_ids = tuple(
                 assignment_id
@@ -148,7 +166,6 @@ class WholePlanPlanningCandidate:
                 windows = dict(entries)
                 if (
                     len(windows) != len(entries)
-                    or not slot_ids.issubset(windows)
                     or any(
                         isinstance(window, bool)
                         or not isinstance(window, int)
@@ -191,6 +208,13 @@ class AssignmentMark:
 
 @dataclass(frozen=True, slots=True)
 class PlannerStatistics:
+    """Search counters at allocation, schedule, and support-evaluation levels.
+
+    ``schedules_examined`` counts CSP schedules handed to whole-plan
+    verification. Provisional support rejections count rejected assignment
+    mappings; final support rejections count rejected verified schedules.
+    """
+
     search: SearchStatistics
     candidate_proposals: int
     provisional_predictions: int
@@ -201,14 +225,30 @@ class PlannerStatistics:
     csp: CspEnumerationStatistics
     terminal_csp_outcomes: tuple[WholePlanSearchOutcome, ...]
     orchestration_time_seconds: float
+    verification_feasible_schedules: int = 0
+    provisional_support_rejections: int = 0
+    final_support_rejections: int = 0
+    final_scored_supported_schedules: int = 0
+
+    @property
+    def csp_schedules_enumerated(self) -> int:
+        """Number of CSP schedules passed to whole-plan verification."""
+        return self.schedules_examined
+
+    @property
+    def support_policy_rejections(self) -> int:
+        """Total provisional and final evaluations rejected by support policy."""
+        return self.provisional_support_rejections + self.final_support_rejections
 
 
 @dataclass(frozen=True, slots=True)
 class FinalPlannerResult:
     status: PlannerStatus
+    outcome: PlannerOutcome
     allocations: tuple[AssignmentAllocation, ...]
     weekly_timetable: tuple[AssignmentSchedule, ...] | None
     predicted_marks: tuple[AssignmentMark, ...]
+    targets: tuple[AssignmentTarget, ...]
     nn_model_identity: str
     nn_model_mode: NNModelMode
     nn_fitted_artifact_digest: str
@@ -217,6 +257,17 @@ class FinalPlannerResult:
     search_statistics: PlannerStatistics
     failure_reasons: tuple[str, ...]
     solution_cost: float | None
+    search_complete: bool
+    best_plan_comparison_rule: str
+    search_state_path: tuple[Hashable, ...] = ()
+    search_action_path: tuple[object, ...] = ()
+
+
+BEST_PLAN_COMPARISON_RULE = (
+    "maximize sum of final predicted marks; then maximize the per-assignment "
+    "mark tuple in canonical assignment order; then minimize total sessions; "
+    "then choose the lexicographically smallest whole-plan and schedule identities"
+)
 
 
 class _Controller(Generic[StateT, ActionT]):
@@ -246,11 +297,15 @@ class _Controller(Generic[StateT, ActionT]):
         self.provisional_predictions = 0
         self.final_predictions = 0
         self.schedules_examined = 0
+        self.verification_feasible_schedules = 0
         self.verification_rejections = 0
+        self.provisional_support_rejections = 0
+        self.final_support_rejections = 0
+        self.final_scored_supported_schedules = 0
         self.target_failures = 0
         self.csp_stats = CspEnumerationStatistics(0, 0, 0, 0, 0, 0, 0.0, 0.0)
         self.last_candidate: WholePlanPlanningCandidate | None = None
-        self.last_scored: (
+        self.best_scored: (
             tuple[
                 WholePlanPlanningCandidate,
                 WholePlanVerificationResult,
@@ -302,6 +357,8 @@ class _Controller(Generic[StateT, ActionT]):
         targets = {
             item.assignment_identity: item.target_mark for item in candidate.targets
         }
+        candidate_target_failures = 0
+        candidate_final_support_rejections = 0
         for plan in manifest.canonical_assignments:
             provisional = self.adapter.evaluate_provisional(
                 CandidateSessionAllocation(
@@ -318,6 +375,7 @@ class _Controller(Generic[StateT, ActionT]):
                     provisional.mapping.marginal_status
                 )
             ):
+                self.provisional_support_rejections += 1
                 self.failure_reasons.append("provisional_mapping_out_of_support")
                 return False
 
@@ -338,6 +396,7 @@ class _Controller(Generic[StateT, ActionT]):
                         self.verification_rejections += 1
                         self.failure_reasons.extend(verification.rejection_reasons)
                         continue
+                    self.verification_feasible_schedules += 1
                     marks: list[AssignmentMark] = []
                     predictions = []
                     windows_by_assignment = dict(
@@ -395,10 +454,15 @@ class _Controller(Generic[StateT, ActionT]):
                         )
                         for prediction in predictions
                     ):
+                        self.final_support_rejections += 1
+                        candidate_final_support_rejections += 1
                         self.failure_reasons.append("final_schedule_out_of_support")
                         continue
                     marks_tuple = tuple(marks)
-                    self.last_scored = (candidate, verification, marks_tuple)
+                    self.final_scored_supported_schedules += 1
+                    scored = (candidate, verification, marks_tuple)
+                    if self._is_better_scored_plan(scored, self.best_scored):
+                        self.best_scored = scored
                     if all(
                         mark.predicted_mark >= mark.target_mark for mark in marks_tuple
                     ):
@@ -421,13 +485,16 @@ class _Controller(Generic[StateT, ActionT]):
                             )
                         self.found = self._result(
                             PlannerStatus.FEASIBLE,
+                            PlannerOutcome.TARGET_ACHIEVED,
                             candidate,
                             verification,
                             marks_tuple,
                             None,
+                            search_complete=False,
                         )
                         return True
                     self.target_failures += 1
+                    candidate_target_failures += 1
                     self.failure_reasons.append("final_target_failed")
                     continue
                 if step.status is ScheduleBridgeStatus.INCOMPLETE:
@@ -450,7 +517,8 @@ class _Controller(Generic[StateT, ActionT]):
                 elif (
                     step.outcome.status
                     is WholePlanEnumerationStatus.EXHAUSTED_WITH_FEASIBLE
-                    and self.target_failures
+                    and candidate_target_failures
+                    and not candidate_final_support_rejections
                 ):
                     self.failure_reasons.append(
                         "all_verified_schedules_missed_nn_target"
@@ -459,6 +527,55 @@ class _Controller(Generic[StateT, ActionT]):
         finally:
             self._add_csp_statistics(bridge.statistics)
         return False
+
+    @staticmethod
+    def _score_key(
+        scored: tuple[
+            WholePlanPlanningCandidate,
+            WholePlanVerificationResult,
+            tuple[AssignmentMark, ...],
+        ],
+    ) -> tuple[tuple[float, tuple[float, ...], int], tuple[str, str]]:
+        candidate, verification, marks = scored
+        by_assignment = {mark.assignment_identity: mark for mark in marks}
+        ordered_marks = tuple(
+            by_assignment[plan.assignment_identity].predicted_mark
+            for plan in candidate.problem.manifest.canonical_assignments
+        )
+        session_count = sum(
+            plan.session_count
+            for plan in candidate.problem.manifest.canonical_assignments
+        )
+        quality = (math.fsum(ordered_marks), ordered_marks, -session_count)
+        stable_identity = (
+            candidate.problem.manifest.canonical_identity,
+            verification.schedule_identity,
+        )
+        return quality, stable_identity
+
+    @classmethod
+    def _is_better_scored_plan(
+        cls,
+        candidate: tuple[
+            WholePlanPlanningCandidate,
+            WholePlanVerificationResult,
+            tuple[AssignmentMark, ...],
+        ],
+        incumbent: tuple[
+            WholePlanPlanningCandidate,
+            WholePlanVerificationResult,
+            tuple[AssignmentMark, ...],
+        ]
+        | None,
+    ) -> bool:
+        """Compare only verified, final-scored schedules with a stable tie-break."""
+        if incumbent is None:
+            return True
+        candidate_quality, candidate_identity = cls._score_key(candidate)
+        incumbent_quality, incumbent_identity = cls._score_key(incumbent)
+        if candidate_quality != incumbent_quality:
+            return candidate_quality > incumbent_quality
+        return candidate_identity < incumbent_identity
 
     def _add_csp_statistics(self, value: CspEnumerationStatistics) -> None:
         current = self.csp_stats
@@ -476,24 +593,27 @@ class _Controller(Generic[StateT, ActionT]):
     def _result(
         self,
         status: PlannerStatus,
+        outcome: PlannerOutcome,
         candidate: WholePlanPlanningCandidate | None,
         verification: WholePlanVerificationResult | None,
         marks: tuple[AssignmentMark, ...],
         search: SearchStatistics | None,
+        *,
+        search_complete: bool,
     ) -> FinalPlannerResult:
         if not self.adapter.fitted_artifact_digest:
             raise RuntimeError("final planner provenance requires a fitted artifact")
         if candidate is None:
             candidate = self.last_candidate
-        if verification is None and self.last_scored is not None:
-            scored_candidate, scored_verification, scored_marks = self.last_scored
+        if verification is None and self.best_scored is not None:
+            scored_candidate, scored_verification, scored_marks = self.best_scored
             candidate = scored_candidate
             verification = scored_verification
             if not marks:
                 marks = scored_marks
         allocations = (
             ()
-            if candidate is None
+            if candidate is None or verification is None
             else tuple(
                 AssignmentAllocation(
                     plan.assignment_identity,
@@ -503,16 +623,18 @@ class _Controller(Generic[StateT, ActionT]):
             )
         )
         return FinalPlannerResult(
-            status,
-            allocations,
-            None if verification is None else verification.schedule,
-            marks,
-            self.adapter.model_provenance_identity,
-            self.adapter.model_mode,
-            self.adapter.fitted_artifact_digest,
-            self.adapter.feature_schema_identity,
-            verification,
-            PlannerStatistics(
+            status=status,
+            outcome=outcome,
+            allocations=allocations,
+            weekly_timetable=None if verification is None else verification.schedule,
+            predicted_marks=marks,
+            targets=() if candidate is None else candidate.targets,
+            nn_model_identity=self.adapter.model_provenance_identity,
+            nn_model_mode=self.adapter.model_mode,
+            nn_fitted_artifact_digest=self.adapter.fitted_artifact_digest,
+            nn_feature_schema_identity=self.adapter.feature_schema_identity,
+            whole_plan_verification=verification,
+            search_statistics=PlannerStatistics(
                 search or SearchStatistics(0, 0, 0.0),
                 self.candidate_proposals,
                 self.provisional_predictions,
@@ -523,9 +645,15 @@ class _Controller(Generic[StateT, ActionT]):
                 self.csp_stats,
                 tuple(self.terminal_csp_outcomes),
                 perf_counter() - self.started,
+                self.verification_feasible_schedules,
+                self.provisional_support_rejections,
+                self.final_support_rejections,
+                self.final_scored_supported_schedules,
             ),
-            tuple(sorted(set(self.failure_reasons))),
-            None,
+            failure_reasons=tuple(sorted(set(self.failure_reasons))),
+            solution_cost=None,
+            search_complete=search_complete,
+            best_plan_comparison_rule=BEST_PLAN_COMPARISON_RULE,
         )
 
 
@@ -601,8 +729,14 @@ def _run(
                 controller.csp_stats,
                 tuple(controller.terminal_csp_outcomes),
                 perf_counter() - controller.started,
+                controller.verification_feasible_schedules,
+                controller.provisional_support_rejections,
+                controller.final_support_rejections,
+                controller.final_scored_supported_schedules,
             ),
             solution_cost=search_result.solution_cost,
+            search_state_path=search_result.state_path,
+            search_action_path=search_result.action_path,
         )
     status = (
         PlannerStatus.ERROR
@@ -611,7 +745,32 @@ def _run(
         if controller.incomplete
         else PlannerStatus.INFEASIBLE
     )
-    return controller._result(status, None, None, (), search_result.statistics)
+    outcome = (
+        PlannerOutcome.ERROR
+        if controller.error
+        else PlannerOutcome.INCOMPLETE
+        if controller.incomplete
+        else PlannerOutcome.TARGET_UNREACHABLE
+        if controller.best_scored is not None
+        else PlannerOutcome.NO_SUPPORTED_PLAN
+        if controller.provisional_support_rejections
+        or controller.final_support_rejections
+        else PlannerOutcome.NO_FEASIBLE_SCHEDULE
+    )
+    result = controller._result(
+        status,
+        outcome,
+        None,
+        None,
+        (),
+        search_result.statistics,
+        search_complete=not controller.error and not controller.incomplete,
+    )
+    return replace(
+        result,
+        search_state_path=search_result.state_path,
+        search_action_path=search_result.action_path,
+    )
 
 
 def integrated_uniform_cost_search(

@@ -2,7 +2,7 @@
 
 from __future__ import annotations
 
-from dataclasses import dataclass
+from dataclasses import dataclass, replace
 from types import SimpleNamespace
 
 import numpy as np
@@ -34,7 +34,10 @@ from study_planner.csp.backtracking import (
 from study_planner.integration import (
     AssignmentTarget,
     CspAlgorithm,
+    OutOfSupportAction,
+    PlannerOutcome,
     PlannerStatus,
+    SupportPolicy,
     WholePlanEnumerationStatus,
     WholePlanPlanningCandidate,
     WholePlanScheduleEnumerator,
@@ -54,6 +57,7 @@ from study_planner.search.nn_adapter import (
 from study_planner.search.session_mapping import (
     STRICT_FFF_FEATURE_NAMES,
     ClickScenario,
+    MarginalSupportStatus,
     SessionClickMappingConfig,
 )
 
@@ -91,10 +95,17 @@ def _row(feature_names: tuple[str, ...]) -> pd.DataFrame:
 class _Predictor:
     assessment_type_columns = _TYPE_COLUMNS
 
-    def __init__(self, *, model_b: bool = False, score_by_window: bool = False) -> None:
+    def __init__(
+        self,
+        *,
+        model_b: bool = False,
+        score_by_window: bool = False,
+        scores_by_weight: dict[float, float] | None = None,
+    ) -> None:
         self.feature_names = _MODEL_B_FEATURES if model_b else STRICT_FFF_FEATURE_NAMES
         self.calls = 0
         self.score_by_window = score_by_window
+        self.scores_by_weight = scores_by_weight
         mode = "proxy" if model_b else "strict"
         self.artifact_digest = artifact_digest_from_files(
             {
@@ -110,6 +121,9 @@ class _Predictor:
         if self.score_by_window:
             week_two = features["click_content_navigation_week_2"].iloc[0]
             return np.asarray([80.0 if week_two > 0 else 60.0])
+        if self.scores_by_weight is not None:
+            weight = float(features["assessment_weight"].iloc[0])
+            return np.asarray([self.scores_by_weight[weight]])
         return np.asarray([60.0])
 
 
@@ -197,15 +211,17 @@ def _candidate(
     empty_domain: bool = False,
     include_second_slot: bool = True,
     target: float = 0.0,
+    assignment_weights: tuple[float, float, float] | None = None,
 ) -> WholePlanPlanningCandidate:
     allocation = (count, 0, 0, 0)
     ids = ("a1", "a2", "a3")
-    contexts = tuple(
-        CandidateFeatureContext(
-            "student-1", assignment_id, _row(adapter.predictor.feature_names)
-        )
-        for assignment_id in ids
-    )
+    weights = assignment_weights or (10.0, 10.0, 10.0)
+    contexts = []
+    for assignment_id, weight in zip(ids, weights, strict=True):
+        features = _row(adapter.predictor.feature_names)
+        features.loc[0, "assessment_weight"] = weight
+        contexts.append(CandidateFeatureContext("student-1", assignment_id, features))
+    contexts = tuple(contexts)
     context_map = {context.assignment_identity: context for context in contexts}
     plans = tuple(
         AssignmentPlan(
@@ -269,10 +285,17 @@ def _candidate(
 
 
 def _adapter(
-    *, model_b: bool = False, score_by_window: bool = False
+    *,
+    model_b: bool = False,
+    score_by_window: bool = False,
+    scores_by_weight: dict[float, float] | None = None,
 ) -> SessionNNAdapter:
     return SessionNNAdapter(
-        _Predictor(model_b=model_b, score_by_window=score_by_window),
+        _Predictor(
+            model_b=model_b,
+            score_by_window=score_by_window,
+            scores_by_weight=scores_by_weight,
+        ),
         SessionClickMappingConfig(ClickScenario.LOW),
     )
 
@@ -321,6 +344,8 @@ def test_successful_planning_preserves_model_schema_and_zero_allocations(
     )
 
     assert result.status is PlannerStatus.FEASIBLE
+    assert result.outcome is PlannerOutcome.TARGET_ACHIEVED
+    assert not result.search_complete
     assert result.nn_model_mode is (
         NNModelMode.MODEL_B_PREVIOUS_MARKS if model_b else NNModelMode.MODEL_A_STRICT
     )
@@ -390,12 +415,73 @@ def test_target_failure_tries_next_schedule_before_searching_next_allocation() -
     )
 
     assert result.status is PlannerStatus.FEASIBLE
+    assert result.outcome is PlannerOutcome.TARGET_ACHIEVED
     assert result.allocations[0].weekly_sessions == (1, 0, 0, 0)
     assert result.weekly_timetable is not None
     assert result.weekly_timetable[0].sessions[0].week_index == 1
     assert result.search_statistics.target_failures == 2
     assert result.search_statistics.schedules_examined == 3
     assert result.search_statistics.final_predictions == 9
+
+
+def test_best_verified_plan_uses_later_candidate_with_higher_total_marks() -> None:
+    adapter = _adapter(score_by_window=True)
+    first = _candidate(adapter, "zero", count=0, target=90)
+    later = _candidate(adapter, "one", count=1, target=90)
+    candidates = {"zero": first, "one": later}
+
+    result = integrated_uniform_cost_search(
+        _AllocationSpace("zero", {"zero": ("one",)}),
+        candidates.__getitem__,
+        adapter,
+        csp_options=BacktrackingOptions(
+            variable_order=BacktrackingVariableOrder.CANONICAL,
+            value_order=BacktrackingValueOrder.CANONICAL,
+        ),
+    )
+
+    assert result.status is PlannerStatus.INFEASIBLE
+    assert result.outcome is PlannerOutcome.TARGET_UNREACHABLE
+    assert result.search_complete
+    assert result.allocations[0].weekly_sessions == (1, 0, 0, 0)
+    assert result.weekly_timetable is not None
+    assert result.weekly_timetable[0].sessions[0].week_index == 1
+    assert tuple(mark.predicted_mark for mark in result.predicted_marks) == (
+        80.0,
+        60.0,
+        60.0,
+    )
+    assert tuple(target.target_mark for target in result.targets) == (90, 0, 0)
+    assert "all_verified_schedules_missed_nn_target" in result.failure_reasons
+    assert result.best_plan_comparison_rule
+    assert all(
+        mark.model_provenance_identity == adapter.model_provenance_identity
+        and mark.fitted_artifact_digest == adapter.fitted_artifact_digest
+        for mark in result.predicted_marks
+    )
+
+
+def test_best_plan_reports_different_final_marks_for_each_assignment() -> None:
+    adapter = _adapter(scores_by_weight={10.0: 45.0, 20.0: 70.0, 30.0: 85.0})
+    candidate = _candidate(
+        adapter,
+        "different-marks",
+        count=0,
+        target=55,
+        assignment_weights=(10.0, 20.0, 30.0),
+    )
+
+    result = integrated_uniform_cost_search(
+        _AllocationSpace("different-marks", {}), lambda _state: candidate, adapter
+    )
+
+    assert result.outcome is PlannerOutcome.TARGET_UNREACHABLE
+    assert tuple(
+        (mark.assignment_identity, mark.predicted_mark, mark.target_mark)
+        for mark in result.predicted_marks
+    ) == (("a1", 45.0, 55), ("a2", 70.0, 0), ("a3", 85.0, 0))
+    assert result.weekly_timetable is not None
+    assert result.whole_plan_verification is not None
 
 
 def test_exhaustive_infeasibility_and_csp_resource_limit_are_distinct() -> None:
@@ -405,7 +491,15 @@ def test_exhaustive_infeasibility_and_csp_resource_limit_are_distinct() -> None:
         _AllocationSpace("impossible", {}), lambda _state: impossible, adapter
     )
     assert exhausted.status is PlannerStatus.INFEASIBLE
+    assert exhausted.outcome is PlannerOutcome.NO_FEASIBLE_SCHEDULE
+    assert exhausted.search_complete
     assert exhausted.search_statistics.schedules_examined == 0
+    assert exhausted.search_statistics.csp_schedules_enumerated == 0
+    assert exhausted.search_statistics.verification_feasible_schedules == 0
+    assert exhausted.predicted_marks == ()
+    assert exhausted.allocations == ()
+    assert exhausted.weekly_timetable is None
+    assert len(exhausted.targets) == 3
     assert exhausted.failure_reasons == ("csp_exhausted_without_feasible_schedule",)
     assert len(exhausted.search_statistics.terminal_csp_outcomes) == 1
     assert (
@@ -421,9 +515,84 @@ def test_exhaustive_infeasibility_and_csp_resource_limit_are_distinct() -> None:
         csp_options=BacktrackingOptions(max_nodes=0),
     )
     assert incomplete.status is PlannerStatus.INCOMPLETE
+    assert incomplete.outcome is PlannerOutcome.INCOMPLETE
+    assert not incomplete.search_complete
     assert "csp_enumeration_incomplete" in incomplete.failure_reasons
     assert incomplete.search_statistics.terminal_csp_outcomes[0].status.value == (
         "incomplete"
+    )
+
+    search_limited = integrated_uniform_cost_search(
+        _AllocationSpace("limited-first", {"limited-first": ("limited-next",)}),
+        lambda _state: _candidate(adapter, "limited", target=90),
+        adapter,
+        max_candidates=1,
+    )
+    assert search_limited.outcome is PlannerOutcome.INCOMPLETE
+    assert not search_limited.search_complete
+    assert search_limited.predicted_marks
+    assert "candidate_limit" in search_limited.failure_reasons
+
+
+def test_support_rejected_candidate_precedes_another_candidates_csp_infeasibility():
+    adapter = _adapter()
+    candidate_a = _candidate(adapter, "candidate-a", count=1)
+    candidate_b = _candidate(adapter, "candidate-b", count=1, empty_domain=True)
+
+    class RejectProvisionalSupport:
+        def permits(self, _status: MarginalSupportStatus) -> bool:
+            return False
+
+    candidate_a = replace(candidate_a, support_policy=RejectProvisionalSupport())
+    candidates = {"candidate-a": candidate_a, "candidate-b": candidate_b}
+    result = integrated_uniform_cost_search(
+        _AllocationSpace("candidate-a", {"candidate-a": ("candidate-b",)}),
+        candidates.__getitem__,
+        adapter,
+    )
+
+    assert result.search_complete
+    assert result.search_statistics.candidate_proposals == 2
+    assert result.search_statistics.provisional_support_rejections == 1
+    assert result.search_statistics.csp_schedules_enumerated == 0
+    assert len(result.search_statistics.terminal_csp_outcomes) == 1
+    assert result.search_statistics.terminal_csp_outcomes[0].status is (
+        WholePlanEnumerationStatus.EXHAUSTED_NO_FEASIBLE
+    )
+    assert "provisional_mapping_out_of_support" in result.failure_reasons
+    assert "csp_exhausted_without_feasible_schedule" in result.failure_reasons
+    # Any support rejection with no supported final score makes the search-wide
+    # outcome indeterminate as to supported-plan availability.
+    assert result.outcome is PlannerOutcome.NO_SUPPORTED_PLAN
+
+
+def test_operational_failure_remains_error_even_after_support_rejection(monkeypatch):
+    adapter = _adapter()
+    candidate = replace(
+        _candidate(adapter, "error-after-support", count=1),
+        support_policy=SupportPolicy(
+            "test-support-policy",
+            "1",
+            "test-reference",
+            OutOfSupportAction.REJECT,
+        ),
+    )
+
+    def fail_provisional(*_args, **_kwargs):
+        raise RuntimeError("synthetic inference failure")
+
+    monkeypatch.setattr(SessionNNAdapter, "evaluate_provisional", fail_provisional)
+    result = integrated_uniform_cost_search(
+        _AllocationSpace("error-after-support", {}),
+        lambda _state: candidate,
+        adapter,
+    )
+
+    assert result.status is PlannerStatus.ERROR
+    assert result.outcome is PlannerOutcome.ERROR
+    assert not result.search_complete
+    assert "operational_error:RuntimeError:synthetic inference failure" in (
+        result.failure_reasons
     )
 
 
@@ -435,8 +604,17 @@ def test_all_verified_schedules_missing_target_has_specific_reason() -> None:
     )
 
     assert result.status is PlannerStatus.INFEASIBLE
+    assert result.outcome is PlannerOutcome.TARGET_UNREACHABLE
+    assert result.search_complete
+    assert tuple(mark.predicted_mark for mark in result.predicted_marks) == (
+        60.0,
+        60.0,
+        60.0,
+    )
     assert result.search_statistics.schedules_examined == 2
     assert result.search_statistics.target_failures == 2
+    assert result.search_statistics.verification_feasible_schedules == 2
+    assert result.search_statistics.final_scored_supported_schedules == 2
     assert result.failure_reasons == (
         "all_verified_schedules_missed_nn_target",
         "final_target_failed",
@@ -474,6 +652,9 @@ def test_all_schedules_rejected_by_verification_has_specific_reason(
     assert result.status is PlannerStatus.INFEASIBLE
     assert result.search_statistics.schedules_examined == 2
     assert result.search_statistics.verification_rejections == 2
+    assert result.search_statistics.verification_feasible_schedules == 0
+    assert result.search_statistics.support_policy_rejections == 0
+    assert result.outcome is PlannerOutcome.NO_FEASIBLE_SCHEDULE
     assert result.failure_reasons == (
         "all_schedules_rejected_by_verification",
         "assignment_contains_out_of_domain_values",
@@ -482,6 +663,156 @@ def test_all_schedules_rejected_by_verification_has_specific_reason(
         result.search_statistics.terminal_csp_outcomes[0].status
         is WholePlanEnumerationStatus.EXHAUSTED_NO_FEASIBLE
     )
+
+
+def test_verification_feasible_schedules_rejected_by_support_are_not_csp_infeasible(
+    monkeypatch,
+) -> None:
+    adapter = _adapter()
+    candidate = _candidate(adapter, "support-rejected", count=1)
+    policy = SupportPolicy(
+        "test-support-policy",
+        "1",
+        "test-reference",
+        OutOfSupportAction.REJECT,
+    )
+    candidate = replace(candidate, support_policy=policy)
+    original_evaluate_final = SessionNNAdapter.evaluate_final
+
+    def out_of_support_final(self, *args, **kwargs):
+        prediction = original_evaluate_final(self, *args, **kwargs)
+        if self is adapter:
+            prediction = replace(
+                prediction,
+                mapping=replace(
+                    prediction.mapping,
+                    marginal_status=MarginalSupportStatus.OUT_OF_RANGE,
+                ),
+            )
+        return prediction
+
+    monkeypatch.setattr(SessionNNAdapter, "evaluate_final", out_of_support_final)
+    result = integrated_uniform_cost_search(
+        _AllocationSpace("support-rejected", {}), lambda _state: candidate, adapter
+    )
+
+    assert result.outcome is PlannerOutcome.NO_SUPPORTED_PLAN
+    assert result.status is PlannerStatus.INFEASIBLE
+    assert result.search_complete
+    assert result.search_statistics.csp_schedules_enumerated == 2
+    assert result.search_statistics.verification_feasible_schedules == 2
+    assert result.search_statistics.verification_rejections == 0
+    assert result.search_statistics.final_support_rejections == 2
+    assert result.search_statistics.provisional_support_rejections == 0
+    assert result.search_statistics.support_policy_rejections == 2
+    assert result.search_statistics.final_scored_supported_schedules == 0
+    assert result.predicted_marks == ()
+    assert result.weekly_timetable is None
+    assert result.search_statistics.terminal_csp_outcomes[0].status is (
+        WholePlanEnumerationStatus.EXHAUSTED_WITH_FEASIBLE
+    )
+    assert "final_schedule_out_of_support" in result.failure_reasons
+
+
+def test_target_failure_reasons_are_candidate_local(monkeypatch) -> None:
+    from study_planner.integration.planner import _Controller
+
+    adapter = _adapter()
+    first = _candidate(adapter, "first", count=0, target=90)
+    second = _candidate(adapter, "second", count=1)
+    second = replace(
+        second,
+        support_policy=SupportPolicy(
+            "test-support-policy",
+            "1",
+            "test-reference",
+            OutOfSupportAction.REJECT,
+        ),
+    )
+    original_evaluate_final = SessionNNAdapter.evaluate_final
+    reject_second = False
+
+    def out_of_support_final(self, *args, **kwargs):
+        prediction = original_evaluate_final(self, *args, **kwargs)
+        if self is adapter and reject_second:
+            prediction = replace(
+                prediction,
+                mapping=replace(
+                    prediction.mapping,
+                    marginal_status=MarginalSupportStatus.OUT_OF_RANGE,
+                ),
+            )
+        return prediction
+
+    monkeypatch.setattr(SessionNNAdapter, "evaluate_final", out_of_support_final)
+    controller = _Controller(
+        _AllocationSpace("first", {}),
+        lambda _state: first,
+        adapter,
+        CspAlgorithm.BT,
+        None,
+        None,
+    )
+    controller._evaluate(first)
+    assert controller.target_failures > 0
+    assert controller.failure_reasons.count(
+        "all_verified_schedules_missed_nn_target"
+    ) == 1
+
+    controller.failure_reasons.clear()
+    reject_second = True
+    controller._evaluate(second)
+    assert controller.target_failures > 0
+    assert "final_schedule_out_of_support" in controller.failure_reasons
+    assert "all_verified_schedules_missed_nn_target" not in controller.failure_reasons
+
+
+def test_support_rejection_suppresses_all_schedules_missed_target_reason(
+    monkeypatch,
+) -> None:
+    adapter = _adapter()
+    candidate = _candidate(adapter, "mixed-support-and-target-failures", target=90)
+    candidate = replace(
+        candidate,
+        support_policy=SupportPolicy(
+            "test-support-policy",
+            "1",
+            "test-reference",
+            OutOfSupportAction.REJECT,
+        ),
+    )
+    original_evaluate_final = SessionNNAdapter.evaluate_final
+    final_evaluations = 0
+
+    def reject_first_schedule(self, *args, **kwargs):
+        nonlocal final_evaluations
+        prediction = original_evaluate_final(self, *args, **kwargs)
+        final_evaluations += 1
+        if self is adapter and final_evaluations <= 3:
+            prediction = replace(
+                prediction,
+                mapping=replace(
+                    prediction.mapping,
+                    marginal_status=MarginalSupportStatus.OUT_OF_RANGE,
+                ),
+            )
+        return prediction
+
+    monkeypatch.setattr(SessionNNAdapter, "evaluate_final", reject_first_schedule)
+    result = integrated_uniform_cost_search(
+        _AllocationSpace("mixed-support-and-target-failures", {}),
+        lambda _state: candidate,
+        adapter,
+    )
+
+    assert result.search_complete
+    assert result.search_statistics.verification_feasible_schedules == 2
+    assert result.search_statistics.final_support_rejections == 1
+    assert result.search_statistics.target_failures == 1
+    assert result.search_statistics.final_scored_supported_schedules == 1
+    assert "final_schedule_out_of_support" in result.failure_reasons
+    assert "final_target_failed" in result.failure_reasons
+    assert "all_verified_schedules_missed_nn_target" not in result.failure_reasons
 
 
 def test_greedy_integration_and_candidate_limit() -> None:

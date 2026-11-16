@@ -13,13 +13,18 @@ from study_planner.csp.core import (
     AssignmentPlan,
     CspProblem,
     SessionOrderingPolicy,
+    SessionPair,
+    SessionVariable,
     VariableDomain,
+    WeeklySlot,
     WholePlanManifest,
 )
 from study_planner.csp.verification import WholePlanVerificationPolicy
 from study_planner.integration.application_inputs import (
     ApplicationInputError,
+    ApplicationSlot,
     ValidatedApplicationInputs,
+    WeeklySlotCatalog,
 )
 from study_planner.integration.planner import WholePlanPlanningCandidate
 from study_planner.search.nn_adapter import (
@@ -27,6 +32,56 @@ from study_planner.search.nn_adapter import (
 )
 
 Allocation = tuple[int, int, int, int]
+
+
+@dataclass(frozen=True, slots=True)
+class CatalogChronologicalOrderingPolicy:
+    """Order same-assignment sessions by their synthetic catalog chronology."""
+
+    catalog: WeeklySlotCatalog
+
+    @property
+    def policy_identity(self) -> str:
+        return (
+            f"catalog-chronological-v1:{self.catalog.configuration_identity}"
+        )
+
+    def required_pairs(
+        self, sessions: tuple[SessionVariable, ...]
+    ) -> tuple[SessionPair, ...]:
+        by_assignment: dict[str, list[SessionVariable]] = {}
+        for session in sessions:
+            by_assignment.setdefault(session.assignment_id, []).append(session)
+        return tuple(
+            SessionPair(earlier, later)
+            for assignment_sessions in by_assignment.values()
+            for earlier, later in zip(
+                sorted(assignment_sessions),
+                sorted(assignment_sessions)[1:],
+                strict=False,
+            )
+        )
+
+    def is_ordered(self, earlier: WeeklySlot, later: WeeklySlot) -> bool:
+        by_id = {slot.slot.slot_id: slot for slot in self.catalog.slots}
+        if earlier.slot_id not in by_id or later.slot_id not in by_id:
+            raise ApplicationInputError(
+                "ordering references a slot outside the catalog"
+            )
+        return self._chronology_key(by_id[earlier.slot_id]) < self._chronology_key(
+            by_id[later.slot_id]
+        )
+
+    def _chronology_key(self, slot: ApplicationSlot) -> tuple[int, int, int]:
+        return (
+            slot.slot.week_index,
+            (
+                slot.time_window.weekday_iso
+                - self.catalog.course_start_weekday_iso
+            )
+            % 7,
+            slot.time_window.start_minute_local,
+        )
 
 
 @dataclass(frozen=True, slots=True, order=True)
@@ -92,6 +147,7 @@ class ApplicationAllocationSpace:
                     {
                         slot_windows[slot_id][assignment_id]
                         for slot_id in rule.eligible_slot_ids
+                        if assignment_id in slot_windows[slot_id]
                     }
                 )
             )
@@ -304,6 +360,7 @@ class ApplicationPlanningBinding:
 
 __all__ = [
     "AddStudySession",
+    "CatalogChronologicalOrderingPolicy",
     "ApplicationAllocationSpace",
     "ApplicationAllocationState",
     "ApplicationPlanningBinding",

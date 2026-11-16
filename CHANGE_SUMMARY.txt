@@ -1,0 +1,14 @@
+ README.md                                          |  36 +-
+ docs/search_integration_contract.md                |  31 +-
+ pyproject.toml                                     |   2 +-
+ run_demo.py                                        | 307 +++++++++---
+ src/study_planner/integration/__init__.py          |   8 +
+ .../integration/application_inputs.py              | 240 ++++++++-
+ .../integration/application_planning.py            |  57 +++
+ src/study_planner/integration/planner.py           | 205 +++++++-
+ src/study_planner/search/nn_adapter.py             |  39 +-
+ tests/test_application_inputs.py                   | 547 +++++++++++++++++++--
+ tests/test_nn_adapter.py                           |  31 ++
+ tests/test_run_demo.py                             | 114 ++++-
+ tests/test_search_csp_integration.py               | 351 ++++++++++++-
+ 13 files changed, 1797 insertions(+), 171 deletions(-)

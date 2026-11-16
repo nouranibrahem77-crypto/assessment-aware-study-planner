@@ -365,10 +365,33 @@ all required schedule-specific predictions are valid, and the support policy
 has defined which candidates count. Report best achievable predicted marks
 from final predictions for feasible schedules, with the corresponding
 allocation/schedule and whether it was in support. Keep provisional-only
-scores out of this statistic. If candidates were unscorable, out of support
-under a reject policy, or truncated by a resource limit, report an incomplete
-or indeterminate result rather than a proven no-solution result. CSP rejection
-counts and prediction target failures must remain separate in summaries.
+scores out of this statistic. If candidates were truncated by a resource limit,
+report `incomplete` rather than a proven no-solution result. If whole-plan
+verification found feasible schedules but SupportPolicy rejected all of them,
+report `no_supported_plan`; this does not imply CSP infeasibility.
+`no_feasible_schedule` is reserved for exhaustive results with no whole-plan
+verification-feasible schedule and no support rejection that prevented a
+supported plan from being evaluated. This is search-wide: if one candidate is
+rejected by provisional support and another exhausts CSP without a feasible
+schedule, the result is `no_supported_plan`, because the rejected candidate's
+supported-plan feasibility was never evaluated. CSP enumeration,
+verification-feasible schedules, verification rejections, support rejections,
+and final-scored supported schedules are reported separately. Prediction
+target failures remain separate from all of these counts.
+
+The planner compares verified feasible schedules by maximizing the sum of
+their final predicted assignment marks; ties maximize the mark tuple in
+canonical assignment order, then minimize total sessions, then choose the
+lexicographically smallest whole-plan and schedule identities. `target_achieved`
+means the returned verified schedule meets all assignment targets;
+`target_unreachable` requires exhaustive search and carries the best schedule
+under that comparison; `no_feasible_schedule` means no whole-plan
+verification-feasible schedule was found and carries no predictions or
+timetable; `no_supported_plan` means support policy rejected candidate
+evaluation before any supported final score was retained; `incomplete` reports
+any best verified schedule found so far without claiming global optimality;
+`error` represents an operational failure. A successful early stop is not an
+exhaustive optimality claim.
 
 ## Testable acceptance criteria
 
