@@ -14,6 +14,7 @@ from typing import TYPE_CHECKING
 import pandas as pd
 
 from study_planner.csp.core import SessionOrderingPolicy, WeeklySlot
+from study_planner.eval.baseline import SimpleAverageMarkPredictor
 from study_planner.integration.planner import AssignmentTarget
 from study_planner.nn.dataset import (
     SPLIT_PRESENTATIONS,
@@ -23,12 +24,12 @@ from study_planner.nn.dataset import (
 from study_planner.nn.inference import (
     PreviousMarksRegressionPredictor,
     RegressionPredictor,
-    verify_trusted_artifact_integrity,
 )
 from study_planner.search.nn_adapter import (
     CandidateFeatureContext,
     NNModelMode,
     SessionNNAdapter,
+    verify_predictor_integrity,
 )
 from study_planner.search.session_mapping import (
     JointSupportStatus,
@@ -46,6 +47,10 @@ if TYPE_CHECKING:
 
 class ApplicationInputError(ValueError):
     """Raised when application configuration or source rows are inconsistent."""
+
+
+# Feature CSVs serialize weeks-since-start to 11 decimal places.
+_FEATURE_ROUNDING_TOLERANCE = 1e-10
 
 
 class OutOfSupportAction(str, Enum):
@@ -431,7 +436,7 @@ class SupportPolicy:
 
 @dataclass(frozen=True, slots=True)
 class ModelArtifactIdentity:
-    """Identity copied from a loader-verified model adapter, never user-labelled."""
+    """Identity copied from a verified model adapter, never user-labelled."""
 
     mode: NNModelMode
     artifact_digest: str
@@ -440,7 +445,7 @@ class ModelArtifactIdentity:
 
     def __post_init__(self) -> None:
         if not isinstance(self.mode, NNModelMode):
-            raise ApplicationInputError("model mode must be Model A or Model B")
+            raise ApplicationInputError("prediction model mode is invalid")
         for name, value in (
             ("artifact digest", self.artifact_digest),
             ("model provenance identity", self.provenance_identity),
@@ -618,6 +623,22 @@ def load_session_nn_adapter(
         ) from error
 
 
+def load_simple_average_adapter(
+    processed_directory: Path,
+    click_mapping: SessionClickMappingConfig,
+) -> SessionNNAdapter:
+    """Fit the planner baseline from training-only strict FFF targets."""
+    try:
+        predictor = SimpleAverageMarkPredictor.fit_from_processed_directory(
+            processed_directory
+        )
+        return predictor.create_session_adapter(click_mapping)
+    except (OSError, TypeError, ValueError) as error:
+        raise ApplicationInputError(
+            f"could not fit the simple-average baseline: {error}"
+        ) from error
+
+
 def build_application_inputs(
     config: ApplicationInputConfig,
     *,
@@ -642,7 +663,7 @@ def build_application_inputs(
     if not isinstance(adapter, SessionNNAdapter):
         raise ApplicationInputError("a loader-verified SessionNNAdapter is required")
     try:
-        verify_trusted_artifact_integrity(adapter.predictor)
+        verify_predictor_integrity(adapter.predictor, adapter.fitted_artifact_digest)
     except (TypeError, ValueError, RuntimeError) as error:
         raise ApplicationInputError(
             f"fitted model integrity check failed: {error}"
@@ -715,7 +736,10 @@ def build_application_inputs(
                 "configured day"
             )
         if not math.isclose(
-            weeks, rule.weeks_since_course_start, rel_tol=0.0, abs_tol=1e-12
+            weeks,
+            rule.weeks_since_course_start,
+            rel_tol=0.0,
+            abs_tol=_FEATURE_ROUNDING_TOLERANCE,
         ):
             raise ApplicationInputError(
                 f"assessment {rule.assessment_id} weeks-since-start must equal "
@@ -748,7 +772,10 @@ def load_application_inputs(
     adapter: SessionNNAdapter,
 ) -> ValidatedApplicationInputs:
     """Load validated later-presentation rows using the matching Model A/B schema."""
-    if adapter.model_mode is NNModelMode.MODEL_A_STRICT:
+    if adapter.model_mode in {
+        NNModelMode.MODEL_A_STRICT,
+        NNModelMode.SIMPLE_AVERAGE_BASELINE,
+    }:
         data = load_strict_feature_data(processed_directory)
     elif adapter.model_mode is NNModelMode.MODEL_B_PREVIOUS_MARKS:
         data = load_previous_marks_feature_data(processed_directory)
@@ -845,7 +872,7 @@ def build_application_planning_problem(
             "an explicit same-assignment ordering policy is required"
         )
     try:
-        verify_trusted_artifact_integrity(adapter.predictor)
+        verify_predictor_integrity(adapter.predictor, adapter.fitted_artifact_digest)
     except (TypeError, ValueError, RuntimeError) as error:
         raise ApplicationInputError(f"model integrity check failed: {error}") from error
     if not inputs.model_identity.matches(adapter):
@@ -885,7 +912,10 @@ def build_application_planning_problem(
                 "validated feature context deadline differs from configuration"
             )
         if not math.isclose(
-            weeks, rule.weeks_since_course_start, rel_tol=0.0, abs_tol=1e-12
+            weeks,
+            rule.weeks_since_course_start,
+            rel_tol=0.0,
+            abs_tol=_FEATURE_ROUNDING_TOLERANCE,
         ):
             raise ApplicationInputError(
                 "validated feature context week conversion differs from configuration"
