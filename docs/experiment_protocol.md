@@ -135,6 +135,33 @@ Predictor when each is used to evaluate the same planner scenarios?
   `reports/experiment_results/prediction_summary.csv`, and
   `reports/experiment_results/prediction_comparison.png`.
 
+## Monotonicity diagnostic
+
+This diagnostic checks whether increasing one assessment's planned study
+sessions by one ever lowers its predicted mark, with all other allocation
+windows held fixed. It evaluates four-window allocations whose total does not
+exceed the configured session cap. Each observation is matched to its student,
+assessment, unchanged base allocation, click-mapping scenario, and run seed.
+
+- **Predictors:** Model A Strict NN or the training-partition Simple
+  Average-Mark Predictor.
+- **Support rule:** Include a pair only when both predictions pass marginal
+  feature-support checks. Record unsupported and failed predictions in the
+  run-level counts; exclude them from the violation denominator. Current data
+  has no joint-support estimate, so this diagnostic uses marginal support
+  only.
+- **Metrics:** supported adjacent comparisons, monotonicity violations,
+  violation rate per profile and seed, unsupported predictions, and errors.
+  Summary files include per-seed and pooled counts, mean profile violation
+  rate, and sample standard deviation.
+- **Outputs:** `monotonicity_runs.csv`, `monotonicity_runs.json`,
+  `monotonicity_summary.csv`, and `monotonicity_report.md` under
+  `reports/experiment_results/`.
+- **Interpretation:** This is a model-behavior diagnostic under synthetic
+  session-to-click perturbations. It does not establish a causal effect of
+  study time on marks. The five seeds repeat a deterministic diagnostic and
+  are retained for protocol consistency.
+
 ## Run status, failures, and incomplete results
 
 - Emit one run record for every requested experiment/scenario/method/profile
@@ -179,9 +206,7 @@ files and must not contain manually transcribed metrics.
 
 ## Reproduction commands
 
-The runner command names and argument syntax will be added here when the
-experiment runner is implemented. The profile manifest can currently be
-generated with:
+The profile manifest can currently be generated with:
 
 ```powershell
 python scripts/make_profiles.py `
@@ -197,6 +222,20 @@ python scripts/make_profiles.py `
 Replace the assessment placeholders only after that assessment set is
 approved. The profile-selection command requires the feature data to have
 already been generated.
+
+After the approved profile manifest and the Model A Strict artifact are
+available, run the monotonicity diagnostic with:
+
+```powershell
+python scripts/run_monotonicity.py `
+  --predictor nn `
+  --artifact-directory data/processed/nn_experiment `
+  --max-sessions 2
+```
+
+Use `--predictor average` to run the training-mean baseline instead. The
+default input paths use the strict FFF test features and the shared profile
+manifest; the runner verifies that the manifest hash matches the feature CSV.
 
 ## Pending decisions before production runs
 
