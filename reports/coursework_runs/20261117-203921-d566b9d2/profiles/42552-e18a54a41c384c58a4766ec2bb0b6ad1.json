@@ -1,0 +1,74 @@
+{
+  "allocations": {
+    "34899": {
+      "total_sessions": 0,
+      "weekly_sessions": [
+        0,
+        0,
+        0,
+        0
+      ]
+    },
+    "34900": {
+      "total_sessions": 0,
+      "weekly_sessions": [
+        0,
+        0,
+        0,
+        0
+      ]
+    },
+    "34901": {
+      "total_sessions": 0,
+      "weekly_sessions": [
+        0,
+        0,
+        0,
+        0
+      ]
+    }
+  },
+  "execution_metrics": {
+    "csp_feasible_schedules": 1,
+    "csp_schedules_examined": 1,
+    "csp_solver_seconds": 0,
+    "csp_verification_rejections": 0,
+    "final_predictions": 3,
+    "orchestration_seconds": 0.4027095689998532,
+    "profile_wall_seconds": 0.6214931930007879,
+    "provisional_predictions": 3,
+    "search_nodes_expanded": 0,
+    "search_nodes_generated": 0,
+    "search_seconds": 0.4026917500013951
+  },
+  "failure_reasons": [],
+  "planner_outcome": "target_achieved",
+  "planner_status": "feasible",
+  "predicted_marks": {
+    "34899": {
+      "predicted_mark": 81.26165008544922,
+      "target_mark": 55.0,
+      "target_met": true
+    },
+    "34900": {
+      "predicted_mark": 83.16439819335938,
+      "target_mark": 55.0,
+      "target_met": true
+    },
+    "34901": {
+      "predicted_mark": 80.52963256835938,
+      "target_mark": 55.0,
+      "target_met": true
+    }
+  },
+  "schedule_verified": true,
+  "search_complete": false,
+  "student_id": "42552",
+  "target_status": "met",
+  "timetable": {
+    "34899": [],
+    "34900": [],
+    "34901": []
+  },
+  "verification_status": "feasible"
+}

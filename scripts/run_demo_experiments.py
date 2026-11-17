@@ -134,6 +134,36 @@ class _DemoSearchProblem:
         return 5.0 if action == "tempting" else 1.0
 
 
+def _search_scenarios() -> tuple[SearchScenario, ...]:
+    """Return the shared synthetic Search cases and consistent A* heuristic."""
+    greedy_values = {
+        "start": 0.0,
+        "cheap-1": 4.0,
+        "cheap-2": 5.0,
+        "tempting": 1.0,
+        "goal": 0.0,
+    }
+    # Exact remaining path costs for this finite graph; therefore h(u) <=
+    # cost(u, v) + h(v) for every edge and h(goal) = 0.
+    astar_values = {
+        "start": 3.0,
+        "cheap-1": 2.0,
+        "cheap-2": 1.0,
+        "tempting": 1.0,
+        "goal": 0.0,
+    }
+    return tuple(
+        SearchScenario(
+            f"capacity-{capacity}",
+            _DemoSearchProblem(),
+            greedy_values.__getitem__,
+            {"configuration_status": "SYNTHETIC_DEMO_ONLY", "capacity": capacity},
+            astar_values.__getitem__,
+        )
+        for capacity in (2, 3, 4)
+    )
+
+
 class _DemoOrdering:
     """Synthetic policy ordering sessions by ascending week index."""
 
@@ -155,16 +185,9 @@ class _DemoOrdering:
         return earlier.week_index < later.week_index
 
 
-def _demo_slots(*, shared_week: bool) -> tuple[WeeklySlot, ...]:
-    return tuple(
-        WeeklySlot(f"demo-slot-{index + 1}", 0 if shared_week else index)
-        for index in range(3)
-    )
-
-
 def _csp_scenarios() -> tuple[CspScenario, ...]:
     scenarios = []
-    for capacity in (2, 3, 4):
+    for slots_per_week in (2, 3, 4):
         assignments = tuple(
             AssignmentPlan(
                 identity,
@@ -172,13 +195,13 @@ def _csp_scenarios() -> tuple[CspScenario, ...]:
                     "demo-student",
                     "FFF",
                     identity,
-                    (1, 0, 0, 0),
+                    (2, 0, 0, 0) if index == 0 else (1, 0, 0, 0),
                     f"demo-features-{identity}",
                     "synthetic-demo-mapping-v1",
                 ),
                 f"demo-features-{identity}",
             )
-            for identity in ASSIGNMENTS
+            for index, identity in enumerate(ASSIGNMENTS)
         )
         manifest = WholePlanManifest(
             "demo-student",
@@ -187,7 +210,11 @@ def _csp_scenarios() -> tuple[CspScenario, ...]:
             "synthetic-demo-mapping-v1",
         )
         variables = expected_session_variables(manifest)
-        slots = _demo_slots(shared_week=True)
+        slots = tuple(
+            WeeklySlot(f"demo-week-{week}-slot-{index + 1}", week)
+            for week in (0, 1)
+            for index in range(slots_per_week)
+        )
         domains = tuple(VariableDomain(variable, slots) for variable in variables)
         eligible = tuple((variable, frozenset(slots)) for variable in variables)
         ordering = _DemoOrdering()
@@ -196,29 +223,65 @@ def _csp_scenarios() -> tuple[CspScenario, ...]:
             variables=variables,
             eligible_slots=eligible,
             ordering_policy=ordering,
-            weekly_capacity=capacity,
+            weekly_capacity=slots_per_week,
         )
         problem = CspProblem(
-            manifest, variables, domains, constraints, capacity, ordering
+            manifest, variables, domains, constraints, slots_per_week, ordering
         )
         policy = WholePlanVerificationPolicy(
             "synthetic-demo-v1",
             "synthetic-demo-deadline-v1",
             problem.ordering_policy.configuration_identity,
-            "synthetic-demo-three-slots-v1",
-            f"synthetic-demo-capacity-{capacity}",
+            f"synthetic-demo-{slots_per_week}-slots-per-week-v1",
+            f"synthetic-demo-{slots_per_week}-slots-per-week",
             "synthetic-demo-slot-id-v1",
-            capacity,
+            slots_per_week,
         )
         scenarios.append(
             CspScenario(
-                f"weekly-capacity-{capacity}",
+                f"slots-per-week-{slots_per_week}",
                 problem,
                 policy,
-                {"configuration_status": "SYNTHETIC_DEMO_ONLY", "capacity": capacity},
+                {
+                    "configuration_status": "SYNTHETIC_DEMO_ONLY",
+                    "physical_slots_per_week": slots_per_week,
+                    "weekly_capacity_from_physical_slots": slots_per_week,
+                },
             )
         )
     return tuple(scenarios)
+
+
+def _replace_csp_status_rows(
+    report_path: Path, records: tuple[ExperimentRunRecord, ...]
+) -> None:
+    """Refresh only the CSP status rows in the combined synthetic report."""
+    if not report_path.is_file():
+        return
+    methods = sorted({record.method for record in records})
+    if methods != ["bt", "bt_fc", "bt_fc_ac3"]:
+        raise ValueError("CSP report update requires all three methods")
+    status_order = ("feasible", "infeasible", "incomplete", "error")
+    replacement = []
+    for method in methods:
+        counts = Counter(
+            record.status.value for record in records if record.method == method
+        )
+        replacement.append(
+            f"| csp | {method} | {sum(counts.values())} | "
+            + " | ".join(str(counts[status]) for status in status_order)
+            + " |"
+        )
+    lines = report_path.read_text(encoding="utf-8").splitlines()
+    csp_indexes = [
+        index for index, line in enumerate(lines) if line.startswith("| csp | ")
+    ]
+    if not csp_indexes:
+        raise ValueError("combined report has no CSP status rows to update")
+    first_csp = csp_indexes[0]
+    filtered = [line for line in lines if not line.startswith("| csp | ")]
+    filtered[first_csp:first_csp] = replacement
+    report_path.write_text("\n".join(filtered) + "\n", encoding="utf-8")
 
 
 def _synthetic_config(adapter: SessionNNAdapter) -> ApplicationInputConfig:
@@ -262,17 +325,12 @@ def _prediction_scenarios(
 ) -> tuple[PredictionScenario, ...]:
     scenarios = []
     for student_id in student_ids:
-        cached_results = {}
-
         def run(
             method: str,
             _seed: int,
             *,
             identity: str = student_id,
-            cache: dict[str, FinalPlannerResult] = cached_results,
         ) -> FinalPlannerResult:
-            if method in cache:
-                return cache[method]
             adapter = adapters[method]
             config = _synthetic_config(adapter)
             validated = build_application_inputs(
@@ -295,7 +353,6 @@ def _prediction_scenarios(
                 adapter,
                 csp_algorithm=CspAlgorithm.BT_FC_AC3,
             )
-            cache[method] = result
             planner_results[(identity, method)] = result
             return result
 
@@ -305,8 +362,8 @@ def _prediction_scenarios(
                 student_id,
                 {
                     "configuration_status": "SYNTHETIC_DEMO_ONLY",
-                    "deterministic_seed_reuse": True,
-                    "elapsed_time_reused_from_first_seed": True,
+                    "independent_execution_per_seed": True,
+                    "deterministic_algorithmic_inputs": True,
                 },
                 run,
             )
@@ -522,13 +579,16 @@ def _write_demo_config(path: Path, profile_manifest: Path) -> None:
             "scenario": "low",
             "activity_group": "content_navigation",
             "clicks_per_session": 22,
-            "window_rule": "computed from each synthetic slot's week, weekday, and assignment deadline",
+            "window_rule": (
+                "computed from each synthetic slot's week, weekday, "
+                "and assignment deadline"
+            ),
         },
         "seed_policy": list(DEFAULT_EXPERIMENT_SEEDS),
         "prediction_seed_execution": (
-            "The demo planner is deterministic; cache one evaluation per profile "
-            "and predictor, then record that outcome for each protocol seed. "
-            "Elapsed time is the first-seed elapsed time repeated in those rows."
+            "Execute the integrated planner independently for each profile, "
+            "predictor, and protocol seed. The algorithms are deterministic, "
+            "so outcomes may match; elapsed time is measured for every execution."
         ),
         "limitations": [
             "Synthetic planning policy values are for pipeline demonstration only.",
@@ -563,8 +623,29 @@ def main(argv: list[str] | None = None) -> int:
         default=root / "reports/experiment_results/demo",
     )
     parser.add_argument("--train-demo-nn", action="store_true")
+    parser.add_argument(
+        "--csp-only",
+        action="store_true",
+        help="run Experiment 2 only, preserving Search and prediction outputs",
+    )
     parser.add_argument("--max-epochs", type=int, default=20)
     args = parser.parse_args(argv)
+
+    if args.csp_only:
+        if args.train_demo_nn:
+            parser.error("--csp-only cannot be combined with --train-demo-nn")
+        args.output_directory.mkdir(parents=True, exist_ok=True)
+        csp_records = run_csp_comparison(_csp_scenarios())
+        paths = write_experiment_bundle(
+            csp_records, args.output_directory, "csp", "nodes_visited"
+        )
+        _replace_csp_status_rows(
+            args.output_directory / "experiment_report.md", csp_records
+        )
+        print("Experiment 2 outputs:")
+        for path in paths:
+            print(path)
+        return int(any(record.error_type for record in csp_records))
 
     if args.train_demo_nn:
         if args.artifact_directory.exists() and any(args.artifact_directory.iterdir()):
@@ -602,21 +683,7 @@ def main(argv: list[str] | None = None) -> int:
         args.profile_manifest,
     )
 
-    search_scenarios = tuple(
-        SearchScenario(
-            f"capacity-{capacity}",
-            _DemoSearchProblem(),
-            lambda state: {
-                "start": 0.0,
-                "cheap-1": 4.0,
-                "cheap-2": 5.0,
-                "tempting": 1.0,
-                "goal": 0.0,
-            }[state],
-            {"configuration_status": "SYNTHETIC_DEMO_ONLY", "capacity": capacity},
-        )
-        for capacity in (2, 3, 4)
-    )
+    search_scenarios = _search_scenarios()
     output = args.output_directory
     search_records = run_search_comparison(search_scenarios)
     write_experiment_bundle(
@@ -676,9 +743,9 @@ def _write_demo_report(
         "one demo-trained Model A artifact, and the training-only average baseline",
         f"with synthetic target marks of {DEMO_TARGET_MARK:g}, a three-slot demo",
         "catalog, low content-navigation click mapping, and report-only support.",
-        "Prediction behavior is deterministic: each profile/predictor is evaluated",
-        "once and its outcome is retained under each protocol seed. Elapsed time is",
-        "the first evaluation time repeated in the seed rows.",
+        "Prediction behavior is deterministic: each profile/predictor/seed is",
+        "executed independently. Identical outcomes across seeds are expected;",
+        "elapsed time is measured separately for each execution.",
         "",
         "## Run status counts",
         "",

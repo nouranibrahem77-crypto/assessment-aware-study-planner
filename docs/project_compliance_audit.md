@@ -1,197 +1,119 @@
-# Project compliance and completion audit
+# Project Compliance Audit
 
-Audit date: 2026-11-15  
-Scope: repository state, the official P1 requirements supplied in the project
-request, available project documents, locally present data and artifacts,
-implementation contracts, tests, and Git history. The application-input phase
-is implemented in the working tree and its focused tests have been run; final
-verification results are recorded below.
+Audit date: 2026-11-17
+Scope: current repository files, local data and generated outputs, tests, and
+Git history. The named professor PDF was not found in the repository or the
+available `/home/nouran` project files during this audit. The checklist below
+uses the exact requirements supplied for this audit; PDF-only wording remains
+unverified. All statuses concern evidence in the repository, not approval of
+synthetic configuration as production policy.
 
-## Audit limitation and headline
+## Status key
 
-The official `IS Projects.pdf` is not present in the repository or tracked Git
-history. This update treats the official P1 requirements explicitly supplied
-by the project owner as authoritative for this audit. The PDF is still needed
-to confirm that this list is complete and resolve conditional wording such as
-whether A* is mandatory.
+- **COMPLETE** — the required implementation or deliverable is present and
+  directly evidenced.
+- **PARTIALLY COMPLETE** — implementation or evidence exists, but a material
+  part of the stated requirement remains incomplete or limited to synthetic
+  scenarios.
+- **MISSING** — no adequate deliverable was found.
+- **NOT VERIFIED** — evidence is insufficient to establish the requirement.
 
-The repository has a broad, tested algorithmic foundation, local OULAD data,
-three-seed neural-network reports, a tested Search–NN–CSP integration API,
-and a typed validated application-input layer. It still lacks approved
-production values for targets, calendar slots, and deadline eligibility, the
-candidate/allocation-space wiring from those inputs, an executable end-to-end
-demo, the requested P1 planner experiments, and final presentation/report
-deliverables. `README.md` still says Search and integration are future work,
-which no longer matches the implementation.
+## Requirements audit
 
-Status meanings:
-
-1. **IMPLEMENTED AND VERIFIED** — implementation and relevant test or measured
-   output evidence are present.
-2. **IMPLEMENTED BUT NOT VERIFIED** — implementation exists, but the relevant
-   real-input or required experiment evidence does not.
-3. **PARTIALLY IMPLEMENTED** — only some of the requirement or an abstract
-   contract exists.
-4. **NOT IMPLEMENTED** — no adequate implementation or deliverable was found.
-
-## Requirement-by-requirement audit
-
-### A. Application inputs
-
-| Requirement | Status | Existing evidence | Missing work and smallest next action |
+| Requirement | Status | Evidence and current finding | Remaining work |
 | --- | --- | --- | --- |
-| Previous marks and recent clicks | **PARTIALLY IMPLEMENTED** | `STRICT_FFF_FEATURE_NAMES` contains the three activity groups over four assessment-relative windows; Model B adds prior-assessment score/availability lags. `build_application_inputs` validates the selected artifact's feature schema and `load_application_inputs` uses the corresponding validated strict/proxy data loader. | Model A Strict intentionally has no previous-mark features, while Model B is a submission-based proxy. Select the intended P1 mode explicitly and verify real later-presentation profiles have the required historical inputs; do not merge the schemas. |
-| Target rules | **IMPLEMENTED BUT NOT VERIFIED** | `src/study_planner/integration/application_inputs.py` requires a versioned `TargetRule`, exactly three explicit marks, and matches them to assignment identities. `tests/test_application_inputs.py` exercises mismatches. | Actual approved target values/rule source are not supplied, and no real target provider is wired to the planner. Obtain/version approved values and connect them to candidate construction. |
-| Assessment deadlines and week conversion | **PARTIALLY IMPLEMENTED** | The input layer binds assessment IDs to supplied deadline days, checks source-row equality and `deadline_day / 7`, and the candidate factory uses each rule's eligible slot IDs as per-session CSP domains. | Approved deadline source, deadline-to-eligible-slot derivation/boundary, and real values remain user-supplied. Provide the approved eligibility list/policy; the implementation does not derive it from local clock fields or click windows. |
-| Authoritative slot catalog and time windows | **PARTIALLY IMPLEMENTED** | `WeeklySlotCatalog` validates versioned slot identities, weekly capacity, timezone-qualified local weekday/time windows, and per-assignment click-window maps. The factory uses configured slots and capacity in CSP and passes distinct assignment mappings to final evaluation. | Production catalog and source are not supplied; all current catalog values are test configuration. Supply/version the authoritative catalog before production use. |
-| Allocation bounds | **IMPLEMENTED BUT NOT VERIFIED** | `AllocationBounds` values now control Search candidate eligibility and upper-bound action generation in `application_planning.py`; candidate creation rejects states outside bounds. | Production values remain caller-supplied and have only explicit test coverage. Provide approved per-assignment min/max values. |
-| Support policy | **PARTIALLY IMPLEMENTED** | `SupportPolicy` is applied to provisional and final mapping marginal statuses; joint support remains `UNASSESSED`, consistent with `session_mapping.py`. Tests cover explicit policy and invalid joint claims. | Approved support-reference identity and out-of-support disposition remain user-supplied. Supply the documented reference and select REPORT_ONLY or REJECT for production. |
-| Exact fitted model artifact identity | **IMPLEMENTED AND VERIFIED** | `src/study_planner/nn/inference.py` hashes loaded schema/config/preprocessor/checkpoint bytes and binds integrity to the loaded predictor; `src/study_planner/search/nn_adapter.py` uses it in prediction and planner provenance. `tests/test_nn_adapter.py` covers loader identity and state mutation. | For demo/reproduction, identify the exact local or regenerated artifact directory in application configuration and preserve its digest in run output. Current model files are local ignored artifacts, not tracked deliverables. |
+| Modular source: data, NN, search, CSP, integration, eval, tests | COMPLETE | `src/study_planner/{data,nn,search,csp,integration,eval}/`; `tests/` | None identified for this requirement. |
+| Reproducible OULAD preparation with fixed seed | COMPLETE | `src/study_planner/data/oulad.py`, `src/study_planner/data/feature_engineering/`, `scripts/make_data.py`, `scripts/make_features.py`; fixed chronological partitions and source hashes in generated `data/processed/fff_preprocessing.json`; stable profile selection seed recorded by `src/study_planner/eval/profiles.py` and `reports/experiment_results/profiles_fff_2014J.json`. Raw OULAD files are present locally but ignored by Git. | Include/acquire the official source data and run documented preparation in the submission environment; preserve generated manifest/hashes. |
+| Complete data dictionary covering real and generated features | COMPLETE | `docs/data_dictionary.md` defines all five OULAD input tables, identifiers, generated strict/proxy features, windows, target, split and missingness conventions. | None identified. |
+| Trained NN and baseline comparison | COMPLETE | `reports/nn_training.md`, local strict-model artifacts under `data/processed/nn_experiment*/`, `src/study_planner/eval/baseline.py`; planner-compatible NN versus Simple Average-Mark results in `reports/experiment_results/experiment3_nn_vs_average/`. Training artifacts are local and ignored by Git; experiment 3 uses actual OULAD profile rows with synthetic planning rules. | Package or regenerate the intended NN artifacts for a clean submission checkout and retain the artifact identity. Do not present synthetic planning assumptions as real policy. |
+| UCS and Greedy Best-First, counters, known-answer tests; A* optional | COMPLETE | `src/study_planner/search/ucs.py`, `greedy.py`, shared counters in `core.py`; known-answer coverage in `tests/test_search.py` and `tests/test_search_csp_integration.py`. A* is implemented in `src/study_planner/search/astar.py` and included in Experiment 1, but it is not needed to satisfy the optional extension. | None for stated requirement. |
+| Backtracking, Forward Checking, AC-3 separately switchable with counters | COMPLETE | `src/study_planner/csp/{backtracking,forward_checking,ac3,core}.py`; selection via `CspAlgorithm` in `src/study_planner/integration/schedule_bridge.py`; correctness/counter tests in `tests/test_csp*.py`; comparative counters in `reports/experiment_results/demo/csp_summary.csv`. | None for implementation. Coursework interpretation of experiment settings remains synthetic as noted below. |
+| Integrated `python run_demo.py` | COMPLETE | Root `run_demo.py`; README gives exact scenario commands. `tests/test_run_demo.py` covers normal, edge, impossible, NN-provisional-accept/CSP-infeasible, and verification-rejected cases. The command takes a named scenario, e.g. `python run_demo.py NORMAL`, and uses TEST configuration. | Run the documented command in the final submission environment with the required local OULAD features and model artifact available. |
+| README with pinned requirements and exact run commands | PARTIALLY COMPLETE | `README.md` has pinned dependencies referenced from `pyproject.toml`, data, train, lint/test, demo and experiment commands. Its opening still says Search/integration are future work, contradicting the current code and later demo section. README also explicitly says the integrated planner has no NN-disabled mode. | Correct the stale opening/status text and reconcile the required NN-on/off presentation demonstration with the actual available interface. |
+| At least 5 normal, 3 edge, and 2 impossible tests | PARTIALLY COMPLETE | Broad tests exist across `tests/`; `tests/test_run_demo.py` explicitly verifies normal and edge behavior, exhaustive impossible-target reporting, NN-accepted/CSP-infeasible behavior, and verification rejection. The repository does not identify or demonstrate a count of five normal, three edge, and two impossible cases as separate rubric categories. | Map existing tests to the required categories and add only enough missing cases to reach each minimum; document the mapping. |
+| Experiment 1: UCS vs Greedy vs A*; ≥5 runs/seeds, mean/SD, table and plot | COMPLETE | `scripts/run_experiment1.py`; `reports/experiment_results/experiment1_astar/search_runs.{csv,json}`, `search_summary.csv`, and SVG comparison plots. Run records use seeds 42, 123, 2025, 31415, 271828 and include all three methods. This is a small synthetic graph comparison, not a production planner benchmark. | Preserve the synthetic-scenario label in the report and use the resulting table/plots as algorithm evidence only. |
+| Experiment 2: BT vs BT+FC vs BT+FC+AC-3 at 2, 3, 4 slots per week; ≥5 runs/seeds, mean/SD, table and plot | COMPLETE | Isolated command: `python scripts/run_demo_experiments.py --csp-only`. Raw records: `reports/experiment_results/demo/csp_runs.csv` and `reports/experiment_results/demo/csp_runs.json` contain 45 records (3 methods × 3 scenarios × 5 seeds): `bt`, `bt_fc`, `bt_fc_ac3`; `slots-per-week-2`, `slots-per-week-3`, `slots-per-week-4`; seeds 42, 123, 2025, 31415, 271828; all 45 outcomes are feasible. Each raw configuration records `physical_slots_per_week` as 2/3/4 and `weekly_capacity_from_physical_slots` equal to that count. Summary table: `reports/experiment_results/demo/csp_summary.csv`; the JSON summary contains 108 metric rows with means and standard deviations. Plot: `reports/experiment_results/demo/csp_comparison.svg`. Combined status rows: `reports/experiment_results/demo/experiment_report.md`. These are explicitly synthetic results, not real-world timetable evidence. Visited nodes are equal for BT+FC and BT+FC+AC-3 in all three scenarios (23/23, 157/157, 597/597); no claim is made that AC-3 reduced visited nodes beyond FC. | None for the stated experiment comparison. Retain the synthetic-setting label and measured AC-3 node-count result in submitted materials. |
+| Experiment 3: NN vs Simple Average-Mark inside planner; ≥5 runs/seeds, mean/SD, table and plot | COMPLETE | `scripts/run_experiment3.py`; `reports/experiment_results/experiment3_nn_vs_average/experiment3_report.md`, config, per-run CSV/JSON, summary/method-summary tables and SVG plots. It records 30 OULAD profiles × 2 predictors × 5 seeds (300 rows), with means and standard deviations. The report states the seeds invoke deterministic matched runs and all target/slot/click rules are synthetic. This experiment output is distinct from the separate coursework 30-profile execution. | Preserve the synthetic planning-settings label; do not cite it as proof that the coursework 30-profile run is complete. |
+| Final report, maximum 12 pages | MISSING | No final report PDF was found in the repository or searched project files. Technical Markdown reports are not a page-verified final report. | Produce the required concise report using the professor's required sections and verified experiment outputs; render and verify no more than 12 pages. |
+| 10-minute presentation and 5-minute live demo: Search trace, CSP pruning with/without FC/AC-3, NN on/off | PARTIALLY COMPLETE | No presentation deck was found. Demo output/test in `tests/test_run_demo.py` prints the actual solution path, not an expansion-by-expansion Search trace. CSP comparison counters/plots exist in the demo experiment outputs. `README.md` states the integrated planner requires an NN adapter and has no NN-disabled mode. | Prepare the 10-minute presentation and 5-minute live demo. Provide the required Search trace and show CSP work with each configuration. Resolve or demonstrate a rubric-compliant NN-off comparison; current integrated demo cannot run with NN disabled. |
+| Individual contribution statement (≤200 words per person) and Git log | PARTIALLY COMPLETE | Git history is available (`git log`); no individual contribution statements were found. The current worktree also includes changes not represented by committed history, so the existing log may not capture the full final contribution record. | Obtain one ≤200-word statement per contributor and include it in the submission. Export/verify the final Git log after the required implementation changes are recorded. |
+| P1: OULAD dataset | COMPLETE | `data/raw/{courses,assessments,studentAssessment,studentVle,vle}.csv` are locally present; acquisition and validation are implemented in `src/study_planner/data/oulad.py`. Data are ignored by Git. | Ensure the submission can reproduce acquisition/preparation or otherwise provide the required dataset access. |
+| P1: three upcoming assignments | PARTIALLY COMPLETE | Integration contracts enforce three assignment contexts (`src/study_planner/integration/application_inputs.py`, `application_planning.py`); demos/profile outputs use assessments 34899, 34900, 34901 in FFF 2014J. The demo target, deadlines, eligible slots, and calendar are explicitly synthetic/TEST. | Confirm the selected assessments are the required upcoming assignments and supply approved assignment targets and timetable/deadline settings. |
+| P1: NN predicts marks from previous marks and recent clicks | PARTIALLY COMPLETE | Model A Strict uses assessment metadata and clicks but excludes prior marks; Model B Previous-Marks Proxy adds prior-score lags/availability features. `docs/data_dictionary.md` and `reports/feature_engineering_proxy.md` state OULAD has no release timestamp, so visibility is unverified. | State which model fulfills the requirement and retain the availability limitation. Do not describe the proxy as verified student-visible prior marks. |
+| P1: Search proposes allocations | COMPLETE | `src/study_planner/integration/application_planning.py`, `planner.py`, and `run_demo.py`; integration tests cover allocation behavior. | None for implementation. |
+| P1: CSP verifies timetables | COMPLETE | `src/study_planner/integration/planner.py`, `schedule_bridge.py`, `src/study_planner/csp/verification.py`; integration and verification tests cover complete schedules. | Use approved timetable inputs for any result described as production. |
+| P1: Search continues after CSP rejection | COMPLETE | `src/study_planner/integration/planner.py`; continued-search tests in `tests/test_search_csp_integration.py` and `tests/test_run_demo.py`. The injected verification-rejection test is separately labeled and is not confused with CSP infeasibility. | None for implementation. |
+| P1: best achievable marks when target is unreachable | COMPLETE | `run_demo.py IMPOSSIBLE`; assertions in `tests/test_run_demo.py` verify exhaustive search, best verified marks, and shortfall reporting. | Keep the result labeled with its synthetic TEST targets/settings. |
+| P1: outputs for at least 30 student profiles | PARTIALLY COMPLETE | `reports/experiment_results/demo/prediction_plans.csv/.json` and Experiment 3 contain 30 OULAD profiles under synthetic settings. Separately, `reports/coursework_runs/20261117-203921-d566b9d2/run_manifest.json` lists 30 IDs, but only three per-profile result JSON files exist in that run directory; it is not complete coursework execution evidence. | Complete and verify the required coursework run for all 30 profiles with the approved settings; do not state that this has already completed. |
+| P1: monotonicity test and violation reporting | COMPLETE | `scripts/run_monotonicity.py`; `reports/experiment_results/demo/monotonicity/monotonicity_report.md`, runs and summary CSV/JSON. Summary records five seeds, 30 profiles per seed, 9,000 comparisons and 2,400 violations overall. Report metadata records the historical manifest SHA-256 `ac6f645af10d5d6ed4085ec2e1946bda7bfa87b7266144592e28941a70f4373f`; provenance clarification documents equivalent JSON content/current line-ending hash. These are synthetic mapping audits. | Preserve the provenance note and describe the results as model-response diagnostics under simulated inputs. |
+| P1: cause-versus-correlation limitations | COMPLETE | `docs/search_design.md`, `docs/experiment_protocol.md`, `reports/experiment_results/demo/experiment_report.md`, and monotonicity report state that OULAD is observational and synthetic clicks do not establish session effects. | Carry the limitation into the final report and presentation. |
+| P1: demo where NN says enough but CSP rejects schedule | COMPLETE | Root `run_demo.py` scenario `NN_ACCEPTS_CSP_INFEASIBLE`; `tests/test_run_demo.py` asserts provisional NN targets pass and real CSP exhausts with no feasible schedule for both model modes. This is an explicitly TEST-configured demonstration, not production evidence. | Show the named TEST case in the live demo and keep the settings label visible. |
 
-### B. End-to-end planner
+## Data and result interpretation
 
-| Requirement | Status | Existing evidence | Missing work and smallest next action |
-| --- | --- | --- | --- |
-| Real application inputs | **PARTIALLY IMPLEMENTED** | `application_inputs.py` validates later-presentation feature rows and exact Model A/B artifact identity. `application_planning.py` converts validated inputs into a deterministic one-session-per-action Search space and a candidate factory that applies allocation bounds, configured eligible-slot domains, weekly capacity, assignment-specific windows, support disposition, and whole-plan CSP verification. `tests/test_application_inputs.py` exercises the public end-to-end path in explicit TEST configuration for Model A and B, including zero-session assignments. | This is still not a production P1 run. User must provide approved targets/rule version; each assignment and assessment ID; deadline day/policy version/eligible slot IDs; min/max session bounds; versioned slot IDs/week indexes/local time windows/timezone/capacity/assignment-relative click windows; support policy/reference/action; mapping scenario/group/increment; course/train/test split and student feature rows; exact fitted artifact directory; and explicit same-assignment ordering policy. |
-| Three assignment allocations | **IMPLEMENTED BUT NOT VERIFIED** | The planner enforces exactly three contexts/targets and returns three allocations. `tests/test_search_csp_integration.py` exercises three-assignment synthetic candidates, including zero-session entries. | Run the planner from real application inputs and save a reproducible output fixture or demonstration transcript. |
-| Weekly timetable | **IMPLEMENTED BUT NOT VERIFIED** | `FinalPlannerResult.weekly_timetable` and the schedule bridge preserve three assignment schedules; integration tests verify schedules and empty assignments. | Verify conversion against the authoritative slot catalog using the real input provider. |
-| Predicted marks | **IMPLEMENTED BUT NOT VERIFIED** | `AssignmentMark` records per-assignment targets, prediction identities, fitted artifact digest, and model provenance. The NN adapter has artifact-backed tests. | Exercise the complete planner with the persisted fitted Model A artifact and real rows/targets; report the resulting marks and context. |
-| Search, NN, and CSP working together | **IMPLEMENTED BUT NOT VERIFIED** | `src/study_planner/integration/planner.py` and `schedule_bridge.py` orchestrate UCS/Greedy, lazy BT/FC/AC-3 schedules, whole-plan verification, and final NN evaluation. `tests/test_search_csp_integration.py` tests the combined flow with controlled predictors and synthetic CSP candidates. | Add one real-input end-to-end run that loads the actual artifact and goes through the public planner path. |
+- The repository contains genuine OULAD source tables and derived feature
+  artifacts locally. The selected profile rows used in the demo experiments
+  come from the OULAD test presentation. Data and trained model artifacts are
+  ignored by Git; a clean checkout needs the documented acquisition,
+  preparation, and training path or separately supplied artifacts.
+- Search/CSP benchmark graphs, target values, slot calendars, capacities,
+  deadline/ordering rules, and click increments in the demo bundles are
+  synthetic scenario settings. The README and experiment reports identify
+  them as TEST/demo settings. They are not approved production policy.
+- Experiment 2 uses four session variables across two weeks, with 2, 3, or 4
+  physical slots per week. The weekly-capacity value is set from that physical
+  slot count; there is no additional independent limit. All 45 recorded
+  method/scenario/seed runs are feasible. BT+FC and BT+FC+AC-3 visited the same
+  number of nodes for each scenario; AC-3 added compatibility checks but did
+  not reduce visited nodes beyond FC in these results.
+- Experiment 3's 300 rows represent repeated deterministic planner invocations
+  over 30 profiles and two predictors with five recorded protocol seeds. The
+  seed labels do not introduce randomized planner behavior. The separate
+  coursework run manifest has 30 intended IDs but only three profile result
+  files, so the 30-profile coursework execution remains incomplete.
+- The monotonicity summary contains 150 profile-seed runs and 9,000 adjacent
+  comparisons, with 2,400 recorded decreases. Its historical and current
+  manifests differ by line endings but parse to identical profile data, as
+  documented in `reports/experiment_results/demo/monotonicity/monotonicity_report.md`.
 
-### C. P1 deliverables
+## Exact remaining mandatory deliverables
 
-| Requirement | Status | Existing evidence | Missing work and smallest next action |
-| --- | --- | --- | --- |
-| At least 30 student profiles | **PARTIALLY IMPLEMENTED** | `configs/p1_production_template.json` lists 30 deterministic later-test student IDs. For the candidate FFF 2014J assessments 34899/34900/34901, 914 students have one row each; all 30 listed candidates have all strict feature cells and all 12 click values present. | The assessment set and student selection still need project-owner approval, and no production planner run is recorded. Confirm the candidate set/student and run the planner. |
-| Monotonicity experiment | **PARTIALLY IMPLEMENTED** | `src/study_planner/search/session_mapping.py` and `nn_adapter.py` detect/report monotonicity observations; unit tests exercise reporting. | No P1 experiment runner or report evaluates a declared set of allocations/scenarios and summarizes monotonicity violations. Define the protocol and run/report it on the selected profiles. |
-| NN-sufficient but CSP-rejected demonstration | **PARTIALLY IMPLEMENTED** | Integration code continues after CSP-rejected candidates; synthetic tests cover rejected allocation followed by a valid one and invalid verification cases. | No dedicated reproducible scenario demonstrates provisional NN target sufficiency followed by exhaustive CSP rejection. Add it to the demo after real application rules are fixed, and report the separate NN/CSP outcomes. |
+1. **Complete the 30-profile coursework execution** with approved inputs and
+   retain a result for every required profile. Evidence of the incomplete run:
+   `reports/coursework_runs/20261117-203921-d566b9d2/run_manifest.json` lists
+   30 profiles while the run directory currently contains only three profile
+   result files.
+2. **Approve and use the required assignment and timetable settings** for any
+   final planner run: the current scenarios use generated targets, deadlines,
+   slot calendars, capacities, click mapping, and support settings. Evidence:
+   `reports/experiment_results/demo/demo_experiment_config.json` and
+   `reports/experiment_results/demo/experiment_report.md` label them synthetic.
+3. **Finish documentation and test-category reconciliation.** Update the stale
+   planner-status statement in `README.md`; map tests to at least 5 normal, 3
+   edge, and 2 impossible cases and add only missing cases. Evidence:
+   `README.md` opening and `tests/test_run_demo.py`.
+4. **Resolve the NN-off live-demo requirement.** Current integrated execution
+   requires an NN adapter. Evidence: `README.md` integration-demo section and
+   `run_demo.py`.
+5. **Prepare the 10-minute presentation and 5-minute live-demo material**
+   showing Search trace and CSP pruning with BT, BT+FC, and BT+FC+AC-3.
+   Evidence: no slide deck is present; current Search demo reports a solution
+   path, not an expansion trace; CSP comparison evidence is in
+   `reports/experiment_results/demo/csp_summary.csv` and
+   `csp_comparison.svg`.
+6. **Produce the final report and verify the 12-page maximum.** Evidence: no
+   final report PDF is present in the repository.
+7. **Collect individual contribution statements** of at most 200 words per
+   contributor and export/verify the final Git log after final work is
+   recorded. Evidence: Git history exists, but no contribution statement was
+   found and the current working-tree state may not be represented in that
+   history.
+8. **Confirm the source of the named official PDF and reconcile any additional
+   wording** beyond the requirements supplied for this audit. The PDF was not
+   found in the repository or searched project files, so its full text could
+   not be independently checked.
 
-### D. Official experiments
+## Optional extension
 
-No P1 experiment runner or experiment-specific output files were found. Existing
-neural-network training reports are not substitutes for planner experiments.
-
-| Requirement | Status | Existing evidence | Missing work and smallest next action |
-| --- | --- | --- | --- |
-| Experiment 1: UCS vs Greedy | **PARTIALLY IMPLEMENTED** | `src/study_planner/search/ucs.py`, `greedy.py`, and integration functions implement both. `tests/test_search.py` and integration tests verify behavior. | No benchmark scenarios, comparison runner, or comparative result table/plot. Build a deterministic scenario suite and collect agreed search/cost/time/planning metrics. |
-| Experiment 1: A* if required | **NOT IMPLEMENTED** | `docs/search_design.md` calls A* optional; no A* source module was found. The official PDF is unavailable, so its mandatory status is unknown. | Check the official PDF first. If required, implement and test A*; otherwise explicitly mark it optional in the final report. |
-| Experiment 2: BT vs BT+FC vs BT+FC+AC-3 at capacities 2, 3, 4 | **PARTIALLY IMPLEMENTED** | `src/study_planner/csp/backtracking.py`, `forward_checking.py`, and `ac3.py` provide the three configurations; `tests/test_csp*.py` covers correctness/equivalence on small CSPs. | No controlled capacity 2/3/4 performance experiment or comparative output. Create matched CSP instances and report nodes, checks/prunings, runtime, and outcomes per configuration/capacity. |
-| Experiment 3: NN vs Simple Average Predictor inside planner | **NOT IMPLEMENTED** | `src/study_planner/nn/training.py` reports a Dummy mean baseline on held-out prediction rows. It is not a planner evaluator and does not run through Search/CSP. | Implement a planner-compatible average baseline with explicit baseline identity, then run the same planner scenarios/targets with both evaluators. |
-| At least five seeds | **NOT IMPLEMENTED** for listed P1 experiments | `reports/nn_training.md`, `reports/nn_extended_training.md`, and `reports/previous_marks_mlp_comparison.md` use seeds 42, 123, and 2025 (three seeds). No planner-experiment seed runner exists. | Confirm whether seeds apply to all experiments in the official PDF; parameterize and run at least five as required. |
-| Mean and standard deviation | **PARTIALLY IMPLEMENTED** | Neural training reports contain means and standard deviations across three seeds; `reports/nn_extended_training.md` reports validation aggregates. | Calculate the requested aggregates for each planner/search/CSP experiment across the required seeds. Do not report an SD from a single deterministic run. |
-| Required experiment tables and plots | **PARTIALLY IMPLEMENTED** | NN reports include tables and local training curves; `reports/figures/` contains only `.gitkeep`. | Create comparison tables and requested plots for the P1 planner experiments, then integrate them into the final report. Exact required plot list awaits the PDF. |
-
-### E. Final deliverables
-
-| Requirement | Status | Existing evidence | Missing work and smallest next action |
-| --- | --- | --- | --- |
-| `run_demo.py` | **NOT IMPLEMENTED** | No `run_demo.py` or equivalent application entry point exists. `pyproject.toml` exposes data and training commands only. | Add a small reproducible CLI that loads the selected student/application inputs and fitted artifact, runs the planner, and prints a typed result. |
-| Normal, edge, and impossible cases | **PARTIALLY IMPLEMENTED** | Unit/integration tests exercise normal, zero-session, empty-domain, rejected schedule, and resource-limit cases. | Expose three named runnable demo scenarios and capture their expected outcomes/output. |
-| README and reproducibility | **PARTIALLY IMPLEMENTED** | `README.md` documents OULAD acquisition and NN training setup; `scripts/make_data.py` and `scripts/make_features.py` support data generation. | README is stale: it says planner Search/integration are future work. Add demo, experiment, artifact, seed, and output reproduction commands after the CLI/runner exist. |
-| Final report, maximum 12 pages | **NOT IMPLEMENTED** | Several detailed Markdown technical reports exist under `reports/`; none is an integrated final report/PDF with verified page count. | Produce a concise report from the official rubric and experiment outputs; render and verify it is at most 12 pages. |
-| Presentation (10 minutes + 5-minute demo) | **NOT IMPLEMENTED** | No slides or presentation script/deck found. | Build a 10-minute narrative plus a rehearsed 5-minute demo using the final runnable scenarios. |
-| Individual contribution statements | **NOT IMPLEMENTED** | No contribution statement files found. | Obtain each team member’s contribution text and include it in the required submission format. This requires team input. |
-| Git log | **PARTIALLY IMPLEMENTED** | Git history exists; latest commit is `5a29003` (`checkpoint: Model B and CSP foundation`, 2026-11-11), preceded by Search/NN/CSP feature commits. | Current CSP/integration/provenance implementation has substantial modified and untracked files (see Git-state section) and is absent from committed history. After team review, create the required final history/log and confirm whether submission needs commits or only an exported log. |
-
-## Data, model artifacts, outputs, and structure
-
-- The repository contains source packages under `src/study_planner/`, tests
-  under `tests/`, two utility scripts under `scripts/`, docs under `docs/`, and
-  Markdown reports under `reports/`. There is no application/demo package,
-  experiment runner directory, project config content, final slide deck, or
-  final report PDF.
-- Raw OULAD CSVs and derived strict/proxy feature CSVs exist locally. They are
-  ignored by `.gitignore` (`data/raw/*`, `data/processed/*`) and are not tracked.
-  `README.md` provides source acquisition and feature-generation instructions.
-- Local ignored fitted outputs exist under `data/processed/nn_experiment/`,
-  `nn_experiment_60ep/`, and `nn_experiment_previous_marks/`; they include
-  preprocessor/config/schema/evaluation files and three MLP checkpoints each.
-  Strict Model A inference artifacts are tested; Model B is explicitly a
-  submission-based availability proxy. Artifact files are not tracked, so a
-  clean checkout needs the documented regeneration path or a separately
-  supplied artifact package.
-- `configs/p1_production_template.json` records verified local Model A Strict
-  options (`data/processed/nn_experiment` and
-  `data/processed/nn_experiment_60ep`) and Model B proxy path
-  (`data/processed/nn_experiment_previous_marks`) with SHA-256 artifact,
-  provenance, and schema identities measured through the current artifact
-  loader. It selects no production model. All artifact directories are ignored
-  by Git.
-- Existing measured outputs are NN training/evaluation and feature-engineering
-  reports. They do not contain the requested three planner experiments. No
-  generated plots are present in `reports/figures/`.
-- `docs/project_completion_status.md` now records the input-to-planner wiring
-  and lists missing production values and experiments. `README.md` still
-  contradicts the implementation status by describing planner search and
-  integration as future work.
-
-## Repository verification and Git state
-
-Application-input-to-planner tests: **15 passed**. Full suite: **229 passed**, with three
-existing sklearn warnings from test scalers fitted without feature names.
-Ruff passed, and `git diff --check` passed. The worktree was already non-clean
-before this phase, with CSP, Search/NN integration, and provenance files
-modified or untracked; this audit does not attribute those pre-existing changes
-to the application-input work.
-
-The working tree is not clean. It contains modified CSP, Search/NN integration,
-and documentation files, plus untracked FC/AC-3/verification/integration
-modules and tests. These are existing working-tree changes, not commits made by
-this audit. `git log` currently ends at `5a29003` on 2026-11-11; therefore that
-log does not represent all current working-tree implementation. Do not treat
-the committed history as proof the complete implementation is recorded.
-
-## Shortest reliable completion order and estimates
-
-Estimates are engineering hours, excluding waiting for rubric/team decisions or
-external artifact access. Several tasks can be narrowed after reading the
-official PDF. The order below minimizes rework by resolving inputs before
-building the demo and experiments.
-
-| Order | Task / smallest concrete result | Estimate |
-| ---: | --- | ---: |
-| 1 | Obtain/review official `IS Projects.pdf`; resolve whether A* and any unstated deliverables are mandatory. | 0.5–1 h |
-| 2 | Approve and version actual target values, deadline boundary, slot catalog/time windows, allocation bounds, support reference, and selected model artifact. | 1–2 h plus decision time |
-| 3 | Supply approved production values, configure the new allocation-space/candidate factory, and select at least 30 deterministic learners using held-out later-presentation rows. | 1–2 h wiring/configuration, plus decision time |
-| 4 | Implement a planner-compatible Simple Average baseline and matched evaluator interface without weakening final provenance checks. | 2–4 h |
-| 5 | Add `run_demo.py` with normal, edge, impossible, and NN-sufficient/CSP-rejected cases; exercise genuine artifact-backed planning. | 3–5 h |
-| 6 | Implement and run Experiment 1 (UCS vs Greedy; add A* only if the PDF requires it), with at least five seeds/scenarios and search/planning metrics. | 3–5 h |
-| 7 | Implement and run Experiment 2 (BT, BT+FC, BT+FC+AC-3; capacities 2, 3, 4) with matched instances and at least five seeds where randomness applies. | 3–5 h |
-| 8 | Implement and run Experiment 3 (NN vs Simple Average in the same planner/scenarios), recording outcome, target, schedule, and resource statistics. | 3–5 h |
-| 9 | Run the monotonicity protocol and summarize violations/support behavior over selected profiles and declared scenarios. | 2–3 h |
-| 10 | Produce mean/SD tables, required plots, and integrated report; render and check the 12-page limit. | 3–5 h |
-| 11 | Update README with environment, data/artifact regeneration, demo, experiments, seeds, and output commands; run clean-checkout reproducibility checks. | 1–2 h |
-| 12 | Prepare/rehearse 10-minute presentation and 5-minute demo; collect individual contribution statements; export required Git log after approved implementation history is finalized. | 2–4 h |
-| 13 | Final rubric cross-check, full tests/lint, verify artifacts are reproducible and outputs complete. | 1–2 h |
-
-**Estimated remaining engineering effort: approximately 27.5–48 hours, plus
-approval and artifact/data availability time.** This is
-not a commitment; obtaining the official PDF may remove or add deliverables.
-Experiments share input and runner work, so parallelization may reduce elapsed
-calendar time but not the listed engineering effort substantially.
-
-## Mandatory versus optional
-
-- The official PDF is unavailable, so exact official mandatory/optional status
-  cannot be certified. Items explicitly called required in the user-provided
-  completion checklist are treated as mandatory for this plan pending PDF
-  reconciliation.
-- `docs/search_design.md` describes UCS and Greedy as required and A* as
-  optional. Treat A* as optional only if the official PDF agrees.
-- BT, BT+FC, and BT+FC+AC-3 are implemented and the internal integration
-  readiness document describes them as required. The capacity comparison is
-  not yet run.
-- Model B / Previous Marks is a separately documented proxy sensitivity
-  experiment, not a substitute for the listed planner-vs-average experiment.
-  Whether Model B is an official deliverable must be checked against the PDF.
-- Robustness extensions beyond the listed normal/edge/impossible cases, causal
-  claims about clicks, and additional NN architectures are optional unless the
-  official rubric says otherwise. Do not add them before required experiments
-  and deliverables are complete.
-
-## Immediate next action
-
-Obtain the official `IS Projects.pdf` if it is available, approve/fill the
-REQUIRED fields in `configs/p1_production_template.json`, and select one exact
-Model A/B artifact and demo student. The input-to-planner factory is already
-implemented; those approved values unblock the real demo and experiments.
+A* is implemented and included in Experiment 1, but the supplied requirement
+calls it optional. It is not counted as a remaining mandatory deliverable.

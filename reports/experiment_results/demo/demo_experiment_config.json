@@ -1,6 +1,6 @@
 {
   "configuration_status": "SYNTHETIC_DEMO_ONLY_NOT_PRODUCTION",
-  "profile_manifest": "/mnt/c/Users/janam/OneDrive/Desktop/3 sem 1/Intelligent systems/project 1/assessment-aware-study-planner/reports/experiment_results/profiles_fff_2014J.json",
+  "profile_manifest": "/home/nouran/projects/assessment-aware-study-planner/reports/experiment_results/profiles_fff_2014J.json",
   "course": "FFF",
   "presentation": "2014J",
   "assignments": [

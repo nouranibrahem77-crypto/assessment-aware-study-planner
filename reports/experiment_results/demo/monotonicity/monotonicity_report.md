@@ -9,6 +9,16 @@
 - Maximum total sessions per assignment: 2
 - Seeds: 42, 123, 2025, 31415, 271828
 
+## Profile manifest provenance
+
+This experiment used the historical profile manifest from Git commit
+`1140272290b362dfb074af9741a1ab082c2dfa7f`, whose recorded SHA-256 is
+`ac6f645af10d5d6ed4085ec2e1946bda7bfa87b7266144592e28941a70f4373f`. The
+current manifest has a different hash because its line endings changed from LF
+to CRLF. Both versions parse to identical JSON and contain the same 30 students,
+assessments, selection seed, and source feature CSV hash. The existing 150
+experiment records have been validated against the current manifest data.
+
 A violation is a one-session allocation increase that lowers the predicted mark. Only predictions whose marginal mapping support is in range are included in comparisons. Out-of-range and unassessed allocations are reported separately.
 
 | Seed | Profile runs | Comparisons | Violations | Pooled rate | Mean profile rate | Profile-rate SD | Errors |

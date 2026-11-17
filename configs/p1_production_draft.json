@@ -126,7 +126,7 @@
       "relative_path": "data/processed/nn_experiment_previous_marks",
       "feature_directory": "data/processed/proxy",
       "artifact_digest_sha256": "679a7fdd3cabc8a2322b92d8a4bfb2f2aedfbda364f343d86f02e2adeef8e9a0",
-      "model_provenance_identity": "81b968f89870ffb3fb9b7a779c2088b0e4db5acde4292a8834d7411b438046dd",
+      "model_provenance_identity": "5262557c814a31c644dd7cf66bbee67f5999778e097c2ef50c465e7db3ce95d3",
       "feature_schema_identity": "73b30f0bae14551c4c15c71d55c224d693473437ce3e3a748aab843bb19323f4",
       "seeds": [
         42,

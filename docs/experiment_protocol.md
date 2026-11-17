@@ -63,13 +63,12 @@ other business configuration that has not been approved.
 
 ## Experiment 1 — Search comparison
 
-**Question:** For the same finite allocation problem, how do UCS and Greedy
-Best-First Search compare in search effort and returned allocation cost?
+**Question:** For the same finite search problem, how do UCS, Greedy
+Best-First Search, and A* compare in search effort and returned solution cost?
 
-- **Methods:** Uniform Cost Search (UCS) and Greedy Best-First Search.
-  A* is not included in the primary comparison unless the official assignment
-  rubric confirms that it is required; the available compliance audit notes
-  that this requirement is unresolved.
+- **Methods:** Uniform Cost Search (UCS), Greedy Best-First Search, and A*.
+  A* uses a deterministic monotone (consistent) heuristic with zero value at
+  each goal; consistency is checked on every generated transition.
 - **Inputs:** Identical deterministic allocation spaces, initial states,
   action costs, candidate evaluator, targets, CSP policy, and resource limits.
   Use the approved production scenarios when available; before then, label the
@@ -93,22 +92,33 @@ weekly scheduling capacities?
 
 - **Methods:** Backtracking (BT), Backtracking with Forward Checking (BT+FC),
   and Backtracking with Forward Checking plus AC-3 (BT+FC+AC-3).
-- **Inputs:** Identical CSP variables, domains, constraints, assignment
-  manifests, ordering/value-ordering policies, and node limits. Run each
-  matched instance at weekly capacities **2, 3, and 4**. Keep all other
-  scheduling rules fixed within a comparison.
+- **Inputs:** Use the same four session variables, assignment manifest,
+  eligibility, ordering policy, and verification policy in two weeks. Each
+  variable is eligible for every physical slot in both weeks. Compare instances
+  with exactly **2, 3, and 4 physical slots per week**, respectively. The
+  modeled weekly capacity equals the number of physical slots; do not add a
+  second independent weekly limit. One assignment has two ordered sessions,
+  providing a binary ordering relation for AC-3; the other two assignments
+  have one session each. Ordering remains strict by ascending week index. All
+  three instances have feasible complete schedules.
 - **Metrics:** terminal status; whether the result is exhaustive; feasible
   schedule count; nodes visited; assignments attempted; backtracks;
   constraint checks; domain prunings; compatibility checks; solver time; wall
   time.
 - **Comparison:** Pair methods on the same instance, capacity, and seed.
   First compare feasibility and completeness; then compare work counters and
-  runtime. Do not treat an incomplete run as an infeasible result.
+  runtime. A feasible assignment uses 2+2 slots in the 2-slot instance and
+  3+1 in each larger-slot instance. The ordered pair must occupy different
+  weeks, so with four variables the 4-slot scenario can use at most three
+  slots in a week even though four are available. The ordered pair's domains
+  let AC-3 prune unsupported week values before search. This keeps slot
+  availability and modeled capacity aligned, as the requirement specifies.
+  Do not treat an incomplete run as an infeasible result.
 - **Outputs:**
-  `reports/experiment_results/csp_runs.csv`,
-  `reports/experiment_results/csp_summary.csv`,
-  `reports/experiment_results/csp_runs.json`, and
-  `reports/experiment_results/csp_comparison.svg`.
+  `reports/experiment_results/demo/csp_runs.csv`,
+  `reports/experiment_results/demo/csp_summary.csv`,
+  `reports/experiment_results/demo/csp_runs.json`, and
+  `reports/experiment_results/demo/csp_comparison.svg`.
 
 ## Experiment 3 — Prediction model comparison
 
@@ -241,6 +251,17 @@ The command keeps demo outputs under `reports/experiment_results/demo/` and
 the demo model under `data/processed/nn_demo/`. These are not production
 results. Omit `--train-demo-nn` to reuse an existing artifact in that location.
 
+To regenerate **Experiment 2 only** without rewriting Experiment 1 or
+Experiment 3 outputs, run:
+
+```bash
+python scripts/run_demo_experiments.py --csp-only
+```
+
+This isolated run writes the four CSP output files listed above and updates
+only the CSP status rows in `experiment_report.md`. It uses the fixed five
+experiment seeds and does not require OULAD features or a fitted NN artifact.
+
 The profile manifest can currently be generated with:
 
 ```powershell
@@ -280,5 +301,5 @@ manifest; the runner verifies that the manifest hash matches the feature CSV.
   same-assignment ordering policy.
 - Allocation bounds, support reference/disposition, and click-mapping policy.
 - Student selection approval and exact NN artifact/mode.
-- Whether A* is an official requirement and any additional rubric-required
-  metrics or plots.
+- Any additional rubric-required metrics or plots beyond the Experiment 1
+  measures above.

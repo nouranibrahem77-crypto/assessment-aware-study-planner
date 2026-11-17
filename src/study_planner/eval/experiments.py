@@ -27,6 +27,7 @@ from study_planner.integration.schedule_bridge import (
     WholePlanEnumerationStatus,
     WholePlanScheduleEnumerator,
 )
+from study_planner.search.astar import a_star_search
 from study_planner.search.core import SearchProblem, SearchResult
 from study_planner.search.greedy import greedy_best_first_search
 from study_planner.search.ucs import uniform_cost_search
@@ -38,12 +39,13 @@ _CspOptions = BacktrackingOptions | ForwardCheckingOptions | Ac3Options | None
 
 @dataclass(frozen=True, slots=True)
 class SearchScenario:
-    """One shared finite search problem and its deterministic heuristic."""
+    """One shared finite problem with separate Greedy and A* heuristics."""
 
     scenario_id: str
     problem: SearchProblem[Any, Any]
     heuristic: SearchHeuristic
     configuration: Mapping[str, Any]
+    astar_heuristic: SearchHeuristic | None = None
 
 
 @dataclass(frozen=True, slots=True)
@@ -72,7 +74,7 @@ def run_search_comparison(
     *,
     seeds: Sequence[int] = DEFAULT_EXPERIMENT_SEEDS,
 ) -> tuple[ExperimentRunRecord, ...]:
-    """Compare UCS and Greedy on identical scenarios and retain each seed run."""
+    """Compare UCS, Greedy, and A* on identical scenarios and retain each run."""
     if not scenarios:
         raise ValueError("at least one search scenario is required")
     cases = tuple(
@@ -80,19 +82,23 @@ def run_search_comparison(
             method, scenario.scenario_id, configuration=scenario.configuration
         )
         for scenario in scenarios
-        for method in ("ucs", "greedy_best_first")
+        for method in ("ucs", "greedy_best_first", "a_star")
     )
     by_id = {scenario.scenario_id: scenario for scenario in scenarios}
     if len(by_id) != len(scenarios):
         raise ValueError("search scenario IDs must be unique")
+    if any(scenario.astar_heuristic is None for scenario in scenarios):
+        raise ValueError("every search scenario must define a consistent A* heuristic")
 
     def evaluate(case: ExperimentCase, _seed: int) -> ExperimentOutcome:
         scenario = by_id[case.scenario_id]
-        result = (
-            uniform_cost_search(scenario.problem)
-            if case.method == "ucs"
-            else greedy_best_first_search(scenario.problem, scenario.heuristic)
-        )
+        if case.method == "ucs":
+            result = uniform_cost_search(scenario.problem)
+        elif case.method == "greedy_best_first":
+            result = greedy_best_first_search(scenario.problem, scenario.heuristic)
+        else:
+            assert scenario.astar_heuristic is not None
+            result = a_star_search(scenario.problem, scenario.astar_heuristic)
         return _search_outcome(result)
 
     return run_experiment("search", cases, evaluate, seeds=seeds)
@@ -179,6 +185,7 @@ def run_prediction_comparison(
     scenarios: Sequence[PredictionScenario],
     *,
     seeds: Sequence[int] = DEFAULT_EXPERIMENT_SEEDS,
+    experiment_id: str = "prediction",
 ) -> tuple[ExperimentRunRecord, ...]:
     """Compare matched NN and average-baseline planner outcomes per profile.
 
@@ -266,12 +273,14 @@ def run_prediction_comparison(
                 "artifact_digest": result.nn_fitted_artifact_digest,
                 "feature_schema_identity": result.nn_feature_schema_identity,
                 "prediction_family": result.prediction_family,
+                "planner_outcome": result.outcome.value,
+                "search_complete": result.search_complete,
                 "failure_reasons": result.failure_reasons,
             },
             result.failure_reasons,
         )
 
-    return run_experiment("prediction", cases, evaluate, seeds=seeds)
+    return run_experiment(experiment_id, cases, evaluate, seeds=seeds)
 
 
 def write_experiment_plot(

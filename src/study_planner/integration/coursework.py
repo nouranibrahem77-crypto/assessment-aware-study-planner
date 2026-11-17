@@ -4,6 +4,10 @@ from __future__ import annotations
 
 import csv
 import json
+import math
+import os
+import time
+import uuid
 from dataclasses import dataclass
 from pathlib import Path
 from typing import Any
@@ -41,8 +45,8 @@ from study_planner.search.session_mapping import (
     SessionClickMappingConfig,
 )
 
-DEFAULT_RESULTS_PATH = Path("reports/coursework_planner_30_profiles.json")
-DEFAULT_CSV_PATH = Path("reports/coursework_planner_30_profiles.csv")
+DEFAULT_RUNS_DIRECTORY = Path("reports/coursework_runs")
+PROFILE_DIRECTORY_NAME = "profiles"
 EXPECTED_BOUNDARY_IDENTITY = "course-day-start-exclusive-v1"
 EXPECTED_SLOT_ID_FORMULA = (
     "P1-SYNTH-W{week:02d}-D{ISO_weekday}-T{start_minute:04d}-{end_minute:04d}"
@@ -408,6 +412,26 @@ def planner_result_record(
         if marks
         else "unknown"
     )
+    statistics = getattr(result, "search_statistics", None)
+    execution_metrics = (
+        {
+            "search_nodes_expanded": statistics.search.nodes_expanded,
+            "search_nodes_generated": statistics.search.nodes_generated,
+            "search_seconds": statistics.search.execution_time_seconds,
+            "orchestration_seconds": statistics.orchestration_time_seconds,
+            "csp_schedules_examined": statistics.schedules_examined,
+            "csp_feasible_schedules": statistics.verification_feasible_schedules,
+            "csp_verification_rejections": statistics.verification_rejections,
+            "csp_solver_seconds": sum(
+                outcome.statistics.solver_time_seconds
+                for outcome in statistics.terminal_csp_outcomes
+            ),
+            "provisional_predictions": statistics.provisional_predictions,
+            "final_predictions": statistics.final_predictions,
+        }
+        if statistics is not None
+        else {}
+    )
     return {
         "student_id": student_id,
         "planner_status": result.status.value,
@@ -420,6 +444,7 @@ def planner_result_record(
         "target_status": target_status,
         "search_complete": result.search_complete,
         "failure_reasons": list(result.failure_reasons),
+        "execution_metrics": execution_metrics,
     }
 
 
@@ -493,6 +518,7 @@ def _write_csv(path: Path, records: list[dict[str, Any]]) -> None:
         "target_status",
         "search_complete",
         "failure_reasons",
+        "execution_metrics",
     )
     with path.open("w", newline="", encoding="utf-8") as stream:
         writer = csv.DictWriter(stream, fieldnames=columns)
@@ -508,24 +534,189 @@ def _write_csv(path: Path, records: list[dict[str, Any]]) -> None:
             )
 
 
+def _atomic_create_json(path: Path, payload: dict[str, Any]) -> None:
+    """Create a JSON file atomically without replacing any existing artifact."""
+    path.parent.mkdir(parents=True, exist_ok=True)
+    temporary = path.with_name(f".{path.name}.{uuid.uuid4().hex}.tmp")
+    try:
+        with temporary.open("x", encoding="utf-8") as stream:
+            json.dump(payload, stream, indent=2, sort_keys=True, allow_nan=False)
+            stream.write("\n")
+            stream.flush()
+            os.fsync(stream.fileno())
+        os.link(temporary, path)
+    finally:
+        temporary.unlink(missing_ok=True)
+
+
+def _is_checkpoint_eligible(payload: object, student_id: str) -> bool:
+    """Return whether a result is complete and safe to checkpoint or resume."""
+    if not isinstance(payload, dict) or payload.get("student_id") != student_id:
+        return False
+    required = {
+        "planner_status",
+        "planner_outcome",
+        "schedule_verified",
+        "verification_status",
+        "allocations",
+        "timetable",
+        "predicted_marks",
+        "target_status",
+        "search_complete",
+        "failure_reasons",
+        "execution_metrics",
+    }
+    if not required <= payload.keys():
+        return False
+    outcome = payload["planner_outcome"]
+    target_achieved = outcome == "target_achieved"
+    if (
+        not isinstance(payload["search_complete"], bool)
+        or not isinstance(payload["planner_status"], str)
+        or not isinstance(outcome, str)
+        or not isinstance(payload["schedule_verified"], bool)
+        or not isinstance(payload["target_status"], str)
+        or payload["planner_status"] in {"error", "incomplete"}
+        or outcome in {"error", "execution_error", "incomplete"}
+        or (target_achieved and payload["planner_status"] != "feasible")
+        or (target_achieved and payload["target_status"] != "met")
+        or (target_achieved and payload["schedule_verified"] is not True)
+        or (target_achieved and payload["verification_status"] != "feasible")
+        or (
+            target_achieved
+            and not all(
+                payload[field]
+                for field in ("allocations", "timetable", "predicted_marks")
+            )
+        )
+        or (not target_achieved and payload["search_complete"] is not True)
+        or (
+            payload["verification_status"] is not None
+            and not isinstance(payload["verification_status"], str)
+        )
+        or not isinstance(payload["allocations"], dict)
+        or not isinstance(payload["timetable"], dict)
+        or not isinstance(payload["predicted_marks"], dict)
+        or not isinstance(payload["failure_reasons"], list)
+        or not all(isinstance(reason, str) for reason in payload["failure_reasons"])
+        or not isinstance(payload["execution_metrics"], dict)
+        or not all(
+            isinstance(value, int | float)
+            and not isinstance(value, bool)
+            and math.isfinite(value)
+            for value in payload["execution_metrics"].values()
+        )
+    ):
+        return False
+    return True
+
+
+def _valid_profile_record(path: Path, student_id: str) -> dict[str, Any] | None:
+    try:
+        payload = json.loads(path.read_text(encoding="utf-8"))
+    except (OSError, json.JSONDecodeError):
+        return None
+    return payload if _is_checkpoint_eligible(payload, student_id) else None
+
+
+def _find_completed_profile(directory: Path, student_id: str) -> dict[str, Any] | None:
+    for path in sorted(directory.glob(f"{student_id}-*.json")):
+        record = _valid_profile_record(path, student_id)
+        if record is not None:
+            return record
+    return None
+
+
+def _write_csv_new(path: Path, records: list[dict[str, Any]]) -> None:
+    """Write a combined CSV through an exclusive temporary path."""
+    temporary = path.with_name(f".{path.name}.{uuid.uuid4().hex}.tmp")
+    try:
+        _write_csv(temporary, records)
+        os.link(temporary, path)
+    finally:
+        temporary.unlink(missing_ok=True)
+
+
 def execute_coursework_profiles(
     project_root: Path,
-    json_output: Path = DEFAULT_RESULTS_PATH,
-    csv_output: Path = DEFAULT_CSV_PATH,
+    run_directory: Path | None = None,
 ) -> dict[str, Any]:
-    """Execute every configured profile and write JSON/CSV result bundles."""
+    """Run or resume profiles in an isolated directory of immutable checkpoints."""
     scenario = load_coursework_scenario(project_root)
+    if run_directory is None:
+        DEFAULT_RUNS_DIRECTORY.mkdir(parents=True, exist_ok=True)
+        run_directory = DEFAULT_RUNS_DIRECTORY / (
+            f"{time.strftime('%Y%m%d-%H%M%S')}-{uuid.uuid4().hex[:8]}"
+        )
+        run_directory.mkdir(exist_ok=False)
+    else:
+        run_directory.mkdir(parents=True, exist_ok=True)
+    profile_directory = run_directory / PROFILE_DIRECTORY_NAME
+    profile_directory.mkdir(exist_ok=True)
+    manifest_path = run_directory / "run_manifest.json"
+    manifest = {
+        "scenario": "documented_synthetic_p1_coursework",
+        "student_ids": list(scenario.student_ids),
+        "course": scenario.config.presentation_split.course_identity,
+        "assignments": [
+            rule.assessment_id for rule in scenario.config.assignment_rules
+        ],
+        "target_marks": {
+            rule.assessment_id: rule.target_mark
+            for rule in scenario.config.assignment_rules
+        },
+        "weekly_capacity": scenario.config.slot_catalog.weekly_capacity,
+        "slot_count": len(scenario.config.slot_catalog.slots),
+        "model_mode": scenario.adapter.model_mode.value,
+        "artifact_digest_sha256": scenario.adapter.fitted_artifact_digest,
+    }
+    if manifest_path.exists():
+        try:
+            existing_manifest = json.loads(manifest_path.read_text(encoding="utf-8"))
+        except (OSError, json.JSONDecodeError) as error:
+            raise CourseworkConfigurationError("run manifest is unreadable") from error
+        if existing_manifest != manifest:
+            raise CourseworkConfigurationError(
+                "run directory belongs to a different scenario"
+            )
+    else:
+        _atomic_create_json(manifest_path, manifest)
+
     records: list[dict[str, Any]] = []
     for student_id in scenario.student_ids:
+        completed = _find_completed_profile(profile_directory, student_id)
+        if completed is not None:
+            records.append(completed)
+            print(f"Skipping completed student {student_id}.", flush=True)
+            continue
         print(f"Running planner for student {student_id}...", flush=True)
+        started = time.perf_counter()
         try:
-            records.append(run_one_profile(scenario, student_id))
+            record = run_one_profile(scenario, student_id)
         except Exception as error:  # preserve one visible record per profile
-            records.append(_error_record(student_id, error))
+            record = _error_record(student_id, error)
+        record.setdefault("execution_metrics", {})
+        record["execution_metrics"]["profile_wall_seconds"] = (
+            time.perf_counter() - started
+        )
+        records.append(record)
+        if _is_checkpoint_eligible(record, student_id):
+            checkpoint = profile_directory / f"{student_id}-{uuid.uuid4().hex}.json"
+            _atomic_create_json(checkpoint, record)
         print(
-            f"Finished student {student_id}: {records[-1]['planner_outcome']}",
+            f"Finished student {student_id}: {record['planner_outcome']}",
             flush=True,
         )
+    completed_records = [
+        _find_completed_profile(profile_directory, student_id)
+        for student_id in scenario.student_ids
+    ]
+    all_profiles_completed = all(record is not None for record in completed_records)
+    final_records = (
+        [record for record in completed_records if record is not None]
+        if all_profiles_completed
+        else records
+    )
     payload = {
         "scenario": "documented_synthetic_p1_coursework",
         "synthetic_settings": {
@@ -548,15 +739,15 @@ def execute_coursework_profiles(
             "artifact_digest_sha256": scenario.adapter.fitted_artifact_digest,
             "feature_directory": str(scenario.feature_directory),
         },
-        "summary": _summary(records),
-        "profiles": records,
+        "summary": _summary(final_records),
+        "profiles": final_records,
     }
-    json_output.parent.mkdir(parents=True, exist_ok=True)
-    json_output.write_text(
-        json.dumps(payload, indent=2, sort_keys=True, allow_nan=False) + "\n",
-        encoding="utf-8",
-    )
-    _write_csv(csv_output, records)
+    json_output = run_directory / "coursework_planner_30_profiles.json"
+    csv_output = run_directory / "coursework_planner_30_profiles.csv"
+    if all_profiles_completed and not json_output.exists():
+        _atomic_create_json(json_output, payload)
+    if all_profiles_completed and not csv_output.exists():
+        _write_csv_new(csv_output, final_records)
     return payload
 
 

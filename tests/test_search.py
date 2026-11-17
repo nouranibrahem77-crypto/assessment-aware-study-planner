@@ -6,6 +6,7 @@ from dataclasses import dataclass
 
 import pytest
 
+from study_planner.search.astar import a_star_search
 from study_planner.search.greedy import greedy_best_first_search
 from study_planner.search.ucs import uniform_cost_search
 
@@ -63,6 +64,54 @@ def test_finds_known_minimum_cost_solution() -> None:
     assert result.state_path == ("start", "a", "goal")
     assert tuple(edge.action for edge in result.action_path) == ("to-a", "a-to-goal")
     assert result.solution_cost == 4
+
+
+def test_a_star_finds_optimal_path_with_consistent_heuristic() -> None:
+    problem = GraphProblem(
+        start="start",
+        goals=frozenset({"goal"}),
+        graph={
+            "start": (
+                Edge("direct-expensive", "goal", 8),
+                Edge("to-a", "a", 2),
+                Edge("to-b", "b", 1),
+            ),
+            "a": (Edge("a-to-goal", "goal", 2),),
+            "b": (Edge("b-to-goal", "goal", 5),),
+        },
+    )
+    heuristic = {"start": 4, "a": 2, "b": 5, "goal": 0}.__getitem__
+
+    result = a_star_search(problem, heuristic)
+
+    assert result.found
+    assert result.state_path == ("start", "a", "goal")
+    assert tuple(edge.action for edge in result.action_path) == ("to-a", "a-to-goal")
+    assert result.solution_cost == 4
+    assert result.statistics.nodes_expanded == 2
+    assert result.statistics.nodes_generated == 4
+
+
+def test_a_star_rejects_inconsistent_heuristic() -> None:
+    problem = GraphProblem(
+        start="start",
+        goals=frozenset({"goal"}),
+        graph={"start": (Edge("finish", "goal", 1),)},
+    )
+
+    with pytest.raises(ValueError, match="consistent"):
+        a_star_search(problem, {"start": 2, "goal": 0}.__getitem__)
+
+
+def test_a_star_requires_zero_heuristic_at_goal() -> None:
+    problem = GraphProblem(
+        start="start",
+        goals=frozenset({"goal"}),
+        graph={"start": (Edge("finish", "goal", 1),)},
+    )
+
+    with pytest.raises(ValueError, match="zero at goal"):
+        a_star_search(problem, {"start": 0, "goal": 1}.__getitem__)
 
 
 def test_updates_duplicate_state_when_a_cheaper_path_is_found() -> None:

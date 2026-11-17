@@ -547,12 +547,15 @@ class SessionNNAdapter:
     fitted_artifact_digest: str = field(init=False)
     feature_schema_identity: str = field(init=False)
     model_provenance_identity: str = field(init=False)
-    _artifact_provenance: _TrustedArtifactProvenance = field(
+    _artifact_provenance: _TrustedArtifactProvenance | None = field(
         init=False, repr=False
     )
     _monotonicity_observations: dict[
         MonotonicityContext, IncrementalMonotonicityReporter
     ] = field(default_factory=dict, init=False, repr=False)
+    _final_prediction_cache: dict[tuple[str, FeatureSnapshot], float] = field(
+        default_factory=dict, init=False, repr=False
+    )
 
     def __post_init__(self) -> None:
         feature_names = tuple(self.predictor.feature_names)
@@ -581,23 +584,31 @@ class SessionNNAdapter:
             raise CandidateEvaluationError(
                 "predictor assessment type columns differ from strict FFF schema"
             )
-        artifact_provenance = trusted_artifact_provenance(self.predictor)
+        object.__setattr__(self, "model_mode", model_mode)
         if artifact_provenance is None:
-            raise CandidateEvaluationError(
-                "predictor was not created by the verified artifact loader"
+            if model_mode is not NNModelMode.SIMPLE_AVERAGE_BASELINE:
+                raise CandidateEvaluationError(
+                    "predictor was not created by the verified artifact loader"
+                )
+            try:
+                artifact_digest = verify_predictor_integrity(self.predictor)
+            except ValueError as error:
+                raise CandidateEvaluationError(str(error)) from error
+        else:
+            try:
+                verify_trusted_artifact_integrity(self.predictor, artifact_provenance)
+            except ValueError as error:
+                raise CandidateEvaluationError(str(error)) from error
+            expected_mode = (
+                "strict"
+                if model_mode is NNModelMode.MODEL_A_STRICT
+                else "proxy"
             )
-        try:
-            verify_trusted_artifact_integrity(self.predictor, artifact_provenance)
-        except ValueError as error:
-            raise CandidateEvaluationError(str(error)) from error
-        expected_mode = (
-            "strict"
-            if self.model_mode is NNModelMode.MODEL_A_STRICT
-            else "proxy"
-        )
-        if artifact_provenance.mode != expected_mode:
-            raise CandidateEvaluationError("artifact mode and predictor schema differ")
-        artifact_digest = artifact_provenance.digest
+            if artifact_provenance.mode != expected_mode:
+                raise CandidateEvaluationError(
+                    "artifact mode and predictor schema differ"
+                )
+            artifact_digest = artifact_provenance.digest
         if not isinstance(artifact_digest, str) or not re.fullmatch(
             r"[0-9a-f]{64}", artifact_digest
         ):
@@ -625,6 +636,18 @@ class SessionNNAdapter:
         object.__setattr__(self, "model_provenance_identity", provenance_identity)
         object.__setattr__(self, "_artifact_provenance", artifact_provenance)
         object.__setattr__(self, "prediction_family", family)
+
+    def _verify_integrity(self) -> None:
+        """Recheck the baseline digest or trusted NN artifact before use."""
+        try:
+            if self._artifact_provenance is None:
+                verify_predictor_integrity(self.predictor, self.fitted_artifact_digest)
+            else:
+                verify_trusted_artifact_integrity(
+                    self.predictor, self._artifact_provenance
+                )
+        except ValueError as error:
+            raise CandidateEvaluationError(str(error)) from error
 
     @property
     def model_identity(self) -> str:
@@ -693,12 +716,7 @@ class SessionNNAdapter:
         """Evaluate only a complete, matching, feasible whole-plan schedule."""
         if expected_model_provenance_identity != self.model_provenance_identity:
             raise CandidateEvaluationError("model provenance identity mismatch")
-        try:
-            verify_trusted_artifact_integrity(
-                self.predictor, self._artifact_provenance
-            )
-        except ValueError as error:
-            raise CandidateEvaluationError(str(error)) from error
+        self._verify_integrity()
         expected_identity = self.candidate_identity(allocation, context)
         if not isinstance(verification, WholePlanVerificationResult):
             raise CandidateEvaluationError(
@@ -827,12 +845,7 @@ class SessionNNAdapter:
         verification_policy_identity: str | None = None,
         verification_policy_version: str | None = None,
     ) -> CandidatePredictionResult:
-        try:
-            verify_trusted_artifact_integrity(
-                self.predictor, self._artifact_provenance
-            )
-        except ValueError as error:
-            raise CandidateEvaluationError(str(error)) from error
+        self._verify_integrity()
         snapshot = MappingEvaluationSnapshot.from_mapping(mapping)
         provenance = {
             "fitted_artifact_digest": self.fitted_artifact_digest,
@@ -840,15 +853,29 @@ class SessionNNAdapter:
             "model_mode": self.model_mode,
             "feature_schema_identity": self.feature_schema_identity,
         }
+        cache_key = (self.model_provenance_identity, snapshot.features)
+        cache_enabled = isinstance(
+            self._artifact_provenance, _TrustedArtifactProvenance
+        )
+        cached_prediction = (
+            self._final_prediction_cache.get(cache_key)
+            if phase is EvaluationPhase.FINAL_SCHEDULED and cache_enabled
+            else None
+        )
         try:
-            output = np.asarray(
-                self.predictor.predict(snapshot.candidate_features.copy(deep=True))
-            )
-            if output.size != 1:
-                raise ValueError("predictor must return exactly one mark")
-            prediction = float(output.reshape(-1)[0])
-            if not np.isfinite(prediction) or not 0 <= prediction <= 100:
-                raise ValueError("predictor returned a mark outside finite [0, 100]")
+            if cached_prediction is None:
+                output = np.asarray(
+                    self.predictor.predict(snapshot.candidate_features.copy(deep=True))
+                )
+                if output.size != 1:
+                    raise ValueError("predictor must return exactly one mark")
+                prediction = float(output.reshape(-1)[0])
+                if not np.isfinite(prediction) or not 0 <= prediction <= 100:
+                    raise ValueError(
+                        "predictor returned a mark outside finite [0, 100]"
+                    )
+            else:
+                prediction = cached_prediction
         except Exception as error:
             result = CandidatePredictionResult(
                 identity=identity,
@@ -888,12 +915,13 @@ class SessionNNAdapter:
             **provenance,
             _predictor_reference=weakref.ref(self.predictor),
         )
-        try:
-            verify_trusted_artifact_integrity(
-                self.predictor, self._artifact_provenance
-            )
-        except ValueError as error:
-            raise CandidateEvaluationError(str(error)) from error
+        self._verify_integrity()
+        if (
+            phase is EvaluationPhase.FINAL_SCHEDULED
+            and cache_enabled
+            and cached_prediction is None
+        ):
+            self._final_prediction_cache[cache_key] = prediction
         return replace(
             result, prediction_identity=_prediction_identity_for_result(result)
         )

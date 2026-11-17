@@ -11,7 +11,8 @@ import numpy as np
 import pandas as pd
 import pytest
 import torch
-from sklearn.preprocessing import StandardScaler
+from sklearn.compose import ColumnTransformer
+from sklearn.preprocessing import OneHotEncoder, StandardScaler
 
 import study_planner.nn.inference as inference_module
 import study_planner.search.nn_adapter as nn_adapter_module
@@ -185,7 +186,9 @@ def _isolated_fake_predictor_trust(monkeypatch):
     )
 
 
-def _write_controlled_artifact(directory, weight_value: float) -> None:
+def _write_controlled_artifact(
+    directory, weight_value: float, *, categorical_preprocessor: bool = False
+) -> None:
     directory.mkdir()
     (directory / "feature_schema.json").write_text(
         json.dumps(
@@ -210,9 +213,33 @@ def _write_controlled_artifact(directory, weight_value: float) -> None:
         ),
         encoding="utf-8",
     )
-    preprocessor = StandardScaler().fit(
-        np.zeros((2, len(STRICT_FFF_FEATURE_NAMES)), dtype=np.float64)
-    )
+    if categorical_preprocessor:
+        numeric_names = tuple(
+            name
+            for name in STRICT_FFF_FEATURE_NAMES
+            if name not in STRICT_FFF_FEATURE_NAMES[:3]
+        )
+        preprocessor = ColumnTransformer(
+            [
+                (
+                    "assessment_type",
+                    OneHotEncoder(handle_unknown="ignore"),
+                    ["assessment_type"],
+                ),
+                ("numeric", StandardScaler(), list(numeric_names)),
+            ]
+        ).fit(
+            pd.DataFrame(
+                {
+                    "assessment_type": ["CMA", "Exam", "TMA"],
+                    **{name: np.zeros(3, dtype=np.float64) for name in numeric_names},
+                }
+            )
+        )
+    else:
+        preprocessor = StandardScaler().fit(
+            np.zeros((2, len(STRICT_FFF_FEATURE_NAMES)), dtype=np.float64)
+        )
     joblib.dump(preprocessor, directory / "preprocessor.joblib")
     model = MLPRegressor(len(STRICT_FFF_FEATURE_NAMES), (2,), 0.0)
     with torch.no_grad():
@@ -221,9 +248,15 @@ def _write_controlled_artifact(directory, weight_value: float) -> None:
     torch.save(model.state_dict(), directory / "mlp_seed_1.pt")
 
 
-def _load_controlled_predictor(tmp_path, weight_value: float = 0.125):
+def _load_controlled_predictor(
+    tmp_path, weight_value: float = 0.125, *, categorical_preprocessor: bool = False
+):
     directory = tmp_path / f"controlled-{weight_value}"
-    _write_controlled_artifact(directory, weight_value)
+    _write_controlled_artifact(
+        directory,
+        weight_value,
+        categorical_preprocessor=categorical_preprocessor,
+    )
     return RegressionPredictor.from_artifact_dir(directory)
 
 
@@ -235,6 +268,18 @@ def setup_adapter(*, scenario: ClickScenario = ClickScenario.LOW, fail: bool = F
     )
     context = CandidateFeatureContext("student-1", "assignment-1", strict_row())
     return predictor, adapter, context
+
+
+def count_loaded_predictor_calls(monkeypatch):
+    calls: list[object] = []
+    original_predict = RegressionPredictor.predict
+
+    def counted_predict(predictor, features):
+        calls.append(predictor)
+        return original_predict(predictor, features)
+
+    monkeypatch.setattr(RegressionPredictor, "predict", counted_predict)
+    return calls
 
 
 def verified_result(
@@ -663,6 +708,206 @@ def test_matching_context_compares_increasing_allocations_across_schedules() -> 
         report.observations[0].schedule_identity
         != report.observations[1].schedule_identity
     )
+
+
+def test_final_prediction_cache_reuses_identical_features_per_model(
+    tmp_path, monkeypatch
+) -> None:
+    calls = count_loaded_predictor_calls(monkeypatch)
+    predictor = _load_controlled_predictor(
+        tmp_path, categorical_preprocessor=True
+    )
+    adapter = SessionNNAdapter(
+        predictor, SessionClickMappingConfig(scenario=ClickScenario.LOW)
+    )
+    context = CandidateFeatureContext("student-1", "assignment-1", strict_row())
+    allocation = CandidateSessionAllocation((1, 0, 0, 0))
+    first_verification = verified_result(
+        adapter,
+        allocation,
+        context,
+        ScheduleData((ScheduledSession("slot-first", 1),)),
+    )
+    second_verification = verified_result(
+        adapter,
+        allocation,
+        context,
+        ScheduleData((ScheduledSession("slot-second", 1),)),
+    )
+
+    first = evaluate_final(adapter, allocation, first_verification, context)
+    second = evaluate_final(adapter, allocation, second_verification, context)
+    uncached_adapter = SessionNNAdapter(
+        predictor,
+        SessionClickMappingConfig(scenario=ClickScenario.LOW),
+    )
+    uncached_verification = verified_result(
+        uncached_adapter,
+        allocation,
+        context,
+        ScheduleData((ScheduledSession("slot-first", 1),)),
+    )
+    uncached = evaluate_final(
+        uncached_adapter, allocation, uncached_verification, context
+    )
+
+    assert calls == [predictor, predictor]
+    assert first.status is EvaluationStatus.PREDICTED
+    assert second.status is EvaluationStatus.PREDICTED
+    assert uncached.status is EvaluationStatus.PREDICTED
+    assert first.prediction == second.prediction == uncached.prediction
+    assert (first.prediction >= 55) == (uncached.prediction >= 55)
+    assert first.schedule_identity != second.schedule_identity
+    assert first.csp_verification_identity != second.csp_verification_identity
+    assert first.monotonicity_report is not None
+    assert second.monotonicity_report is not None
+    observations = second.monotonicity_report.observations
+    assert len(observations) == 2
+    assert {item.schedule_identity for item in observations} == {
+        first.schedule_identity,
+        second.schedule_identity,
+    }
+
+
+def test_final_prediction_cache_misses_for_different_features(
+    tmp_path, monkeypatch
+) -> None:
+    calls = count_loaded_predictor_calls(monkeypatch)
+    predictor = _load_controlled_predictor(
+        tmp_path, categorical_preprocessor=True
+    )
+    adapter = SessionNNAdapter(
+        predictor, SessionClickMappingConfig(scenario=ClickScenario.LOW)
+    )
+    context = CandidateFeatureContext("student-1", "assignment-1", strict_row())
+    first_allocation = CandidateSessionAllocation((1, 0, 0, 0))
+    second_allocation = CandidateSessionAllocation((0, 1, 0, 0))
+    first_verification = verified_result(
+        adapter,
+        first_allocation,
+        context,
+        ScheduleData((ScheduledSession("slot-week-one", 1),)),
+    )
+    second_verification = verified_result(
+        adapter,
+        second_allocation,
+        context,
+        ScheduleData((ScheduledSession("slot-week-two", 2),)),
+    )
+
+    first = evaluate_final(adapter, first_allocation, first_verification, context)
+    second = evaluate_final(adapter, second_allocation, second_verification, context)
+
+    assert calls == [predictor, predictor]
+    assert first.mapping.features != second.mapping.features
+
+
+def test_final_prediction_cache_is_scoped_to_model_identity(
+    tmp_path, monkeypatch
+) -> None:
+    calls = count_loaded_predictor_calls(monkeypatch)
+    first_predictor = _load_controlled_predictor(
+        tmp_path, categorical_preprocessor=True
+    )
+    first_adapter = SessionNNAdapter(
+        first_predictor, SessionClickMappingConfig(scenario=ClickScenario.LOW)
+    )
+    context = CandidateFeatureContext("student-1", "assignment-1", strict_row())
+    second_predictor = _load_controlled_predictor(
+        tmp_path, weight_value=0.25, categorical_preprocessor=True
+    )
+    second_adapter = SessionNNAdapter(
+        second_predictor,
+        SessionClickMappingConfig(scenario=ClickScenario.LOW),
+    )
+    allocation = CandidateSessionAllocation((1, 0, 0, 0))
+    first_verification = verified_result(
+        first_adapter,
+        allocation,
+        context,
+        ScheduleData((ScheduledSession("slot-shared", 1),)),
+    )
+    second_verification = verified_result(
+        second_adapter,
+        allocation,
+        context,
+        ScheduleData((ScheduledSession("slot-shared", 1),)),
+    )
+
+    first = evaluate_final(first_adapter, allocation, first_verification, context)
+    second = evaluate_final(second_adapter, allocation, second_verification, context)
+
+    assert first_adapter.model_provenance_identity != (
+        second_adapter.model_provenance_identity
+    )
+    assert calls == [first_predictor, second_predictor]
+    assert first.prediction is not None
+    assert second.prediction is not None
+
+
+def test_final_prediction_cache_does_not_bypass_integrity_checks(
+    tmp_path, monkeypatch
+) -> None:
+    calls = count_loaded_predictor_calls(monkeypatch)
+    predictor = _load_controlled_predictor(
+        tmp_path, categorical_preprocessor=True
+    )
+    adapter = SessionNNAdapter(
+        predictor, SessionClickMappingConfig(scenario=ClickScenario.LOW)
+    )
+    context = CandidateFeatureContext("student-1", "assignment-1", strict_row())
+    allocation = CandidateSessionAllocation((1, 0, 0, 0))
+    schedule = ScheduleData((ScheduledSession("slot-integrity", 1),))
+    verification = verified_result(adapter, allocation, context, schedule)
+    evaluate_final(adapter, allocation, verification, context)
+    predictor.models[0].layers[0].weight.data[0, 0] += 1
+
+    with pytest.raises(
+        CandidateEvaluationError, match="no longer matches its artifact"
+    ):
+        evaluate_final(adapter, allocation, verification, context)
+
+    assert calls == [predictor]
+
+
+@pytest.mark.parametrize("failure", ["exception", "invalid_mark"])
+def test_final_prediction_cache_does_not_store_failed_inference(
+    tmp_path, monkeypatch, failure: str
+) -> None:
+    predictor = _load_controlled_predictor(
+        tmp_path, categorical_preprocessor=True
+    )
+    adapter = SessionNNAdapter(
+        predictor, SessionClickMappingConfig(scenario=ClickScenario.LOW)
+    )
+    context = CandidateFeatureContext("student-1", "assignment-1", strict_row())
+    allocation = CandidateSessionAllocation((1, 0, 0, 0))
+    verifications = tuple(
+        verified_result(
+            adapter,
+            allocation,
+            context,
+            ScheduleData((ScheduledSession(f"slot-{index}", 1),)),
+        )
+        for index in range(2)
+    )
+    calls = 0
+
+    def failed_prediction(_predictor, _features):
+        nonlocal calls
+        calls += 1
+        if failure == "exception":
+            raise RuntimeError("controlled inference failure")
+        return np.asarray([np.nan])
+
+    monkeypatch.setattr(RegressionPredictor, "predict", failed_prediction)
+    results = tuple(
+        evaluate_final(adapter, allocation, verification, context)
+        for verification in verifications
+    )
+
+    assert calls == 2
+    assert all(result.status is EvaluationStatus.INFERENCE_FAILED for result in results)
 
 
 def test_unrelated_contexts_are_never_compared() -> None:

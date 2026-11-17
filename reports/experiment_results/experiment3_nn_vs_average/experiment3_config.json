@@ -1,0 +1,17 @@
+{
+  "activity_group": "content_navigation",
+  "assessment_ids": [
+    "34899",
+    "34900",
+    "34901"
+  ],
+  "click_scenario": "low",
+  "clicks_per_session": 22,
+  "configuration_status": "SYNTHETIC_DEMO_ONLY_NOT_PRODUCTION",
+  "course_module": "FFF",
+  "slot_count": 3,
+  "support_policy": "report_only",
+  "target_mark": 60.0,
+  "test_presentation": "2014J",
+  "weekly_capacity": 2
+}

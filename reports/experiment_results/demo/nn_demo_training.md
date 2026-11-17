@@ -101,11 +101,11 @@ those three seed predictions and is reported separately.
 Checkpoint restoration minimizes validation Huber loss. Full epoch
 curves for all candidates and seeds are saved in `training_curves.csv`.
 Selected configuration checkpoints:
-Total experiment runtime including preprocessing and evaluation: 8.62 seconds; MLP search: 8.11 seconds.
+Total experiment runtime including preprocessing and evaluation: 6.94 seconds; MLP search: 6.59 seconds.
 
 | Seed | Epochs run | Best epoch | Best validation Huber loss | Duration (s) |
 | ---: | ---: | ---: | ---: | ---: |
-| 42 | 20 | 20 | 0.00888 | 4.48 |
+| 42 | 20 | 20 | 0.00888 | 4.15 |
 
 Representative selected-model training curve (seed 42):
 
@@ -127,6 +127,6 @@ constraint. No study sessions or causal effects are inferred.
 
 ## Artifacts
 
-All experiment files are under `C:\Users\janam\OneDrive\Desktop\3 sem 1\Intelligent systems\project 1\assessment-aware-study-planner\data\processed\nn_demo`: fitted preprocessor, Dummy/Ridge estimators, selected-seed MLP state dictionaries, strict
+All experiment files are under `/home/nouran/projects/assessment-aware-study-planner/data/processed/nn_demo`: fitted preprocessor, Dummy/Ridge estimators, selected-seed MLP state dictionaries, strict
 feature schema, configuration and versions, evaluation JSON, test
 predictions, and full training curves.

@@ -2,9 +2,9 @@
 
 **Configuration status:** SYNTHETIC DEMO ONLY — not production evidence.
 
-Profile manifest: `/mnt/c/Users/janam/OneDrive/Desktop/3 sem 1/Intelligent systems/project 1/assessment-aware-study-planner/reports/experiment_results/profiles_fff_2014J.json` (30 selected FFF 2014J students).
+Profile manifest: `/home/nouran/projects/assessment-aware-study-planner/reports/experiment_results/profiles_fff_2014J.json` (30 selected FFF 2014J students).
 Experiment seeds: `[42, 123, 2025, 31415, 271828]`.
-Demo NN artifact digest: `ab6d3a07b9fc4768e2e5341583f9a8e49c8e03e0520b26cf3daa9d7372e03e9a`.
+Demo NN artifact digest: `3e9080e6aee5b2cc42419316111d4fc62d2be7f92d10478a66b568ba538bca12`.
 Average baseline artifact identity: `0b3325d145d56a8aad8a48df2203b6db4d47bdf70b4e8256db00e312d09457a0`.
 
 The Search and CSP runs execute the project algorithms on explicit small
@@ -22,9 +22,9 @@ the first evaluation time repeated in the seed rows.
 | --- | --- | ---: | ---: | ---: | ---: | ---: |
 | search | greedy_best_first | 15 | 15 | 0 | 0 | 0 |
 | search | ucs | 15 | 15 | 0 | 0 | 0 |
-| csp | bt | 15 | 10 | 5 | 0 | 0 |
-| csp | bt_fc | 15 | 10 | 5 | 0 | 0 |
-| csp | bt_fc_ac3 | 15 | 10 | 5 | 0 | 0 |
+| csp | bt | 15 | 15 | 0 | 0 | 0 |
+| csp | bt_fc | 15 | 15 | 0 | 0 | 0 |
+| csp | bt_fc_ac3 | 15 | 15 | 0 | 0 | 0 |
 | prediction | average | 150 | 150 | 0 | 0 | 0 |
 | prediction | nn | 150 | 150 | 0 | 0 | 0 |
 

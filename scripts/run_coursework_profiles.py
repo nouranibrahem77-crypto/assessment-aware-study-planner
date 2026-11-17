@@ -6,8 +6,7 @@ import argparse
 from pathlib import Path
 
 from study_planner.integration.coursework import (
-    DEFAULT_CSV_PATH,
-    DEFAULT_RESULTS_PATH,
+    DEFAULT_RUNS_DIRECTORY,
     execute_coursework_profiles,
 )
 
@@ -15,13 +14,21 @@ from study_planner.integration.coursework import (
 def main() -> int:
     root = Path(__file__).resolve().parents[1]
     parser = argparse.ArgumentParser(description=__doc__)
-    parser.add_argument("--output", type=Path, default=root / DEFAULT_RESULTS_PATH)
-    parser.add_argument("--csv-output", type=Path, default=root / DEFAULT_CSV_PATH)
+    parser.add_argument(
+        "--run-dir",
+        type=Path,
+        help=(
+            "resume in this dedicated run directory; omit to create a new run "
+            f"under {DEFAULT_RUNS_DIRECTORY}"
+        ),
+    )
     args = parser.parse_args()
-    payload = execute_coursework_profiles(root, args.output, args.csv_output)
+    run_directory = args.run_dir
+    if run_directory is not None and not run_directory.is_absolute():
+        run_directory = root / run_directory
+    payload = execute_coursework_profiles(root, run_directory)
     print(payload["summary"])
-    print(f"JSON results: {args.output}")
-    print(f"CSV results: {args.csv_output}")
+    print(f"Run directory: {run_directory or DEFAULT_RUNS_DIRECTORY}")
     return 1 if payload["summary"]["execution_failures"] else 0
 
 

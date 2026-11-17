@@ -1,0 +1,230 @@
+%PDF-1.4
+%‚„œ”
+1 0 obj
+<< /Type /Catalog /Pages 2 0 R >>
+endobj
+2 0 obj
+<< /Type /Pages /Kids [6 0 R 8 0 R 10 0 R] /Count 3 >>
+endobj
+3 0 obj
+<< /Type /Font /Subtype /Type1 /BaseFont /Helvetica /Encoding /WinAnsiEncoding >>
+endobj
+4 0 obj
+<< /Type /Font /Subtype /Type1 /BaseFont /Helvetica-Bold /Encoding /WinAnsiEncoding >>
+endobj
+5 0 obj
+<< /Type /Font /Subtype /Type1 /BaseFont /Courier /Encoding /WinAnsiEncoding >>
+endobj
+6 0 obj
+<< /Type /Page /Parent 2 0 R /MediaBox [0 0 612 792] /Resources << /Font << /F1 3 0 R /F2 4 0 R /F3 5 0 R >> >> /Contents 7 0 R >>
+endobj
+7 0 obj
+<< /Length 8663 >>
+stream
+0.12 0.25 0.39 rg
+54.00 760.00 504.00 0.6 re f
+0.340 0.390 0.440 rg BT /F1 7.20 Tf 1 0 0 1 54.00 767.00 Tm (ASSESSMENT-AWARE STUDY PLANNER  |  FINAL PROJECT REPORT) Tj ET
+0.080 0.220 0.370 rg BT /F2 21.00 Tf 1 0 0 1 54.00 724.00 Tm (Assessment-Aware Study Planner) Tj ET
+0.100 0.240 0.390 rg BT /F2 14.20 Tf 1 0 0 1 54.00 690.00 Tm (Final Project Report) Tj ET
+0.300 0.340 0.390 rg BT /F1 9.00 Tf 1 0 0 1 54.00 672.00 Tm (Project: Intelligent Systems Project) Tj ET
+0.300 0.340 0.390 rg BT /F1 9.00 Tf 1 0 0 1 54.00 659.00 Tm (Report date: 17 November 2026) Tj ET
+0.100 0.240 0.390 rg BT /F2 14.20 Tf 1 0 0 1 54.00 643.00 Tm (Problem) Tj ET
+0.130 0.160 0.200 rg BT /F1 9.10 Tf 1 0 0 1 54.00 625.00 Tm (The planner addresses allocation of study sessions for three upcoming assessments. It predicts marks from) Tj ET
+0.130 0.160 0.200 rg BT /F1 9.10 Tf 1 0 0 1 54.00 613.00 Tm (historical OULAD features, proposes session allocations across eligible weeks, and checks whether each) Tj ET
+0.130 0.160 0.200 rg BT /F1 9.10 Tf 1 0 0 1 54.00 601.00 Tm (allocation can be placed in a timetable that respects the configured slot, deadline, ordering, and capacity) Tj ET
+0.130 0.160 0.200 rg BT /F1 9.10 Tf 1 0 0 1 54.00 589.00 Tm (constraints. A plan meets its goal only when a concrete schedule passes CSP verification and final predicted) Tj ET
+0.130 0.160 0.200 rg BT /F1 9.10 Tf 1 0 0 1 54.00 577.00 Tm (marks meet every configured target. Prediction alone cannot establish timetable feasibility. [1-4]) Tj ET
+0.130 0.160 0.200 rg BT /F1 9.10 Tf 1 0 0 1 54.00 560.00 Tm (The inputs combine retrospective OULAD student features with explicit planning settings. Demo and experiment) Tj ET
+0.130 0.160 0.200 rg BT /F1 9.10 Tf 1 0 0 1 54.00 548.00 Tm (targets, slot calendars, capacities, and session-to-click changes are synthetic configurations, not observed) Tj ET
+0.130 0.160 0.200 rg BT /F1 9.10 Tf 1 0 0 1 54.00 536.00 Tm (student schedules or approved course policy. If Search completes without finding a target-reaching plan, the) Tj ET
+0.130 0.160 0.200 rg BT /F1 9.10 Tf 1 0 0 1 54.00 524.00 Tm (planner can return its best final-scored, supported, verified plan. A run stopped by a resource limit is) Tj ET
+0.130 0.160 0.200 rg BT /F1 9.10 Tf 1 0 0 1 54.00 512.00 Tm (incomplete and does not establish that a target is unreachable. The predicted relationship between study) Tj ET
+0.130 0.160 0.200 rg BT /F1 9.10 Tf 1 0 0 1 54.00 500.00 Tm (activity and marks is observational/simulated, not causal. [1, 2, 4, 11]) Tj ET
+0.100 0.240 0.390 rg BT /F2 14.20 Tf 1 0 0 1 54.00 480.00 Tm (Design Choices) Tj ET
+0.130 0.160 0.200 rg BT /F1 9.10 Tf 1 0 0 1 54.00 462.00 Tm (Prediction, allocation search, and timetable scheduling are separate components: the NN estimates marks,) Tj ET
+0.130 0.160 0.200 rg BT /F1 9.10 Tf 1 0 0 1 54.00 450.00 Tm (Search proposes session counts and weeks, and CSP determines whether sessions can occupy eligible concrete) Tj ET
+0.130 0.160 0.200 rg BT /F1 9.10 Tf 1 0 0 1 54.00 438.00 Tm (slots. This distinguishes a promising predicted mark from a usable verified plan. Model A Strict is the) Tj ET
+0.130 0.160 0.200 rg BT /F1 9.10 Tf 1 0 0 1 54.00 426.00 Tm (primary mode and excludes previous marks. Model B is a separate proxy sensitivity comparison because its) Tj ET
+0.130 0.160 0.200 rg BT /F1 9.10 Tf 1 0 0 1 54.00 414.00 Tm (submission-based prior marks may not have been released by the next prediction cutoff. [1-3, 5]) Tj ET
+0.130 0.160 0.200 rg BT /F1 9.10 Tf 1 0 0 1 54.00 397.00 Tm (UCS assigns unit cost to each added session, making path cost equal to plan size; it prioritizes smaller) Tj ET
+0.130 0.160 0.200 rg BT /F1 9.10 Tf 1 0 0 1 54.00 385.00 Tm (allocations and, under finite bounds and correct goal evaluation, finds a minimum-session goal. Greedy) Tj ET
+0.130 0.160 0.200 rg BT /F1 9.10 Tf 1 0 0 1 54.00 373.00 Tm (Best-First is also available in integrated planning; A* is used in the separate search comparison rather) Tj ET
+0.130 0.160 0.200 rg BT /F1 9.10 Tf 1 0 0 1 54.00 361.00 Tm (than integrated orchestration. CSP exposes BT, BT+FC, and BT+FC+AC-3 separately. FC prunes values when) Tj ET
+0.130 0.160 0.200 rg BT /F1 9.10 Tf 1 0 0 1 54.00 349.00 Tm (constraints have one unassigned variable; AC-3 propagates explicit binary constraints and does not make) Tj ET
+0.130 0.160 0.200 rg BT /F1 9.10 Tf 1 0 0 1 54.00 337.00 Tm (higher-scope constraints arc-consistent. No method is assumed to dominate runtime on every problem. [1, 4,) Tj ET
+0.130 0.160 0.200 rg BT /F1 9.10 Tf 1 0 0 1 54.00 325.00 Tm (6-8]) Tj ET
+0.130 0.160 0.200 rg BT /F1 9.10 Tf 1 0 0 1 54.00 308.00 Tm (The chronological split \(2013B/2013J train, 2014B validation, 2014J test\) and deadline-day feature cutoff) Tj ET
+0.130 0.160 0.200 rg BT /F1 9.10 Tf 1 0 0 1 54.00 296.00 Tm (constrain temporal leakage. Strict features use clicks before the start of the target deadline day and) Tj ET
+0.130 0.160 0.200 rg BT /F1 9.10 Tf 1 0 0 1 54.00 284.00 Tm (exclude prior scores. Training configurations record seeds and artifact settings; inference binds) Tj ET
+0.130 0.160 0.200 rg BT /F1 9.10 Tf 1 0 0 1 54.00 272.00 Tm (predictions to the loaded model, schema, candidate, and CSP verification identity. These choices support) Tj ET
+0.130 0.160 0.200 rg BT /F1 9.10 Tf 1 0 0 1 54.00 260.00 Tm (repeatable evaluation and prevent unverified predictions from satisfying the planner goal. [2-4, 6]) Tj ET
+0.100 0.240 0.390 rg BT /F2 14.20 Tf 1 0 0 1 54.00 240.00 Tm (Neural Network \(NN\)) Tj ET
+0.130 0.160 0.200 rg BT /F1 9.10 Tf 1 0 0 1 54.00 222.00 Tm (Two MLP modes predict target_score, a mark in [0, 100]. Model A Strict uses assessment metadata and recent) Tj ET
+0.130 0.160 0.200 rg BT /F1 9.10 Tf 1 0 0 1 54.00 210.00 Tm (clicks, with 19 source features \(17 model inputs; 18 transformed inputs\). Model B Previous-Marks Proxy adds) Tj ET
+0.130 0.160 0.200 rg BT /F1 9.10 Tf 1 0 0 1 54.00 198.00 Tm (five prior-score lags and five availability indicators, with 29 source features \(27 model inputs; 33) Tj ET
+0.130 0.160 0.200 rg BT /F1 9.10 Tf 1 0 0 1 54.00 186.00 Tm (transformed inputs\). The fixed chronological row counts are 25,229 train, 9,013 validation, and 14,241 test.) Tj ET
+0.130 0.160 0.200 rg BT /F1 9.10 Tf 1 0 0 1 54.00 174.00 Tm (Both saved experiments record seeds 42, 123, and 2025; test metrics below are three-seed ensemble results,) Tj ET
+0.130 0.160 0.200 rg BT /F1 9.10 Tf 1 0 0 1 54.00 162.00 Tm (not the mean of separate seed metrics. [2-5]) Tj ET
+0.130 0.160 0.200 rg BT /F1 9.10 Tf 1 0 0 1 54.00 145.00 Tm (The selected MLP uses 64- and 32-unit hidden layers, 0.1 dropout, and Huber loss; configuration selection) Tj ET
+0.130 0.160 0.200 rg BT /F1 9.10 Tf 1 0 0 1 54.00 133.00 Tm (uses validation MAE, leaving test rows for final evaluation. [3-5]) Tj ET
+0.88 0.92 0.96 rg 54.00 102.00 504.00 17.00 re f
+0.72 0.77 0.82 RG 0.45 w 54.00 102.00 504.00 17.00 re S
+0.120 0.170 0.220 rg BT /F2 8.00 Tf 1 0 0 1 59.00 107.00 Tm (Test evaluation \(n = 14,241\)) Tj ET
+0.78 0.81 0.84 RG 0.35 w 290.88 102.00 m 290.88 119.00 l S
+0.120 0.170 0.220 rg BT /F2 8.00 Tf 1 0 0 1 295.88 107.00 Tm (MAE) Tj ET
+0.78 0.81 0.84 RG 0.35 w 381.60 102.00 m 381.60 119.00 l S
+0.120 0.170 0.220 rg BT /F2 8.00 Tf 1 0 0 1 386.60 107.00 Tm (RMSE) Tj ET
+0.78 0.81 0.84 RG 0.35 w 472.32 102.00 m 472.32 119.00 l S
+0.120 0.170 0.220 rg BT /F2 8.00 Tf 1 0 0 1 477.32 107.00 Tm (R2) Tj ET
+0.72 0.77 0.82 RG 0.45 w 54.00 85.00 504.00 17.00 re S
+0.120 0.170 0.220 rg BT /F1 8.00 Tf 1 0 0 1 59.00 90.00 Tm (Model A Strict, seed ensemble) Tj ET
+0.78 0.81 0.84 RG 0.35 w 290.88 85.00 m 290.88 102.00 l S
+0.120 0.170 0.220 rg BT /F1 8.00 Tf 1 0 0 1 295.88 90.00 Tm (10.061613) Tj ET
+0.78 0.81 0.84 RG 0.35 w 381.60 85.00 m 381.60 102.00 l S
+0.120 0.170 0.220 rg BT /F1 8.00 Tf 1 0 0 1 386.60 90.00 Tm (12.834290) Tj ET
+0.78 0.81 0.84 RG 0.35 w 472.32 85.00 m 472.32 102.00 l S
+0.120 0.170 0.220 rg BT /F1 8.00 Tf 1 0 0 1 477.32 90.00 Tm (0.074467) Tj ET
+0.72 0.77 0.82 RG 0.45 w 54.00 68.00 504.00 17.00 re S
+0.120 0.170 0.220 rg BT /F1 8.00 Tf 1 0 0 1 59.00 73.00 Tm (Model A Dummy mean baseline) Tj ET
+0.78 0.81 0.84 RG 0.35 w 290.88 68.00 m 290.88 85.00 l S
+0.120 0.170 0.220 rg BT /F1 8.00 Tf 1 0 0 1 295.88 73.00 Tm (10.488579) Tj ET
+0.78 0.81 0.84 RG 0.35 w 381.60 68.00 m 381.60 85.00 l S
+0.120 0.170 0.220 rg BT /F1 8.00 Tf 1 0 0 1 386.60 73.00 Tm (13.405465) Tj ET
+0.78 0.81 0.84 RG 0.35 w 472.32 68.00 m 472.32 85.00 l S
+0.120 0.170 0.220 rg BT /F1 8.00 Tf 1 0 0 1 477.32 73.00 Tm (-0.009746) Tj ET
+0.35 0.39 0.43 rg BT /F1 7.5 Tf 1 0 0 1 513.00 24 Tm (1 / 3) Tj ET
+0.35 0.39 0.43 rg BT /F1 7.5 Tf 1 0 0 1 513.00 24 Tm (1 / 3) Tj ET
+endstream
+endobj
+8 0 obj
+<< /Type /Page /Parent 2 0 R /MediaBox [0 0 612 792] /Resources << /Font << /F1 3 0 R /F2 4 0 R /F3 5 0 R >> >> /Contents 9 0 R >>
+endobj
+9 0 obj
+<< /Length 8584 >>
+stream
+0.12 0.25 0.39 rg
+54.00 760.00 504.00 0.6 re f
+0.340 0.390 0.440 rg BT /F1 7.20 Tf 1 0 0 1 54.00 767.00 Tm (ASSESSMENT-AWARE STUDY PLANNER  |  FINAL PROJECT REPORT) Tj ET
+0.72 0.77 0.82 RG 0.45 w 54.00 710.00 504.00 17.00 re S
+0.120 0.170 0.220 rg BT /F1 8.00 Tf 1 0 0 1 59.00 715.00 Tm (Model A Ridge baseline) Tj ET
+0.78 0.81 0.84 RG 0.35 w 290.88 710.00 m 290.88 727.00 l S
+0.120 0.170 0.220 rg BT /F1 8.00 Tf 1 0 0 1 295.88 715.00 Tm (10.240101) Tj ET
+0.78 0.81 0.84 RG 0.35 w 381.60 710.00 m 381.60 727.00 l S
+0.120 0.170 0.220 rg BT /F1 8.00 Tf 1 0 0 1 386.60 715.00 Tm (13.070490) Tj ET
+0.78 0.81 0.84 RG 0.35 w 472.32 710.00 m 472.32 727.00 l S
+0.120 0.170 0.220 rg BT /F1 8.00 Tf 1 0 0 1 477.32 715.00 Tm (0.040087) Tj ET
+0.72 0.77 0.82 RG 0.45 w 54.00 693.00 504.00 17.00 re S
+0.120 0.170 0.220 rg BT /F1 8.00 Tf 1 0 0 1 59.00 698.00 Tm (Model B Previous-Marks Proxy, paired ensemble) Tj ET
+0.78 0.81 0.84 RG 0.35 w 290.88 693.00 m 290.88 710.00 l S
+0.120 0.170 0.220 rg BT /F1 8.00 Tf 1 0 0 1 295.88 698.00 Tm (8.608332) Tj ET
+0.78 0.81 0.84 RG 0.35 w 381.60 693.00 m 381.60 710.00 l S
+0.120 0.170 0.220 rg BT /F1 8.00 Tf 1 0 0 1 386.60 698.00 Tm (11.328663) Tj ET
+0.78 0.81 0.84 RG 0.35 w 472.32 693.00 m 472.32 710.00 l S
+0.120 0.170 0.220 rg BT /F1 8.00 Tf 1 0 0 1 477.32 698.00 Tm (0.278883) Tj ET
+0.130 0.160 0.200 rg BT /F1 9.10 Tf 1 0 0 1 54.00 683.00 Tm (Model A's ensemble improves on its Dummy and Ridge baselines by these regression metrics. Model B's test) Tj ET
+0.130 0.160 0.200 rg BT /F1 9.10 Tf 1 0 0 1 54.00 671.00 Tm (comparison uses the same paired rows but remains a proxy sensitivity result: a prior mark appears in 12,469) Tj ET
+0.130 0.160 0.200 rg BT /F1 9.10 Tf 1 0 0 1 54.00 659.00 Tm (of 14,241 test rows \(87.557%\), while OULAD provides no grade-release timestamps to confirm it was visible by) Tj ET
+0.130 0.160 0.200 rg BT /F1 9.10 Tf 1 0 0 1 54.00 647.00 Tm (prediction time. MAE, RMSE, and R2 are appropriate for numeric marks; they are not classification accuracy.) Tj ET
+0.130 0.160 0.200 rg BT /F1 9.10 Tf 1 0 0 1 54.00 635.00 Tm (Predictive association does not establish that clicks or prior marks cause later results. [3-5]) Tj ET
+0.100 0.240 0.390 rg BT /F2 14.20 Tf 1 0 0 1 54.00 615.00 Tm (Integration) Tj ET
+0.130 0.160 0.200 rg BT /F1 9.10 Tf 1 0 0 1 54.00 597.00 Tm (The application selects Model A or Model B and binds it to the session-feature adapter. For each UCS) Tj ET
+0.130 0.160 0.200 rg BT /F1 9.10 Tf 1 0 0 1 54.00 585.00 Tm (allocation, the adapter maps proposed sessions to candidate click features and obtains provisional NN) Tj ET
+0.130 0.160 0.200 rg BT /F1 9.10 Tf 1 0 0 1 54.00 573.00 Tm (predictions before CSP verification. CSP then enumerates schedules and verifies each concrete timetable.) Tj ET
+0.130 0.160 0.200 rg BT /F1 9.10 Tf 1 0 0 1 54.00 561.00 Tm (Only a schedule that passes verification receives final NN predictions. Target misses or rejected schedules) Tj ET
+0.130 0.160 0.200 rg BT /F1 9.10 Tf 1 0 0 1 54.00 549.00 Tm (lead to another CSP schedule; once that allocation's schedules are exhausted, Search can try another) Tj ET
+0.130 0.160 0.200 rg BT /F1 9.10 Tf 1 0 0 1 54.00 537.00 Tm (allocation. [6, 7]) Tj ET
+0.96 0.97 0.98 rg 54.00 478.00 504.00 42.00 re f
+0.67 0.73 0.79 RG 0.6 w 54.00 478.00 504.00 42.00 re S
+0.160 0.240 0.310 rg BT /F3 8.30 Tf 1 0 0 1 64.00 507.00 Tm (OULAD features + configured scenario -> UCS allocation -> provisional NN prediction) Tj ET
+0.160 0.240 0.310 rg BT /F3 8.30 Tf 1 0 0 1 64.00 496.00 Tm (-> CSP schedule enumeration and verification -> final NN prediction) Tj ET
+0.160 0.240 0.310 rg BT /F3 8.30 Tf 1 0 0 1 64.00 485.00 Tm (Rejected schedule: next CSP schedule | CSP exhausted: return to UCS) Tj ET
+0.130 0.160 0.200 rg BT /F1 9.10 Tf 1 0 0 1 54.00 471.00 Tm (CSP uses eligible slot domains and checks deadline eligibility, unique slot use, same-assignment ordering,) Tj ET
+0.130 0.160 0.200 rg BT /F1 9.10 Tf 1 0 0 1 54.00 459.00 Tm (and weekly capacity. BT, FC, and AC-3 are separate options. A target-achieving result may stop Search early.) Tj ET
+0.130 0.160 0.200 rg BT /F1 9.10 Tf 1 0 0 1 54.00 447.00 Tm (An unreachable-target result requires completed Search; node or candidate limits produce an incomplete) Tj ET
+0.130 0.160 0.200 rg BT /F1 9.10 Tf 1 0 0 1 54.00 435.00 Tm (result. When Search completes without meeting targets, the planner can return the best final-scored,) Tj ET
+0.130 0.160 0.200 rg BT /F1 9.10 Tf 1 0 0 1 54.00 423.00 Tm (supported, CSP-verified plan found. [1, 6-8]) Tj ET
+0.100 0.240 0.390 rg BT /F2 14.20 Tf 1 0 0 1 54.00 403.00 Tm (Limitations) Tj ET
+0.130 0.160 0.200 rg BT /F1 9.10 Tf 1 0 0 1 54.00 385.00 Tm (OULAD is retrospective and observational, with day-level activity timestamps; it cannot establish that study) Tj ET
+0.130 0.160 0.200 rg BT /F1 9.10 Tf 1 0 0 1 54.00 373.00 Tm (clicks cause marks or generalization to other institutions or cohorts. Model B's prior-score availability is) Tj ET
+0.130 0.160 0.200 rg BT /F1 9.10 Tf 1 0 0 1 54.00 361.00 Tm (unverified because release timestamps are absent. Session-to-click increments \(22, 62, or 121 configured) Tj ET
+0.130 0.160 0.200 rg BT /F1 9.10 Tf 1 0 0 1 54.00 349.00 Tm (clicks per hypothetical session\) are training-anchored synthetic assumptions, not measured session durations) Tj ET
+0.130 0.160 0.200 rg BT /F1 9.10 Tf 1 0 0 1 54.00 337.00 Tm (or effects. [3, 5, 12]) Tj ET
+0.130 0.160 0.200 rg BT /F1 9.10 Tf 1 0 0 1 54.00 320.00 Tm (Planner experiments use synthetic targets, slot calendars/capacities, and click mappings even when profiles) Tj ET
+0.130 0.160 0.200 rg BT /F1 9.10 Tf 1 0 0 1 54.00 308.00 Tm (or features come from OULAD. Their results demonstrate behavior under those settings, not real student) Tj ET
+0.130 0.160 0.200 rg BT /F1 9.10 Tf 1 0 0 1 54.00 296.00 Tm (behavior, production policy, deployment, or intervention effectiveness. Search/CSP resource limits can leave) Tj ET
+0.130 0.160 0.200 rg BT /F1 9.10 Tf 1 0 0 1 54.00 284.00 Tm (a run incomplete; such a run cannot support an unreachable-target claim. The separate 30-profile coursework) Tj ET
+0.130 0.160 0.200 rg BT /F1 9.10 Tf 1 0 0 1 54.00 272.00 Tm (execution is also incomplete: its manifest lists 30 intended IDs but the recorded run contains only three) Tj ET
+0.130 0.160 0.200 rg BT /F1 9.10 Tf 1 0 0 1 54.00 260.00 Tm (per-profile result files. [9-13]) Tj ET
+0.100 0.240 0.390 rg BT /F2 14.20 Tf 1 0 0 1 54.00 240.00 Tm (Conclusions) Tj ET
+0.130 0.160 0.200 rg BT /F1 9.10 Tf 1 0 0 1 54.00 222.00 Tm (The project implements OULAD feature preparation, two distinct mark-prediction modes, UCS allocation search,) Tj ET
+0.130 0.160 0.200 rg BT /F1 9.10 Tf 1 0 0 1 54.00 210.00 Tm (and CSP timetable verification. Model A's saved ensemble improves on its Dummy and Ridge baselines on the) Tj ET
+0.130 0.160 0.200 rg BT /F1 9.10 Tf 1 0 0 1 54.00 198.00 Tm (chronological test split. Model B has better paired test metrics under its submission-based prior-mark) Tj ET
+0.130 0.160 0.200 rg BT /F1 9.10 Tf 1 0 0 1 54.00 186.00 Tm (proxy, with the grade-release limitation above. [2-5]) Tj ET
+0.130 0.160 0.200 rg BT /F1 9.10 Tf 1 0 0 1 54.00 169.00 Tm (Experiment 1's small synthetic search cases returned solution cost 3 for UCS and A*, versus 6 for Greedy.) Tj ET
+0.130 0.160 0.200 rg BT /F1 9.10 Tf 1 0 0 1 54.00 157.00 Tm (Experiment 2 recorded 45 feasible runs across BT, BT+FC, BT+FC+AC-3, and 2/3/4 physical slots per week; FC) Tj ET
+0.130 0.160 0.200 rg BT /F1 9.10 Tf 1 0 0 1 54.00 145.00 Tm (visited fewer nodes than BT in these scenarios, while AC-3 visited the same number as FC. Experiment 3 met) Tj ET
+0.130 0.160 0.200 rg BT /F1 9.10 Tf 1 0 0 1 54.00 133.00 Tm (its synthetic 60-mark target in all 150 runs per predictor, with mean predicted marks of 76.698 +/- 4.306) Tj ET
+0.130 0.160 0.200 rg BT /F1 9.10 Tf 1 0 0 1 54.00 121.00 Tm (for the NN and 78.761 +/- 0.000 for Average-Mark. The target was met at zero sessions by both predictors, so) Tj ET
+0.130 0.160 0.200 rg BT /F1 9.10 Tf 1 0 0 1 54.00 109.00 Tm (this experiment does not show an NN planning advantage. These results demonstrate implemented component) Tj ET
+0.130 0.160 0.200 rg BT /F1 9.10 Tf 1 0 0 1 54.00 97.00 Tm (behavior under specified data and scenario settings; they do not establish causal study effects, real-world) Tj ET
+0.130 0.160 0.200 rg BT /F1 9.10 Tf 1 0 0 1 54.00 85.00 Tm (validation, or production deployment. [9-11]) Tj ET
+0.35 0.39 0.43 rg BT /F1 7.5 Tf 1 0 0 1 513.00 24 Tm (2 / 3) Tj ET
+0.35 0.39 0.43 rg BT /F1 7.5 Tf 1 0 0 1 513.00 24 Tm (2 / 3) Tj ET
+endstream
+endobj
+10 0 obj
+<< /Type /Page /Parent 2 0 R /MediaBox [0 0 612 792] /Resources << /Font << /F1 3 0 R /F2 4 0 R /F3 5 0 R >> >> /Contents 11 0 R >>
+endobj
+11 0 obj
+<< /Length 3936 >>
+stream
+0.12 0.25 0.39 rg
+54.00 760.00 504.00 0.6 re f
+0.340 0.390 0.440 rg BT /F1 7.20 Tf 1 0 0 1 54.00 767.00 Tm (ASSESSMENT-AWARE STUDY PLANNER  |  FINAL PROJECT REPORT) Tj ET
+0.130 0.160 0.200 rg BT /F1 9.10 Tf 1 0 0 1 54.00 724.00 Tm (The planner distinguishes target achievement with a verified schedule, target unreachability after) Tj ET
+0.130 0.160 0.200 rg BT /F1 9.10 Tf 1 0 0 1 54.00 712.00 Tm (exhaustive Search, and incomplete execution when a limit prevents completion. The cited 30-profile) Tj ET
+0.130 0.160 0.200 rg BT /F1 9.10 Tf 1 0 0 1 54.00 700.00 Tm (experiments are not evidence that the separate coursework batch completed. [6, 13]) Tj ET
+0.100 0.240 0.390 rg BT /F2 14.20 Tf 1 0 0 1 54.00 680.00 Tm (References) Tj ET
+0.130 0.160 0.200 rg BT /F1 8.20 Tf 1 0 0 1 54.00 662.00 Tm (1. docs/search_design.md - project problem formulation, design and outcome semantics.) Tj ET
+0.130 0.160 0.200 rg BT /F1 8.20 Tf 1 0 0 1 54.00 650.00 Tm (2. reports/feature_engineering_strict.md - OULAD strict features, chronological splits and cutoff.) Tj ET
+0.130 0.160 0.200 rg BT /F1 8.20 Tf 1 0 0 1 54.00 638.00 Tm (3. reports/nn_training.md - Model A protocol, baselines, metrics and limitations.) Tj ET
+0.130 0.160 0.200 rg BT /F1 8.20 Tf 1 0 0 1 54.00 626.00 Tm (4. data/processed/nn_experiment/evaluation.json - saved Model A evaluation metrics.) Tj ET
+0.130 0.160 0.200 rg BT /F1 8.20 Tf 1 0 0 1 54.00 614.00 Tm (5. reports/previous_marks_mlp_comparison.md; data/processed/nn_experiment_previous_marks/evaluation.json - paired Model) Tj ET
+0.130 0.160 0.200 rg BT /F1 8.20 Tf 1 0 0 1 54.00 604.00 Tm (B comparison, coverage and limitations.) Tj ET
+0.130 0.160 0.200 rg BT /F1 8.20 Tf 1 0 0 1 54.00 592.00 Tm (6. src/study_planner/integration/planner.py - integrated prediction, schedule evaluation, Search continuation and) Tj ET
+0.130 0.160 0.200 rg BT /F1 8.20 Tf 1 0 0 1 54.00 582.00 Tm (completion states.) Tj ET
+0.130 0.160 0.200 rg BT /F1 8.20 Tf 1 0 0 1 54.00 570.00 Tm (7. src/study_planner/integration/application_inputs.py; src/study_planner/integration/application_planning.py -) Tj ET
+0.130 0.160 0.200 rg BT /F1 8.20 Tf 1 0 0 1 54.00 560.00 Tm (validated inputs, predictor binding and CSP problem construction.) Tj ET
+0.130 0.160 0.200 rg BT /F1 8.20 Tf 1 0 0 1 54.00 548.00 Tm (8. src/study_planner/integration/schedule_bridge.py; src/study_planner/csp/backtracking.py;) Tj ET
+0.130 0.160 0.200 rg BT /F1 8.20 Tf 1 0 0 1 54.00 538.00 Tm (src/study_planner/csp/forward_checking.py; src/study_planner/csp/ac3.py - schedule enumeration and CSP methods.) Tj ET
+0.130 0.160 0.200 rg BT /F1 8.20 Tf 1 0 0 1 54.00 526.00 Tm (9. reports/experiment_results/experiment1_astar/search_summary.csv - Experiment 1 run summaries.) Tj ET
+0.130 0.160 0.200 rg BT /F1 8.20 Tf 1 0 0 1 54.00 514.00 Tm (10. reports/experiment_results/demo/experiment_report.md; reports/experiment_results/demo/csp_summary.csv - synthetic) Tj ET
+0.130 0.160 0.200 rg BT /F1 8.20 Tf 1 0 0 1 54.00 504.00 Tm (demo and Experiment 2 findings.) Tj ET
+0.130 0.160 0.200 rg BT /F1 8.20 Tf 1 0 0 1 54.00 492.00 Tm (11. reports/experiment_results/experiment3_nn_vs_average/experiment3_report.md;) Tj ET
+0.130 0.160 0.200 rg BT /F1 8.20 Tf 1 0 0 1 54.00 482.00 Tm (reports/experiment_results/experiment3_nn_vs_average/experiment3_method_summary.csv - Experiment 3 protocol and results.) Tj ET
+0.130 0.160 0.200 rg BT /F1 8.20 Tf 1 0 0 1 54.00 470.00 Tm (12. reports/oulad_exploration.md - dataset interpretation and generalization limitations.) Tj ET
+0.130 0.160 0.200 rg BT /F1 8.20 Tf 1 0 0 1 54.00 458.00 Tm (13. docs/project_compliance_audit.md; reports/coursework_runs/20261117-203921-d566b9d2/run_manifest.json -) Tj ET
+0.130 0.160 0.200 rg BT /F1 8.20 Tf 1 0 0 1 54.00 448.00 Tm (coursework-run status and evidence.) Tj ET
+0.35 0.39 0.43 rg BT /F1 7.5 Tf 1 0 0 1 513.00 24 Tm (3 / 3) Tj ET
+0.35 0.39 0.43 rg BT /F1 7.5 Tf 1 0 0 1 513.00 24 Tm (3 / 3) Tj ET
+endstream
+endobj
+xref
+0 12
+0000000000 65535 f 
+0000000015 00000 n 
+0000000064 00000 n 
+0000000134 00000 n 
+0000000231 00000 n 
+0000000333 00000 n 
+0000000428 00000 n 
+0000000574 00000 n 
+0000009289 00000 n 
+0000009435 00000 n 
+0000018071 00000 n 
+0000018219 00000 n 
+trailer
+<< /Size 12 /Root 1 0 R /Info << /Title (Assessment-Aware Study Planner Final Project Report) /Author (Assessment-Aware Study Planner Project) >> >>
+startxref
+22208
+%%EOF

@@ -277,6 +277,45 @@ def test_fc_binary_pruning_restoration_and_solution_set_match_backtracking() -> 
     )
 
 
+def test_fc_scope_index_preserves_order_and_complete_solution_set() -> None:
+    variables = tuple(SessionVariable(name, 0) for name in ("a", "b", "c"))
+    extra = _NaryConstraint(variables)
+    problem = _three_variable_problem(extra_constraint=extra)
+    enumerator = forward_checking_enumerator(problem)
+
+    for variable in problem.variables:
+        assert enumerator._constraints_by_variable[variable] == tuple(
+            constraint
+            for constraint in problem.constraints
+            if variable in constraint.scope
+        )
+
+    solutions = set()
+    while True:
+        result = enumerator.next_solution()
+        if result.status is BacktrackingEnumerationStatus.EXHAUSTED:
+            break
+        assert result.status is BacktrackingEnumerationStatus.SOLUTION_FOUND
+        assert result.evaluation is not None
+        solutions.add(frozenset(result.evaluation.assignment.placements.items()))
+
+    baseline = backtracking_enumerator(problem)
+    baseline_solutions = set()
+    while True:
+        result = baseline.next_solution()
+        if result.status is BacktrackingEnumerationStatus.EXHAUSTED:
+            break
+        assert result.status is BacktrackingEnumerationStatus.SOLUTION_FOUND
+        assert result.evaluation is not None
+        baseline_solutions.add(
+            frozenset(result.evaluation.assignment.placements.items())
+        )
+
+    assert len(solutions) == 60
+    assert solutions == baseline_solutions
+    assert enumerator.next_solution().status is BacktrackingEnumerationStatus.EXHAUSTED
+
+
 def test_fc_domain_wipeout_restores_values_before_later_branch() -> None:
     assignments = tuple(
         AssignmentPlan(

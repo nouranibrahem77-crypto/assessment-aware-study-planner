@@ -3,8 +3,9 @@
   "runs": [
     {
       "configuration": {
-        "capacity": 2,
-        "configuration_status": "SYNTHETIC_DEMO_ONLY"
+        "configuration_status": "SYNTHETIC_DEMO_ONLY",
+        "physical_slots_per_week": 2,
+        "weekly_capacity_from_physical_slots": 2
       },
       "error_message": null,
       "error_type": null,
@@ -12,559 +13,35 @@
       "failure_reasons": [],
       "method": "bt",
       "metrics": {
-        "assignments_attempted": 30,
-        "backtracks": 30,
+        "assignments_attempted": 68,
+        "backtracks": 46,
         "compatibility_checks": 0,
-        "constraint_checks": 847,
+        "constraint_checks": 5244,
         "domain_prunings": 0,
         "exhaustive": 1,
-        "feasible_schedules": 0,
-        "nodes_visited": 31,
+        "feasible_schedules": 8,
+        "nodes_visited": 69,
         "rejected_schedules": 0,
-        "schedules_examined": 0,
-        "solver_time_seconds": 0.004656246000195097,
-        "wall_time_seconds": 0.004695771999649878
+        "schedules_examined": 8,
+        "solver_time_seconds": 0.02193543600878911,
+        "wall_time_seconds": 0.023829965997720137
       },
       "profile_id": null,
       "provenance": {
-        "problem_identity": "a6102e105ab941b2593e124f2d7aa07bfdc65d22e2db8b7d8c7cf508e0d45c2b",
-        "rejection_reasons": [],
-        "terminal_status": "exhausted_no_feasible",
-        "whole_plan_identity": "f9a8fd5b53c8e98cd140afe4bfc084ce14d464836c78c2cefa5a6306a272bbc4"
-      },
-      "scenario_id": "weekly-capacity-2",
-      "seed": 42,
-      "status": "infeasible"
-    },
-    {
-      "configuration": {
-        "capacity": 2,
-        "configuration_status": "SYNTHETIC_DEMO_ONLY"
-      },
-      "error_message": null,
-      "error_type": null,
-      "experiment_id": "csp",
-      "failure_reasons": [],
-      "method": "bt",
-      "metrics": {
-        "assignments_attempted": 30,
-        "backtracks": 30,
-        "compatibility_checks": 0,
-        "constraint_checks": 847,
-        "domain_prunings": 0,
-        "exhaustive": 1,
-        "feasible_schedules": 0,
-        "nodes_visited": 31,
-        "rejected_schedules": 0,
-        "schedules_examined": 0,
-        "solver_time_seconds": 0.004245033999723091,
-        "wall_time_seconds": 0.0042607790001056856
-      },
-      "profile_id": null,
-      "provenance": {
-        "problem_identity": "a6102e105ab941b2593e124f2d7aa07bfdc65d22e2db8b7d8c7cf508e0d45c2b",
-        "rejection_reasons": [],
-        "terminal_status": "exhausted_no_feasible",
-        "whole_plan_identity": "f9a8fd5b53c8e98cd140afe4bfc084ce14d464836c78c2cefa5a6306a272bbc4"
-      },
-      "scenario_id": "weekly-capacity-2",
-      "seed": 123,
-      "status": "infeasible"
-    },
-    {
-      "configuration": {
-        "capacity": 2,
-        "configuration_status": "SYNTHETIC_DEMO_ONLY"
-      },
-      "error_message": null,
-      "error_type": null,
-      "experiment_id": "csp",
-      "failure_reasons": [],
-      "method": "bt",
-      "metrics": {
-        "assignments_attempted": 30,
-        "backtracks": 30,
-        "compatibility_checks": 0,
-        "constraint_checks": 847,
-        "domain_prunings": 0,
-        "exhaustive": 1,
-        "feasible_schedules": 0,
-        "nodes_visited": 31,
-        "rejected_schedules": 0,
-        "schedules_examined": 0,
-        "solver_time_seconds": 0.004070979999596602,
-        "wall_time_seconds": 0.004082090999872889
-      },
-      "profile_id": null,
-      "provenance": {
-        "problem_identity": "a6102e105ab941b2593e124f2d7aa07bfdc65d22e2db8b7d8c7cf508e0d45c2b",
-        "rejection_reasons": [],
-        "terminal_status": "exhausted_no_feasible",
-        "whole_plan_identity": "f9a8fd5b53c8e98cd140afe4bfc084ce14d464836c78c2cefa5a6306a272bbc4"
-      },
-      "scenario_id": "weekly-capacity-2",
-      "seed": 2025,
-      "status": "infeasible"
-    },
-    {
-      "configuration": {
-        "capacity": 2,
-        "configuration_status": "SYNTHETIC_DEMO_ONLY"
-      },
-      "error_message": null,
-      "error_type": null,
-      "experiment_id": "csp",
-      "failure_reasons": [],
-      "method": "bt",
-      "metrics": {
-        "assignments_attempted": 30,
-        "backtracks": 30,
-        "compatibility_checks": 0,
-        "constraint_checks": 847,
-        "domain_prunings": 0,
-        "exhaustive": 1,
-        "feasible_schedules": 0,
-        "nodes_visited": 31,
-        "rejected_schedules": 0,
-        "schedules_examined": 0,
-        "solver_time_seconds": 0.004204118999950879,
-        "wall_time_seconds": 0.004215594000015699
-      },
-      "profile_id": null,
-      "provenance": {
-        "problem_identity": "a6102e105ab941b2593e124f2d7aa07bfdc65d22e2db8b7d8c7cf508e0d45c2b",
-        "rejection_reasons": [],
-        "terminal_status": "exhausted_no_feasible",
-        "whole_plan_identity": "f9a8fd5b53c8e98cd140afe4bfc084ce14d464836c78c2cefa5a6306a272bbc4"
-      },
-      "scenario_id": "weekly-capacity-2",
-      "seed": 31415,
-      "status": "infeasible"
-    },
-    {
-      "configuration": {
-        "capacity": 2,
-        "configuration_status": "SYNTHETIC_DEMO_ONLY"
-      },
-      "error_message": null,
-      "error_type": null,
-      "experiment_id": "csp",
-      "failure_reasons": [],
-      "method": "bt",
-      "metrics": {
-        "assignments_attempted": 30,
-        "backtracks": 30,
-        "compatibility_checks": 0,
-        "constraint_checks": 847,
-        "domain_prunings": 0,
-        "exhaustive": 1,
-        "feasible_schedules": 0,
-        "nodes_visited": 31,
-        "rejected_schedules": 0,
-        "schedules_examined": 0,
-        "solver_time_seconds": 0.004237957000441384,
-        "wall_time_seconds": 0.004249286000231223
-      },
-      "profile_id": null,
-      "provenance": {
-        "problem_identity": "a6102e105ab941b2593e124f2d7aa07bfdc65d22e2db8b7d8c7cf508e0d45c2b",
-        "rejection_reasons": [],
-        "terminal_status": "exhausted_no_feasible",
-        "whole_plan_identity": "f9a8fd5b53c8e98cd140afe4bfc084ce14d464836c78c2cefa5a6306a272bbc4"
-      },
-      "scenario_id": "weekly-capacity-2",
-      "seed": 271828,
-      "status": "infeasible"
-    },
-    {
-      "configuration": {
-        "capacity": 2,
-        "configuration_status": "SYNTHETIC_DEMO_ONLY"
-      },
-      "error_message": null,
-      "error_type": null,
-      "experiment_id": "csp",
-      "failure_reasons": [],
-      "method": "bt_fc",
-      "metrics": {
-        "assignments_attempted": 9,
-        "backtracks": 9,
-        "compatibility_checks": 0,
-        "constraint_checks": 148,
-        "domain_prunings": 18,
-        "exhaustive": 1,
-        "feasible_schedules": 0,
-        "nodes_visited": 4,
-        "rejected_schedules": 0,
-        "schedules_examined": 0,
-        "solver_time_seconds": 0.0012922659998366726,
-        "wall_time_seconds": 0.0013141379995431635
-      },
-      "profile_id": null,
-      "provenance": {
-        "problem_identity": "a6102e105ab941b2593e124f2d7aa07bfdc65d22e2db8b7d8c7cf508e0d45c2b",
-        "rejection_reasons": [],
-        "terminal_status": "exhausted_no_feasible",
-        "whole_plan_identity": "f9a8fd5b53c8e98cd140afe4bfc084ce14d464836c78c2cefa5a6306a272bbc4"
-      },
-      "scenario_id": "weekly-capacity-2",
-      "seed": 42,
-      "status": "infeasible"
-    },
-    {
-      "configuration": {
-        "capacity": 2,
-        "configuration_status": "SYNTHETIC_DEMO_ONLY"
-      },
-      "error_message": null,
-      "error_type": null,
-      "experiment_id": "csp",
-      "failure_reasons": [],
-      "method": "bt_fc",
-      "metrics": {
-        "assignments_attempted": 9,
-        "backtracks": 9,
-        "compatibility_checks": 0,
-        "constraint_checks": 148,
-        "domain_prunings": 18,
-        "exhaustive": 1,
-        "feasible_schedules": 0,
-        "nodes_visited": 4,
-        "rejected_schedules": 0,
-        "schedules_examined": 0,
-        "solver_time_seconds": 0.001241887999640312,
-        "wall_time_seconds": 0.0012530470003184746
-      },
-      "profile_id": null,
-      "provenance": {
-        "problem_identity": "a6102e105ab941b2593e124f2d7aa07bfdc65d22e2db8b7d8c7cf508e0d45c2b",
-        "rejection_reasons": [],
-        "terminal_status": "exhausted_no_feasible",
-        "whole_plan_identity": "f9a8fd5b53c8e98cd140afe4bfc084ce14d464836c78c2cefa5a6306a272bbc4"
-      },
-      "scenario_id": "weekly-capacity-2",
-      "seed": 123,
-      "status": "infeasible"
-    },
-    {
-      "configuration": {
-        "capacity": 2,
-        "configuration_status": "SYNTHETIC_DEMO_ONLY"
-      },
-      "error_message": null,
-      "error_type": null,
-      "experiment_id": "csp",
-      "failure_reasons": [],
-      "method": "bt_fc",
-      "metrics": {
-        "assignments_attempted": 9,
-        "backtracks": 9,
-        "compatibility_checks": 0,
-        "constraint_checks": 148,
-        "domain_prunings": 18,
-        "exhaustive": 1,
-        "feasible_schedules": 0,
-        "nodes_visited": 4,
-        "rejected_schedules": 0,
-        "schedules_examined": 0,
-        "solver_time_seconds": 0.001171455999610771,
-        "wall_time_seconds": 0.0011804550003944314
-      },
-      "profile_id": null,
-      "provenance": {
-        "problem_identity": "a6102e105ab941b2593e124f2d7aa07bfdc65d22e2db8b7d8c7cf508e0d45c2b",
-        "rejection_reasons": [],
-        "terminal_status": "exhausted_no_feasible",
-        "whole_plan_identity": "f9a8fd5b53c8e98cd140afe4bfc084ce14d464836c78c2cefa5a6306a272bbc4"
-      },
-      "scenario_id": "weekly-capacity-2",
-      "seed": 2025,
-      "status": "infeasible"
-    },
-    {
-      "configuration": {
-        "capacity": 2,
-        "configuration_status": "SYNTHETIC_DEMO_ONLY"
-      },
-      "error_message": null,
-      "error_type": null,
-      "experiment_id": "csp",
-      "failure_reasons": [],
-      "method": "bt_fc",
-      "metrics": {
-        "assignments_attempted": 9,
-        "backtracks": 9,
-        "compatibility_checks": 0,
-        "constraint_checks": 148,
-        "domain_prunings": 18,
-        "exhaustive": 1,
-        "feasible_schedules": 0,
-        "nodes_visited": 4,
-        "rejected_schedules": 0,
-        "schedules_examined": 0,
-        "solver_time_seconds": 0.001195510999423277,
-        "wall_time_seconds": 0.0012038510003549163
-      },
-      "profile_id": null,
-      "provenance": {
-        "problem_identity": "a6102e105ab941b2593e124f2d7aa07bfdc65d22e2db8b7d8c7cf508e0d45c2b",
-        "rejection_reasons": [],
-        "terminal_status": "exhausted_no_feasible",
-        "whole_plan_identity": "f9a8fd5b53c8e98cd140afe4bfc084ce14d464836c78c2cefa5a6306a272bbc4"
-      },
-      "scenario_id": "weekly-capacity-2",
-      "seed": 31415,
-      "status": "infeasible"
-    },
-    {
-      "configuration": {
-        "capacity": 2,
-        "configuration_status": "SYNTHETIC_DEMO_ONLY"
-      },
-      "error_message": null,
-      "error_type": null,
-      "experiment_id": "csp",
-      "failure_reasons": [],
-      "method": "bt_fc",
-      "metrics": {
-        "assignments_attempted": 9,
-        "backtracks": 9,
-        "compatibility_checks": 0,
-        "constraint_checks": 148,
-        "domain_prunings": 18,
-        "exhaustive": 1,
-        "feasible_schedules": 0,
-        "nodes_visited": 4,
-        "rejected_schedules": 0,
-        "schedules_examined": 0,
-        "solver_time_seconds": 0.001271211000130279,
-        "wall_time_seconds": 0.0012804899997718167
-      },
-      "profile_id": null,
-      "provenance": {
-        "problem_identity": "a6102e105ab941b2593e124f2d7aa07bfdc65d22e2db8b7d8c7cf508e0d45c2b",
-        "rejection_reasons": [],
-        "terminal_status": "exhausted_no_feasible",
-        "whole_plan_identity": "f9a8fd5b53c8e98cd140afe4bfc084ce14d464836c78c2cefa5a6306a272bbc4"
-      },
-      "scenario_id": "weekly-capacity-2",
-      "seed": 271828,
-      "status": "infeasible"
-    },
-    {
-      "configuration": {
-        "capacity": 2,
-        "configuration_status": "SYNTHETIC_DEMO_ONLY"
-      },
-      "error_message": null,
-      "error_type": null,
-      "experiment_id": "csp",
-      "failure_reasons": [],
-      "method": "bt_fc_ac3",
-      "metrics": {
-        "assignments_attempted": 9,
-        "backtracks": 9,
-        "compatibility_checks": 102,
-        "constraint_checks": 208,
-        "domain_prunings": 18,
-        "exhaustive": 1,
-        "feasible_schedules": 0,
-        "nodes_visited": 4,
-        "rejected_schedules": 0,
-        "schedules_examined": 0,
-        "solver_time_seconds": 0.001442106000467902,
-        "wall_time_seconds": 0.0014668009998786147
-      },
-      "profile_id": null,
-      "provenance": {
-        "problem_identity": "a6102e105ab941b2593e124f2d7aa07bfdc65d22e2db8b7d8c7cf508e0d45c2b",
-        "rejection_reasons": [],
-        "terminal_status": "exhausted_no_feasible",
-        "whole_plan_identity": "f9a8fd5b53c8e98cd140afe4bfc084ce14d464836c78c2cefa5a6306a272bbc4"
-      },
-      "scenario_id": "weekly-capacity-2",
-      "seed": 42,
-      "status": "infeasible"
-    },
-    {
-      "configuration": {
-        "capacity": 2,
-        "configuration_status": "SYNTHETIC_DEMO_ONLY"
-      },
-      "error_message": null,
-      "error_type": null,
-      "experiment_id": "csp",
-      "failure_reasons": [],
-      "method": "bt_fc_ac3",
-      "metrics": {
-        "assignments_attempted": 9,
-        "backtracks": 9,
-        "compatibility_checks": 102,
-        "constraint_checks": 208,
-        "domain_prunings": 18,
-        "exhaustive": 1,
-        "feasible_schedules": 0,
-        "nodes_visited": 4,
-        "rejected_schedules": 0,
-        "schedules_examined": 0,
-        "solver_time_seconds": 0.0013041989996054326,
-        "wall_time_seconds": 0.0013169080002626288
-      },
-      "profile_id": null,
-      "provenance": {
-        "problem_identity": "a6102e105ab941b2593e124f2d7aa07bfdc65d22e2db8b7d8c7cf508e0d45c2b",
-        "rejection_reasons": [],
-        "terminal_status": "exhausted_no_feasible",
-        "whole_plan_identity": "f9a8fd5b53c8e98cd140afe4bfc084ce14d464836c78c2cefa5a6306a272bbc4"
-      },
-      "scenario_id": "weekly-capacity-2",
-      "seed": 123,
-      "status": "infeasible"
-    },
-    {
-      "configuration": {
-        "capacity": 2,
-        "configuration_status": "SYNTHETIC_DEMO_ONLY"
-      },
-      "error_message": null,
-      "error_type": null,
-      "experiment_id": "csp",
-      "failure_reasons": [],
-      "method": "bt_fc_ac3",
-      "metrics": {
-        "assignments_attempted": 9,
-        "backtracks": 9,
-        "compatibility_checks": 102,
-        "constraint_checks": 208,
-        "domain_prunings": 18,
-        "exhaustive": 1,
-        "feasible_schedules": 0,
-        "nodes_visited": 4,
-        "rejected_schedules": 0,
-        "schedules_examined": 0,
-        "solver_time_seconds": 0.001293827000154124,
-        "wall_time_seconds": 0.0013041869997323374
-      },
-      "profile_id": null,
-      "provenance": {
-        "problem_identity": "a6102e105ab941b2593e124f2d7aa07bfdc65d22e2db8b7d8c7cf508e0d45c2b",
-        "rejection_reasons": [],
-        "terminal_status": "exhausted_no_feasible",
-        "whole_plan_identity": "f9a8fd5b53c8e98cd140afe4bfc084ce14d464836c78c2cefa5a6306a272bbc4"
-      },
-      "scenario_id": "weekly-capacity-2",
-      "seed": 2025,
-      "status": "infeasible"
-    },
-    {
-      "configuration": {
-        "capacity": 2,
-        "configuration_status": "SYNTHETIC_DEMO_ONLY"
-      },
-      "error_message": null,
-      "error_type": null,
-      "experiment_id": "csp",
-      "failure_reasons": [],
-      "method": "bt_fc_ac3",
-      "metrics": {
-        "assignments_attempted": 9,
-        "backtracks": 9,
-        "compatibility_checks": 102,
-        "constraint_checks": 208,
-        "domain_prunings": 18,
-        "exhaustive": 1,
-        "feasible_schedules": 0,
-        "nodes_visited": 4,
-        "rejected_schedules": 0,
-        "schedules_examined": 0,
-        "solver_time_seconds": 0.0012782409994542832,
-        "wall_time_seconds": 0.001287724000576418
-      },
-      "profile_id": null,
-      "provenance": {
-        "problem_identity": "a6102e105ab941b2593e124f2d7aa07bfdc65d22e2db8b7d8c7cf508e0d45c2b",
-        "rejection_reasons": [],
-        "terminal_status": "exhausted_no_feasible",
-        "whole_plan_identity": "f9a8fd5b53c8e98cd140afe4bfc084ce14d464836c78c2cefa5a6306a272bbc4"
-      },
-      "scenario_id": "weekly-capacity-2",
-      "seed": 31415,
-      "status": "infeasible"
-    },
-    {
-      "configuration": {
-        "capacity": 2,
-        "configuration_status": "SYNTHETIC_DEMO_ONLY"
-      },
-      "error_message": null,
-      "error_type": null,
-      "experiment_id": "csp",
-      "failure_reasons": [],
-      "method": "bt_fc_ac3",
-      "metrics": {
-        "assignments_attempted": 9,
-        "backtracks": 9,
-        "compatibility_checks": 102,
-        "constraint_checks": 208,
-        "domain_prunings": 18,
-        "exhaustive": 1,
-        "feasible_schedules": 0,
-        "nodes_visited": 4,
-        "rejected_schedules": 0,
-        "schedules_examined": 0,
-        "solver_time_seconds": 0.0013432010000542505,
-        "wall_time_seconds": 0.0013527540004361072
-      },
-      "profile_id": null,
-      "provenance": {
-        "problem_identity": "a6102e105ab941b2593e124f2d7aa07bfdc65d22e2db8b7d8c7cf508e0d45c2b",
-        "rejection_reasons": [],
-        "terminal_status": "exhausted_no_feasible",
-        "whole_plan_identity": "f9a8fd5b53c8e98cd140afe4bfc084ce14d464836c78c2cefa5a6306a272bbc4"
-      },
-      "scenario_id": "weekly-capacity-2",
-      "seed": 271828,
-      "status": "infeasible"
-    },
-    {
-      "configuration": {
-        "capacity": 3,
-        "configuration_status": "SYNTHETIC_DEMO_ONLY"
-      },
-      "error_message": null,
-      "error_type": null,
-      "experiment_id": "csp",
-      "failure_reasons": [],
-      "method": "bt",
-      "metrics": {
-        "assignments_attempted": 30,
-        "backtracks": 15,
-        "compatibility_checks": 0,
-        "constraint_checks": 847,
-        "domain_prunings": 0,
-        "exhaustive": 1,
-        "feasible_schedules": 6,
-        "nodes_visited": 31,
-        "rejected_schedules": 0,
-        "schedules_examined": 6,
-        "solver_time_seconds": 0.004390975000205799,
-        "wall_time_seconds": 0.005562211000324169
-      },
-      "profile_id": null,
-      "provenance": {
-        "problem_identity": "0885d1e5ebd9e87037aaee745384d5db4d686402818e517d84ed7f8c87daac91",
+        "problem_identity": "c0f64ee31cfad24b244ca83c3db621d1a25e82a8305eaecf9c693001d26c9e89",
         "rejection_reasons": [],
         "terminal_status": "exhausted_with_feasible",
-        "whole_plan_identity": "f9a8fd5b53c8e98cd140afe4bfc084ce14d464836c78c2cefa5a6306a272bbc4"
+        "whole_plan_identity": "f9eebf0664a6d68b30e21cd076b512ff4312f362e6e8e2d7183f2d90ad28c5a6"
       },
-      "scenario_id": "weekly-capacity-3",
+      "scenario_id": "slots-per-week-2",
       "seed": 42,
       "status": "feasible"
     },
     {
       "configuration": {
-        "capacity": 3,
-        "configuration_status": "SYNTHETIC_DEMO_ONLY"
+        "configuration_status": "SYNTHETIC_DEMO_ONLY",
+        "physical_slots_per_week": 2,
+        "weekly_capacity_from_physical_slots": 2
       },
       "error_message": null,
       "error_type": null,
@@ -572,34 +49,35 @@
       "failure_reasons": [],
       "method": "bt",
       "metrics": {
-        "assignments_attempted": 30,
-        "backtracks": 15,
+        "assignments_attempted": 68,
+        "backtracks": 46,
         "compatibility_checks": 0,
-        "constraint_checks": 847,
+        "constraint_checks": 5244,
         "domain_prunings": 0,
         "exhaustive": 1,
-        "feasible_schedules": 6,
-        "nodes_visited": 31,
+        "feasible_schedules": 8,
+        "nodes_visited": 69,
         "rejected_schedules": 0,
-        "schedules_examined": 6,
-        "solver_time_seconds": 0.0042342120004832395,
-        "wall_time_seconds": 0.005139967999639339
+        "schedules_examined": 8,
+        "solver_time_seconds": 0.02168171700759558,
+        "wall_time_seconds": 0.02401499899860937
       },
       "profile_id": null,
       "provenance": {
-        "problem_identity": "0885d1e5ebd9e87037aaee745384d5db4d686402818e517d84ed7f8c87daac91",
+        "problem_identity": "c0f64ee31cfad24b244ca83c3db621d1a25e82a8305eaecf9c693001d26c9e89",
         "rejection_reasons": [],
         "terminal_status": "exhausted_with_feasible",
-        "whole_plan_identity": "f9a8fd5b53c8e98cd140afe4bfc084ce14d464836c78c2cefa5a6306a272bbc4"
+        "whole_plan_identity": "f9eebf0664a6d68b30e21cd076b512ff4312f362e6e8e2d7183f2d90ad28c5a6"
       },
-      "scenario_id": "weekly-capacity-3",
+      "scenario_id": "slots-per-week-2",
       "seed": 123,
       "status": "feasible"
     },
     {
       "configuration": {
-        "capacity": 3,
-        "configuration_status": "SYNTHETIC_DEMO_ONLY"
+        "configuration_status": "SYNTHETIC_DEMO_ONLY",
+        "physical_slots_per_week": 2,
+        "weekly_capacity_from_physical_slots": 2
       },
       "error_message": null,
       "error_type": null,
@@ -607,34 +85,35 @@
       "failure_reasons": [],
       "method": "bt",
       "metrics": {
-        "assignments_attempted": 30,
-        "backtracks": 15,
+        "assignments_attempted": 68,
+        "backtracks": 46,
         "compatibility_checks": 0,
-        "constraint_checks": 847,
+        "constraint_checks": 5244,
         "domain_prunings": 0,
         "exhaustive": 1,
-        "feasible_schedules": 6,
-        "nodes_visited": 31,
+        "feasible_schedules": 8,
+        "nodes_visited": 69,
         "rejected_schedules": 0,
-        "schedules_examined": 6,
-        "solver_time_seconds": 0.004328158000134863,
-        "wall_time_seconds": 0.005205338999985543
+        "schedules_examined": 8,
+        "solver_time_seconds": 0.022110172001703177,
+        "wall_time_seconds": 0.024020199998631142
       },
       "profile_id": null,
       "provenance": {
-        "problem_identity": "0885d1e5ebd9e87037aaee745384d5db4d686402818e517d84ed7f8c87daac91",
+        "problem_identity": "c0f64ee31cfad24b244ca83c3db621d1a25e82a8305eaecf9c693001d26c9e89",
         "rejection_reasons": [],
         "terminal_status": "exhausted_with_feasible",
-        "whole_plan_identity": "f9a8fd5b53c8e98cd140afe4bfc084ce14d464836c78c2cefa5a6306a272bbc4"
+        "whole_plan_identity": "f9eebf0664a6d68b30e21cd076b512ff4312f362e6e8e2d7183f2d90ad28c5a6"
       },
-      "scenario_id": "weekly-capacity-3",
+      "scenario_id": "slots-per-week-2",
       "seed": 2025,
       "status": "feasible"
     },
     {
       "configuration": {
-        "capacity": 3,
-        "configuration_status": "SYNTHETIC_DEMO_ONLY"
+        "configuration_status": "SYNTHETIC_DEMO_ONLY",
+        "physical_slots_per_week": 2,
+        "weekly_capacity_from_physical_slots": 2
       },
       "error_message": null,
       "error_type": null,
@@ -642,34 +121,35 @@
       "failure_reasons": [],
       "method": "bt",
       "metrics": {
-        "assignments_attempted": 30,
-        "backtracks": 15,
+        "assignments_attempted": 68,
+        "backtracks": 46,
         "compatibility_checks": 0,
-        "constraint_checks": 847,
+        "constraint_checks": 5244,
         "domain_prunings": 0,
         "exhaustive": 1,
-        "feasible_schedules": 6,
-        "nodes_visited": 31,
+        "feasible_schedules": 8,
+        "nodes_visited": 69,
         "rejected_schedules": 0,
-        "schedules_examined": 6,
-        "solver_time_seconds": 0.004423487001986359,
-        "wall_time_seconds": 0.0053253469995979685
+        "schedules_examined": 8,
+        "solver_time_seconds": 0.021015903002989944,
+        "wall_time_seconds": 0.02289721700071823
       },
       "profile_id": null,
       "provenance": {
-        "problem_identity": "0885d1e5ebd9e87037aaee745384d5db4d686402818e517d84ed7f8c87daac91",
+        "problem_identity": "c0f64ee31cfad24b244ca83c3db621d1a25e82a8305eaecf9c693001d26c9e89",
         "rejection_reasons": [],
         "terminal_status": "exhausted_with_feasible",
-        "whole_plan_identity": "f9a8fd5b53c8e98cd140afe4bfc084ce14d464836c78c2cefa5a6306a272bbc4"
+        "whole_plan_identity": "f9eebf0664a6d68b30e21cd076b512ff4312f362e6e8e2d7183f2d90ad28c5a6"
       },
-      "scenario_id": "weekly-capacity-3",
+      "scenario_id": "slots-per-week-2",
       "seed": 31415,
       "status": "feasible"
     },
     {
       "configuration": {
-        "capacity": 3,
-        "configuration_status": "SYNTHETIC_DEMO_ONLY"
+        "configuration_status": "SYNTHETIC_DEMO_ONLY",
+        "physical_slots_per_week": 2,
+        "weekly_capacity_from_physical_slots": 2
       },
       "error_message": null,
       "error_type": null,
@@ -677,34 +157,35 @@
       "failure_reasons": [],
       "method": "bt",
       "metrics": {
-        "assignments_attempted": 30,
-        "backtracks": 15,
+        "assignments_attempted": 68,
+        "backtracks": 46,
         "compatibility_checks": 0,
-        "constraint_checks": 847,
+        "constraint_checks": 5244,
         "domain_prunings": 0,
         "exhaustive": 1,
-        "feasible_schedules": 6,
-        "nodes_visited": 31,
+        "feasible_schedules": 8,
+        "nodes_visited": 69,
         "rejected_schedules": 0,
-        "schedules_examined": 6,
-        "solver_time_seconds": 0.004786480999428022,
-        "wall_time_seconds": 0.005890714999623015
+        "schedules_examined": 8,
+        "solver_time_seconds": 0.022221108978556003,
+        "wall_time_seconds": 0.024092783001833595
       },
       "profile_id": null,
       "provenance": {
-        "problem_identity": "0885d1e5ebd9e87037aaee745384d5db4d686402818e517d84ed7f8c87daac91",
+        "problem_identity": "c0f64ee31cfad24b244ca83c3db621d1a25e82a8305eaecf9c693001d26c9e89",
         "rejection_reasons": [],
         "terminal_status": "exhausted_with_feasible",
-        "whole_plan_identity": "f9a8fd5b53c8e98cd140afe4bfc084ce14d464836c78c2cefa5a6306a272bbc4"
+        "whole_plan_identity": "f9eebf0664a6d68b30e21cd076b512ff4312f362e6e8e2d7183f2d90ad28c5a6"
       },
-      "scenario_id": "weekly-capacity-3",
+      "scenario_id": "slots-per-week-2",
       "seed": 271828,
       "status": "feasible"
     },
     {
       "configuration": {
-        "capacity": 3,
-        "configuration_status": "SYNTHETIC_DEMO_ONLY"
+        "configuration_status": "SYNTHETIC_DEMO_ONLY",
+        "physical_slots_per_week": 2,
+        "weekly_capacity_from_physical_slots": 2
       },
       "error_message": null,
       "error_type": null,
@@ -712,34 +193,35 @@
       "failure_reasons": [],
       "method": "bt_fc",
       "metrics": {
-        "assignments_attempted": 15,
-        "backtracks": 0,
+        "assignments_attempted": 24,
+        "backtracks": 2,
         "compatibility_checks": 0,
-        "constraint_checks": 232,
-        "domain_prunings": 12,
+        "constraint_checks": 616,
+        "domain_prunings": 32,
         "exhaustive": 1,
-        "feasible_schedules": 6,
-        "nodes_visited": 16,
+        "feasible_schedules": 8,
+        "nodes_visited": 23,
         "rejected_schedules": 0,
-        "schedules_examined": 6,
-        "solver_time_seconds": 0.0019205550006518024,
-        "wall_time_seconds": 0.002856858000086504
+        "schedules_examined": 8,
+        "solver_time_seconds": 0.005129797988047358,
+        "wall_time_seconds": 0.007146422998630442
       },
       "profile_id": null,
       "provenance": {
-        "problem_identity": "0885d1e5ebd9e87037aaee745384d5db4d686402818e517d84ed7f8c87daac91",
+        "problem_identity": "c0f64ee31cfad24b244ca83c3db621d1a25e82a8305eaecf9c693001d26c9e89",
         "rejection_reasons": [],
         "terminal_status": "exhausted_with_feasible",
-        "whole_plan_identity": "f9a8fd5b53c8e98cd140afe4bfc084ce14d464836c78c2cefa5a6306a272bbc4"
+        "whole_plan_identity": "f9eebf0664a6d68b30e21cd076b512ff4312f362e6e8e2d7183f2d90ad28c5a6"
       },
-      "scenario_id": "weekly-capacity-3",
+      "scenario_id": "slots-per-week-2",
       "seed": 42,
       "status": "feasible"
     },
     {
       "configuration": {
-        "capacity": 3,
-        "configuration_status": "SYNTHETIC_DEMO_ONLY"
+        "configuration_status": "SYNTHETIC_DEMO_ONLY",
+        "physical_slots_per_week": 2,
+        "weekly_capacity_from_physical_slots": 2
       },
       "error_message": null,
       "error_type": null,
@@ -747,34 +229,35 @@
       "failure_reasons": [],
       "method": "bt_fc",
       "metrics": {
-        "assignments_attempted": 15,
-        "backtracks": 0,
+        "assignments_attempted": 24,
+        "backtracks": 2,
         "compatibility_checks": 0,
-        "constraint_checks": 232,
-        "domain_prunings": 12,
+        "constraint_checks": 616,
+        "domain_prunings": 32,
         "exhaustive": 1,
-        "feasible_schedules": 6,
-        "nodes_visited": 16,
+        "feasible_schedules": 8,
+        "nodes_visited": 23,
         "rejected_schedules": 0,
-        "schedules_examined": 6,
-        "solver_time_seconds": 0.0019419710006332025,
-        "wall_time_seconds": 0.002834547000020393
+        "schedules_examined": 8,
+        "solver_time_seconds": 0.0048037140077212825,
+        "wall_time_seconds": 0.006499781004094984
       },
       "profile_id": null,
       "provenance": {
-        "problem_identity": "0885d1e5ebd9e87037aaee745384d5db4d686402818e517d84ed7f8c87daac91",
+        "problem_identity": "c0f64ee31cfad24b244ca83c3db621d1a25e82a8305eaecf9c693001d26c9e89",
         "rejection_reasons": [],
         "terminal_status": "exhausted_with_feasible",
-        "whole_plan_identity": "f9a8fd5b53c8e98cd140afe4bfc084ce14d464836c78c2cefa5a6306a272bbc4"
+        "whole_plan_identity": "f9eebf0664a6d68b30e21cd076b512ff4312f362e6e8e2d7183f2d90ad28c5a6"
       },
-      "scenario_id": "weekly-capacity-3",
+      "scenario_id": "slots-per-week-2",
       "seed": 123,
       "status": "feasible"
     },
     {
       "configuration": {
-        "capacity": 3,
-        "configuration_status": "SYNTHETIC_DEMO_ONLY"
+        "configuration_status": "SYNTHETIC_DEMO_ONLY",
+        "physical_slots_per_week": 2,
+        "weekly_capacity_from_physical_slots": 2
       },
       "error_message": null,
       "error_type": null,
@@ -782,34 +265,35 @@
       "failure_reasons": [],
       "method": "bt_fc",
       "metrics": {
-        "assignments_attempted": 15,
-        "backtracks": 0,
+        "assignments_attempted": 24,
+        "backtracks": 2,
         "compatibility_checks": 0,
-        "constraint_checks": 232,
-        "domain_prunings": 12,
+        "constraint_checks": 616,
+        "domain_prunings": 32,
         "exhaustive": 1,
-        "feasible_schedules": 6,
-        "nodes_visited": 16,
+        "feasible_schedules": 8,
+        "nodes_visited": 23,
         "rejected_schedules": 0,
-        "schedules_examined": 6,
-        "solver_time_seconds": 0.001876683999398665,
-        "wall_time_seconds": 0.0027505789994393126
+        "schedules_examined": 8,
+        "solver_time_seconds": 0.0054507899840245955,
+        "wall_time_seconds": 0.0075631810032064095
       },
       "profile_id": null,
       "provenance": {
-        "problem_identity": "0885d1e5ebd9e87037aaee745384d5db4d686402818e517d84ed7f8c87daac91",
+        "problem_identity": "c0f64ee31cfad24b244ca83c3db621d1a25e82a8305eaecf9c693001d26c9e89",
         "rejection_reasons": [],
         "terminal_status": "exhausted_with_feasible",
-        "whole_plan_identity": "f9a8fd5b53c8e98cd140afe4bfc084ce14d464836c78c2cefa5a6306a272bbc4"
+        "whole_plan_identity": "f9eebf0664a6d68b30e21cd076b512ff4312f362e6e8e2d7183f2d90ad28c5a6"
       },
-      "scenario_id": "weekly-capacity-3",
+      "scenario_id": "slots-per-week-2",
       "seed": 2025,
       "status": "feasible"
     },
     {
       "configuration": {
-        "capacity": 3,
-        "configuration_status": "SYNTHETIC_DEMO_ONLY"
+        "configuration_status": "SYNTHETIC_DEMO_ONLY",
+        "physical_slots_per_week": 2,
+        "weekly_capacity_from_physical_slots": 2
       },
       "error_message": null,
       "error_type": null,
@@ -817,34 +301,35 @@
       "failure_reasons": [],
       "method": "bt_fc",
       "metrics": {
-        "assignments_attempted": 15,
-        "backtracks": 0,
+        "assignments_attempted": 24,
+        "backtracks": 2,
         "compatibility_checks": 0,
-        "constraint_checks": 232,
-        "domain_prunings": 12,
+        "constraint_checks": 616,
+        "domain_prunings": 32,
         "exhaustive": 1,
-        "feasible_schedules": 6,
-        "nodes_visited": 16,
+        "feasible_schedules": 8,
+        "nodes_visited": 23,
         "rejected_schedules": 0,
-        "schedules_examined": 6,
-        "solver_time_seconds": 0.0018999349986188463,
-        "wall_time_seconds": 0.002762156000244431
+        "schedules_examined": 8,
+        "solver_time_seconds": 0.00451110699941637,
+        "wall_time_seconds": 0.006187890001456253
       },
       "profile_id": null,
       "provenance": {
-        "problem_identity": "0885d1e5ebd9e87037aaee745384d5db4d686402818e517d84ed7f8c87daac91",
+        "problem_identity": "c0f64ee31cfad24b244ca83c3db621d1a25e82a8305eaecf9c693001d26c9e89",
         "rejection_reasons": [],
         "terminal_status": "exhausted_with_feasible",
-        "whole_plan_identity": "f9a8fd5b53c8e98cd140afe4bfc084ce14d464836c78c2cefa5a6306a272bbc4"
+        "whole_plan_identity": "f9eebf0664a6d68b30e21cd076b512ff4312f362e6e8e2d7183f2d90ad28c5a6"
       },
-      "scenario_id": "weekly-capacity-3",
+      "scenario_id": "slots-per-week-2",
       "seed": 31415,
       "status": "feasible"
     },
     {
       "configuration": {
-        "capacity": 3,
-        "configuration_status": "SYNTHETIC_DEMO_ONLY"
+        "configuration_status": "SYNTHETIC_DEMO_ONLY",
+        "physical_slots_per_week": 2,
+        "weekly_capacity_from_physical_slots": 2
       },
       "error_message": null,
       "error_type": null,
@@ -852,34 +337,35 @@
       "failure_reasons": [],
       "method": "bt_fc",
       "metrics": {
-        "assignments_attempted": 15,
-        "backtracks": 0,
+        "assignments_attempted": 24,
+        "backtracks": 2,
         "compatibility_checks": 0,
-        "constraint_checks": 232,
-        "domain_prunings": 12,
+        "constraint_checks": 616,
+        "domain_prunings": 32,
         "exhaustive": 1,
-        "feasible_schedules": 6,
-        "nodes_visited": 16,
+        "feasible_schedules": 8,
+        "nodes_visited": 23,
         "rejected_schedules": 0,
-        "schedules_examined": 6,
-        "solver_time_seconds": 0.0020683439997810638,
-        "wall_time_seconds": 0.0031135529998209677
+        "schedules_examined": 8,
+        "solver_time_seconds": 0.004540033012744971,
+        "wall_time_seconds": 0.0063367399998242036
       },
       "profile_id": null,
       "provenance": {
-        "problem_identity": "0885d1e5ebd9e87037aaee745384d5db4d686402818e517d84ed7f8c87daac91",
+        "problem_identity": "c0f64ee31cfad24b244ca83c3db621d1a25e82a8305eaecf9c693001d26c9e89",
         "rejection_reasons": [],
         "terminal_status": "exhausted_with_feasible",
-        "whole_plan_identity": "f9a8fd5b53c8e98cd140afe4bfc084ce14d464836c78c2cefa5a6306a272bbc4"
+        "whole_plan_identity": "f9eebf0664a6d68b30e21cd076b512ff4312f362e6e8e2d7183f2d90ad28c5a6"
       },
-      "scenario_id": "weekly-capacity-3",
+      "scenario_id": "slots-per-week-2",
       "seed": 271828,
       "status": "feasible"
     },
     {
       "configuration": {
-        "capacity": 3,
-        "configuration_status": "SYNTHETIC_DEMO_ONLY"
+        "configuration_status": "SYNTHETIC_DEMO_ONLY",
+        "physical_slots_per_week": 2,
+        "weekly_capacity_from_physical_slots": 2
       },
       "error_message": null,
       "error_type": null,
@@ -887,34 +373,35 @@
       "failure_reasons": [],
       "method": "bt_fc_ac3",
       "metrics": {
-        "assignments_attempted": 15,
+        "assignments_attempted": 22,
         "backtracks": 0,
-        "compatibility_checks": 198,
-        "constraint_checks": 388,
-        "domain_prunings": 12,
+        "compatibility_checks": 688,
+        "constraint_checks": 1152,
+        "domain_prunings": 24,
         "exhaustive": 1,
-        "feasible_schedules": 6,
-        "nodes_visited": 16,
+        "feasible_schedules": 8,
+        "nodes_visited": 23,
         "rejected_schedules": 0,
-        "schedules_examined": 6,
-        "solver_time_seconds": 0.0031508350002695806,
-        "wall_time_seconds": 0.004199396999865712
+        "schedules_examined": 8,
+        "solver_time_seconds": 0.007036791001155507,
+        "wall_time_seconds": 0.008769471998675726
       },
       "profile_id": null,
       "provenance": {
-        "problem_identity": "0885d1e5ebd9e87037aaee745384d5db4d686402818e517d84ed7f8c87daac91",
+        "problem_identity": "c0f64ee31cfad24b244ca83c3db621d1a25e82a8305eaecf9c693001d26c9e89",
         "rejection_reasons": [],
         "terminal_status": "exhausted_with_feasible",
-        "whole_plan_identity": "f9a8fd5b53c8e98cd140afe4bfc084ce14d464836c78c2cefa5a6306a272bbc4"
+        "whole_plan_identity": "f9eebf0664a6d68b30e21cd076b512ff4312f362e6e8e2d7183f2d90ad28c5a6"
       },
-      "scenario_id": "weekly-capacity-3",
+      "scenario_id": "slots-per-week-2",
       "seed": 42,
       "status": "feasible"
     },
     {
       "configuration": {
-        "capacity": 3,
-        "configuration_status": "SYNTHETIC_DEMO_ONLY"
+        "configuration_status": "SYNTHETIC_DEMO_ONLY",
+        "physical_slots_per_week": 2,
+        "weekly_capacity_from_physical_slots": 2
       },
       "error_message": null,
       "error_type": null,
@@ -922,34 +409,35 @@
       "failure_reasons": [],
       "method": "bt_fc_ac3",
       "metrics": {
-        "assignments_attempted": 15,
+        "assignments_attempted": 22,
         "backtracks": 0,
-        "compatibility_checks": 198,
-        "constraint_checks": 388,
-        "domain_prunings": 12,
+        "compatibility_checks": 688,
+        "constraint_checks": 1152,
+        "domain_prunings": 24,
         "exhaustive": 1,
-        "feasible_schedules": 6,
-        "nodes_visited": 16,
+        "feasible_schedules": 8,
+        "nodes_visited": 23,
         "rejected_schedules": 0,
-        "schedules_examined": 6,
-        "solver_time_seconds": 0.0030270519991972833,
-        "wall_time_seconds": 0.004085428999133001
+        "schedules_examined": 8,
+        "solver_time_seconds": 0.0066603290106286295,
+        "wall_time_seconds": 0.008409588001086377
       },
       "profile_id": null,
       "provenance": {
-        "problem_identity": "0885d1e5ebd9e87037aaee745384d5db4d686402818e517d84ed7f8c87daac91",
+        "problem_identity": "c0f64ee31cfad24b244ca83c3db621d1a25e82a8305eaecf9c693001d26c9e89",
         "rejection_reasons": [],
         "terminal_status": "exhausted_with_feasible",
-        "whole_plan_identity": "f9a8fd5b53c8e98cd140afe4bfc084ce14d464836c78c2cefa5a6306a272bbc4"
+        "whole_plan_identity": "f9eebf0664a6d68b30e21cd076b512ff4312f362e6e8e2d7183f2d90ad28c5a6"
       },
-      "scenario_id": "weekly-capacity-3",
+      "scenario_id": "slots-per-week-2",
       "seed": 123,
       "status": "feasible"
     },
     {
       "configuration": {
-        "capacity": 3,
-        "configuration_status": "SYNTHETIC_DEMO_ONLY"
+        "configuration_status": "SYNTHETIC_DEMO_ONLY",
+        "physical_slots_per_week": 2,
+        "weekly_capacity_from_physical_slots": 2
       },
       "error_message": null,
       "error_type": null,
@@ -957,34 +445,35 @@
       "failure_reasons": [],
       "method": "bt_fc_ac3",
       "metrics": {
-        "assignments_attempted": 15,
+        "assignments_attempted": 22,
         "backtracks": 0,
-        "compatibility_checks": 198,
-        "constraint_checks": 388,
-        "domain_prunings": 12,
+        "compatibility_checks": 688,
+        "constraint_checks": 1152,
+        "domain_prunings": 24,
         "exhaustive": 1,
-        "feasible_schedules": 6,
-        "nodes_visited": 16,
+        "feasible_schedules": 8,
+        "nodes_visited": 23,
         "rejected_schedules": 0,
-        "schedules_examined": 6,
-        "solver_time_seconds": 0.003645691000201623,
-        "wall_time_seconds": 0.004752246999487397
+        "schedules_examined": 8,
+        "solver_time_seconds": 0.008111996001389343,
+        "wall_time_seconds": 0.010317772001144476
       },
       "profile_id": null,
       "provenance": {
-        "problem_identity": "0885d1e5ebd9e87037aaee745384d5db4d686402818e517d84ed7f8c87daac91",
+        "problem_identity": "c0f64ee31cfad24b244ca83c3db621d1a25e82a8305eaecf9c693001d26c9e89",
         "rejection_reasons": [],
         "terminal_status": "exhausted_with_feasible",
-        "whole_plan_identity": "f9a8fd5b53c8e98cd140afe4bfc084ce14d464836c78c2cefa5a6306a272bbc4"
+        "whole_plan_identity": "f9eebf0664a6d68b30e21cd076b512ff4312f362e6e8e2d7183f2d90ad28c5a6"
       },
-      "scenario_id": "weekly-capacity-3",
+      "scenario_id": "slots-per-week-2",
       "seed": 2025,
       "status": "feasible"
     },
     {
       "configuration": {
-        "capacity": 3,
-        "configuration_status": "SYNTHETIC_DEMO_ONLY"
+        "configuration_status": "SYNTHETIC_DEMO_ONLY",
+        "physical_slots_per_week": 2,
+        "weekly_capacity_from_physical_slots": 2
       },
       "error_message": null,
       "error_type": null,
@@ -992,34 +481,35 @@
       "failure_reasons": [],
       "method": "bt_fc_ac3",
       "metrics": {
-        "assignments_attempted": 15,
+        "assignments_attempted": 22,
         "backtracks": 0,
-        "compatibility_checks": 198,
-        "constraint_checks": 388,
-        "domain_prunings": 12,
+        "compatibility_checks": 688,
+        "constraint_checks": 1152,
+        "domain_prunings": 24,
         "exhaustive": 1,
-        "feasible_schedules": 6,
-        "nodes_visited": 16,
+        "feasible_schedules": 8,
+        "nodes_visited": 23,
         "rejected_schedules": 0,
-        "schedules_examined": 6,
-        "solver_time_seconds": 0.003133467999759887,
-        "wall_time_seconds": 0.0041675620004753
+        "schedules_examined": 8,
+        "solver_time_seconds": 0.006819471993367188,
+        "wall_time_seconds": 0.008581296999182086
       },
       "profile_id": null,
       "provenance": {
-        "problem_identity": "0885d1e5ebd9e87037aaee745384d5db4d686402818e517d84ed7f8c87daac91",
+        "problem_identity": "c0f64ee31cfad24b244ca83c3db621d1a25e82a8305eaecf9c693001d26c9e89",
         "rejection_reasons": [],
         "terminal_status": "exhausted_with_feasible",
-        "whole_plan_identity": "f9a8fd5b53c8e98cd140afe4bfc084ce14d464836c78c2cefa5a6306a272bbc4"
+        "whole_plan_identity": "f9eebf0664a6d68b30e21cd076b512ff4312f362e6e8e2d7183f2d90ad28c5a6"
       },
-      "scenario_id": "weekly-capacity-3",
+      "scenario_id": "slots-per-week-2",
       "seed": 31415,
       "status": "feasible"
     },
     {
       "configuration": {
-        "capacity": 3,
-        "configuration_status": "SYNTHETIC_DEMO_ONLY"
+        "configuration_status": "SYNTHETIC_DEMO_ONLY",
+        "physical_slots_per_week": 2,
+        "weekly_capacity_from_physical_slots": 2
       },
       "error_message": null,
       "error_type": null,
@@ -1027,34 +517,35 @@
       "failure_reasons": [],
       "method": "bt_fc_ac3",
       "metrics": {
-        "assignments_attempted": 15,
+        "assignments_attempted": 22,
         "backtracks": 0,
-        "compatibility_checks": 198,
-        "constraint_checks": 388,
-        "domain_prunings": 12,
+        "compatibility_checks": 688,
+        "constraint_checks": 1152,
+        "domain_prunings": 24,
         "exhaustive": 1,
-        "feasible_schedules": 6,
-        "nodes_visited": 16,
+        "feasible_schedules": 8,
+        "nodes_visited": 23,
         "rejected_schedules": 0,
-        "schedules_examined": 6,
-        "solver_time_seconds": 0.0036819439992541447,
-        "wall_time_seconds": 0.00483103700025822
+        "schedules_examined": 8,
+        "solver_time_seconds": 0.006947523004782852,
+        "wall_time_seconds": 0.008624955000414047
       },
       "profile_id": null,
       "provenance": {
-        "problem_identity": "0885d1e5ebd9e87037aaee745384d5db4d686402818e517d84ed7f8c87daac91",
+        "problem_identity": "c0f64ee31cfad24b244ca83c3db621d1a25e82a8305eaecf9c693001d26c9e89",
         "rejection_reasons": [],
         "terminal_status": "exhausted_with_feasible",
-        "whole_plan_identity": "f9a8fd5b53c8e98cd140afe4bfc084ce14d464836c78c2cefa5a6306a272bbc4"
+        "whole_plan_identity": "f9eebf0664a6d68b30e21cd076b512ff4312f362e6e8e2d7183f2d90ad28c5a6"
       },
-      "scenario_id": "weekly-capacity-3",
+      "scenario_id": "slots-per-week-2",
       "seed": 271828,
       "status": "feasible"
     },
     {
       "configuration": {
-        "capacity": 4,
-        "configuration_status": "SYNTHETIC_DEMO_ONLY"
+        "configuration_status": "SYNTHETIC_DEMO_ONLY",
+        "physical_slots_per_week": 3,
+        "weekly_capacity_from_physical_slots": 3
       },
       "error_message": null,
       "error_type": null,
@@ -1062,34 +553,35 @@
       "failure_reasons": [],
       "method": "bt",
       "metrics": {
-        "assignments_attempted": 30,
-        "backtracks": 15,
+        "assignments_attempted": 312,
+        "backtracks": 156,
         "compatibility_checks": 0,
-        "constraint_checks": 847,
+        "constraint_checks": 19596,
         "domain_prunings": 0,
         "exhaustive": 1,
-        "feasible_schedules": 6,
-        "nodes_visited": 31,
+        "feasible_schedules": 108,
+        "nodes_visited": 313,
         "rejected_schedules": 0,
-        "schedules_examined": 6,
-        "solver_time_seconds": 0.004922700999486551,
-        "wall_time_seconds": 0.006237599000087357
+        "schedules_examined": 108,
+        "solver_time_seconds": 0.08796663601970067,
+        "wall_time_seconds": 0.11225409300095635
       },
       "profile_id": null,
       "provenance": {
-        "problem_identity": "1d55137b5278ac5515dfded00ee2c1e8a8d7b6bcb1d9dac4188b7b218198a22e",
+        "problem_identity": "7ee5803f3a06de5419aad1858810b2f065eb63e03f70ec871e6b9cbf02b0d47a",
         "rejection_reasons": [],
         "terminal_status": "exhausted_with_feasible",
-        "whole_plan_identity": "f9a8fd5b53c8e98cd140afe4bfc084ce14d464836c78c2cefa5a6306a272bbc4"
+        "whole_plan_identity": "f9eebf0664a6d68b30e21cd076b512ff4312f362e6e8e2d7183f2d90ad28c5a6"
       },
-      "scenario_id": "weekly-capacity-4",
+      "scenario_id": "slots-per-week-3",
       "seed": 42,
       "status": "feasible"
     },
     {
       "configuration": {
-        "capacity": 4,
-        "configuration_status": "SYNTHETIC_DEMO_ONLY"
+        "configuration_status": "SYNTHETIC_DEMO_ONLY",
+        "physical_slots_per_week": 3,
+        "weekly_capacity_from_physical_slots": 3
       },
       "error_message": null,
       "error_type": null,
@@ -1097,34 +589,35 @@
       "failure_reasons": [],
       "method": "bt",
       "metrics": {
-        "assignments_attempted": 30,
-        "backtracks": 15,
+        "assignments_attempted": 312,
+        "backtracks": 156,
         "compatibility_checks": 0,
-        "constraint_checks": 847,
+        "constraint_checks": 19596,
         "domain_prunings": 0,
         "exhaustive": 1,
-        "feasible_schedules": 6,
-        "nodes_visited": 31,
+        "feasible_schedules": 108,
+        "nodes_visited": 313,
         "rejected_schedules": 0,
-        "schedules_examined": 6,
-        "solver_time_seconds": 0.004372288000013214,
-        "wall_time_seconds": 0.005331403000127466
+        "schedules_examined": 108,
+        "solver_time_seconds": 0.10286775600980036,
+        "wall_time_seconds": 0.1312970619983389
       },
       "profile_id": null,
       "provenance": {
-        "problem_identity": "1d55137b5278ac5515dfded00ee2c1e8a8d7b6bcb1d9dac4188b7b218198a22e",
+        "problem_identity": "7ee5803f3a06de5419aad1858810b2f065eb63e03f70ec871e6b9cbf02b0d47a",
         "rejection_reasons": [],
         "terminal_status": "exhausted_with_feasible",
-        "whole_plan_identity": "f9a8fd5b53c8e98cd140afe4bfc084ce14d464836c78c2cefa5a6306a272bbc4"
+        "whole_plan_identity": "f9eebf0664a6d68b30e21cd076b512ff4312f362e6e8e2d7183f2d90ad28c5a6"
       },
-      "scenario_id": "weekly-capacity-4",
+      "scenario_id": "slots-per-week-3",
       "seed": 123,
       "status": "feasible"
     },
     {
       "configuration": {
-        "capacity": 4,
-        "configuration_status": "SYNTHETIC_DEMO_ONLY"
+        "configuration_status": "SYNTHETIC_DEMO_ONLY",
+        "physical_slots_per_week": 3,
+        "weekly_capacity_from_physical_slots": 3
       },
       "error_message": null,
       "error_type": null,
@@ -1132,34 +625,35 @@
       "failure_reasons": [],
       "method": "bt",
       "metrics": {
-        "assignments_attempted": 30,
-        "backtracks": 15,
+        "assignments_attempted": 312,
+        "backtracks": 156,
         "compatibility_checks": 0,
-        "constraint_checks": 847,
+        "constraint_checks": 19596,
         "domain_prunings": 0,
         "exhaustive": 1,
-        "feasible_schedules": 6,
-        "nodes_visited": 31,
+        "feasible_schedules": 108,
+        "nodes_visited": 313,
         "rejected_schedules": 0,
-        "schedules_examined": 6,
-        "solver_time_seconds": 0.004420592000315082,
-        "wall_time_seconds": 0.005315059000167821
+        "schedules_examined": 108,
+        "solver_time_seconds": 0.08985837805084884,
+        "wall_time_seconds": 0.11454856800264679
       },
       "profile_id": null,
       "provenance": {
-        "problem_identity": "1d55137b5278ac5515dfded00ee2c1e8a8d7b6bcb1d9dac4188b7b218198a22e",
+        "problem_identity": "7ee5803f3a06de5419aad1858810b2f065eb63e03f70ec871e6b9cbf02b0d47a",
         "rejection_reasons": [],
         "terminal_status": "exhausted_with_feasible",
-        "whole_plan_identity": "f9a8fd5b53c8e98cd140afe4bfc084ce14d464836c78c2cefa5a6306a272bbc4"
+        "whole_plan_identity": "f9eebf0664a6d68b30e21cd076b512ff4312f362e6e8e2d7183f2d90ad28c5a6"
       },
-      "scenario_id": "weekly-capacity-4",
+      "scenario_id": "slots-per-week-3",
       "seed": 2025,
       "status": "feasible"
     },
     {
       "configuration": {
-        "capacity": 4,
-        "configuration_status": "SYNTHETIC_DEMO_ONLY"
+        "configuration_status": "SYNTHETIC_DEMO_ONLY",
+        "physical_slots_per_week": 3,
+        "weekly_capacity_from_physical_slots": 3
       },
       "error_message": null,
       "error_type": null,
@@ -1167,34 +661,35 @@
       "failure_reasons": [],
       "method": "bt",
       "metrics": {
-        "assignments_attempted": 30,
-        "backtracks": 15,
+        "assignments_attempted": 312,
+        "backtracks": 156,
         "compatibility_checks": 0,
-        "constraint_checks": 847,
+        "constraint_checks": 19596,
         "domain_prunings": 0,
         "exhaustive": 1,
-        "feasible_schedules": 6,
-        "nodes_visited": 31,
+        "feasible_schedules": 108,
+        "nodes_visited": 313,
         "rejected_schedules": 0,
-        "schedules_examined": 6,
-        "solver_time_seconds": 0.004159629001151188,
-        "wall_time_seconds": 0.005065108999588119
+        "schedules_examined": 108,
+        "solver_time_seconds": 0.08620901397807756,
+        "wall_time_seconds": 0.1101851759958663
       },
       "profile_id": null,
       "provenance": {
-        "problem_identity": "1d55137b5278ac5515dfded00ee2c1e8a8d7b6bcb1d9dac4188b7b218198a22e",
+        "problem_identity": "7ee5803f3a06de5419aad1858810b2f065eb63e03f70ec871e6b9cbf02b0d47a",
         "rejection_reasons": [],
         "terminal_status": "exhausted_with_feasible",
-        "whole_plan_identity": "f9a8fd5b53c8e98cd140afe4bfc084ce14d464836c78c2cefa5a6306a272bbc4"
+        "whole_plan_identity": "f9eebf0664a6d68b30e21cd076b512ff4312f362e6e8e2d7183f2d90ad28c5a6"
       },
-      "scenario_id": "weekly-capacity-4",
+      "scenario_id": "slots-per-week-3",
       "seed": 31415,
       "status": "feasible"
     },
     {
       "configuration": {
-        "capacity": 4,
-        "configuration_status": "SYNTHETIC_DEMO_ONLY"
+        "configuration_status": "SYNTHETIC_DEMO_ONLY",
+        "physical_slots_per_week": 3,
+        "weekly_capacity_from_physical_slots": 3
       },
       "error_message": null,
       "error_type": null,
@@ -1202,34 +697,35 @@
       "failure_reasons": [],
       "method": "bt",
       "metrics": {
-        "assignments_attempted": 30,
-        "backtracks": 15,
+        "assignments_attempted": 312,
+        "backtracks": 156,
         "compatibility_checks": 0,
-        "constraint_checks": 847,
+        "constraint_checks": 19596,
         "domain_prunings": 0,
         "exhaustive": 1,
-        "feasible_schedules": 6,
-        "nodes_visited": 31,
+        "feasible_schedules": 108,
+        "nodes_visited": 313,
         "rejected_schedules": 0,
-        "schedules_examined": 6,
-        "solver_time_seconds": 0.004258305998519063,
-        "wall_time_seconds": 0.005166435000319325
+        "schedules_examined": 108,
+        "solver_time_seconds": 0.08757235603115987,
+        "wall_time_seconds": 0.11088364900206216
       },
       "profile_id": null,
       "provenance": {
-        "problem_identity": "1d55137b5278ac5515dfded00ee2c1e8a8d7b6bcb1d9dac4188b7b218198a22e",
+        "problem_identity": "7ee5803f3a06de5419aad1858810b2f065eb63e03f70ec871e6b9cbf02b0d47a",
         "rejection_reasons": [],
         "terminal_status": "exhausted_with_feasible",
-        "whole_plan_identity": "f9a8fd5b53c8e98cd140afe4bfc084ce14d464836c78c2cefa5a6306a272bbc4"
+        "whole_plan_identity": "f9eebf0664a6d68b30e21cd076b512ff4312f362e6e8e2d7183f2d90ad28c5a6"
       },
-      "scenario_id": "weekly-capacity-4",
+      "scenario_id": "slots-per-week-3",
       "seed": 271828,
       "status": "feasible"
     },
     {
       "configuration": {
-        "capacity": 4,
-        "configuration_status": "SYNTHETIC_DEMO_ONLY"
+        "configuration_status": "SYNTHETIC_DEMO_ONLY",
+        "physical_slots_per_week": 3,
+        "weekly_capacity_from_physical_slots": 3
       },
       "error_message": null,
       "error_type": null,
@@ -1237,34 +733,35 @@
       "failure_reasons": [],
       "method": "bt_fc",
       "metrics": {
-        "assignments_attempted": 15,
-        "backtracks": 0,
+        "assignments_attempted": 159,
+        "backtracks": 3,
         "compatibility_checks": 0,
-        "constraint_checks": 232,
-        "domain_prunings": 12,
+        "constraint_checks": 3534,
+        "domain_prunings": 87,
         "exhaustive": 1,
-        "feasible_schedules": 6,
-        "nodes_visited": 16,
+        "feasible_schedules": 108,
+        "nodes_visited": 157,
         "rejected_schedules": 0,
-        "schedules_examined": 6,
-        "solver_time_seconds": 0.0018380419996901765,
-        "wall_time_seconds": 0.002761686000667396
+        "schedules_examined": 108,
+        "solver_time_seconds": 0.025823861098615453,
+        "wall_time_seconds": 0.04888546199799748
       },
       "profile_id": null,
       "provenance": {
-        "problem_identity": "1d55137b5278ac5515dfded00ee2c1e8a8d7b6bcb1d9dac4188b7b218198a22e",
+        "problem_identity": "7ee5803f3a06de5419aad1858810b2f065eb63e03f70ec871e6b9cbf02b0d47a",
         "rejection_reasons": [],
         "terminal_status": "exhausted_with_feasible",
-        "whole_plan_identity": "f9a8fd5b53c8e98cd140afe4bfc084ce14d464836c78c2cefa5a6306a272bbc4"
+        "whole_plan_identity": "f9eebf0664a6d68b30e21cd076b512ff4312f362e6e8e2d7183f2d90ad28c5a6"
       },
-      "scenario_id": "weekly-capacity-4",
+      "scenario_id": "slots-per-week-3",
       "seed": 42,
       "status": "feasible"
     },
     {
       "configuration": {
-        "capacity": 4,
-        "configuration_status": "SYNTHETIC_DEMO_ONLY"
+        "configuration_status": "SYNTHETIC_DEMO_ONLY",
+        "physical_slots_per_week": 3,
+        "weekly_capacity_from_physical_slots": 3
       },
       "error_message": null,
       "error_type": null,
@@ -1272,34 +769,35 @@
       "failure_reasons": [],
       "method": "bt_fc",
       "metrics": {
-        "assignments_attempted": 15,
-        "backtracks": 0,
+        "assignments_attempted": 159,
+        "backtracks": 3,
         "compatibility_checks": 0,
-        "constraint_checks": 232,
-        "domain_prunings": 12,
+        "constraint_checks": 3534,
+        "domain_prunings": 87,
         "exhaustive": 1,
-        "feasible_schedules": 6,
-        "nodes_visited": 16,
+        "feasible_schedules": 108,
+        "nodes_visited": 157,
         "rejected_schedules": 0,
-        "schedules_examined": 6,
-        "solver_time_seconds": 0.0018503429992051679,
-        "wall_time_seconds": 0.002706315999603248
+        "schedules_examined": 108,
+        "solver_time_seconds": 0.02650885896582622,
+        "wall_time_seconds": 0.04896573800215265
       },
       "profile_id": null,
       "provenance": {
-        "problem_identity": "1d55137b5278ac5515dfded00ee2c1e8a8d7b6bcb1d9dac4188b7b218198a22e",
+        "problem_identity": "7ee5803f3a06de5419aad1858810b2f065eb63e03f70ec871e6b9cbf02b0d47a",
         "rejection_reasons": [],
         "terminal_status": "exhausted_with_feasible",
-        "whole_plan_identity": "f9a8fd5b53c8e98cd140afe4bfc084ce14d464836c78c2cefa5a6306a272bbc4"
+        "whole_plan_identity": "f9eebf0664a6d68b30e21cd076b512ff4312f362e6e8e2d7183f2d90ad28c5a6"
       },
-      "scenario_id": "weekly-capacity-4",
+      "scenario_id": "slots-per-week-3",
       "seed": 123,
       "status": "feasible"
     },
     {
       "configuration": {
-        "capacity": 4,
-        "configuration_status": "SYNTHETIC_DEMO_ONLY"
+        "configuration_status": "SYNTHETIC_DEMO_ONLY",
+        "physical_slots_per_week": 3,
+        "weekly_capacity_from_physical_slots": 3
       },
       "error_message": null,
       "error_type": null,
@@ -1307,34 +805,35 @@
       "failure_reasons": [],
       "method": "bt_fc",
       "metrics": {
-        "assignments_attempted": 15,
-        "backtracks": 0,
+        "assignments_attempted": 159,
+        "backtracks": 3,
         "compatibility_checks": 0,
-        "constraint_checks": 232,
-        "domain_prunings": 12,
+        "constraint_checks": 3534,
+        "domain_prunings": 87,
         "exhaustive": 1,
-        "feasible_schedules": 6,
-        "nodes_visited": 16,
+        "feasible_schedules": 108,
+        "nodes_visited": 157,
         "rejected_schedules": 0,
-        "schedules_examined": 6,
-        "solver_time_seconds": 0.0018509329993321444,
-        "wall_time_seconds": 0.0027516480004123878
+        "schedules_examined": 108,
+        "solver_time_seconds": 0.026265849992341828,
+        "wall_time_seconds": 0.04934383700310718
       },
       "profile_id": null,
       "provenance": {
-        "problem_identity": "1d55137b5278ac5515dfded00ee2c1e8a8d7b6bcb1d9dac4188b7b218198a22e",
+        "problem_identity": "7ee5803f3a06de5419aad1858810b2f065eb63e03f70ec871e6b9cbf02b0d47a",
         "rejection_reasons": [],
         "terminal_status": "exhausted_with_feasible",
-        "whole_plan_identity": "f9a8fd5b53c8e98cd140afe4bfc084ce14d464836c78c2cefa5a6306a272bbc4"
+        "whole_plan_identity": "f9eebf0664a6d68b30e21cd076b512ff4312f362e6e8e2d7183f2d90ad28c5a6"
       },
-      "scenario_id": "weekly-capacity-4",
+      "scenario_id": "slots-per-week-3",
       "seed": 2025,
       "status": "feasible"
     },
     {
       "configuration": {
-        "capacity": 4,
-        "configuration_status": "SYNTHETIC_DEMO_ONLY"
+        "configuration_status": "SYNTHETIC_DEMO_ONLY",
+        "physical_slots_per_week": 3,
+        "weekly_capacity_from_physical_slots": 3
       },
       "error_message": null,
       "error_type": null,
@@ -1342,34 +841,35 @@
       "failure_reasons": [],
       "method": "bt_fc",
       "metrics": {
-        "assignments_attempted": 15,
-        "backtracks": 0,
+        "assignments_attempted": 159,
+        "backtracks": 3,
         "compatibility_checks": 0,
-        "constraint_checks": 232,
-        "domain_prunings": 12,
+        "constraint_checks": 3534,
+        "domain_prunings": 87,
         "exhaustive": 1,
-        "feasible_schedules": 6,
-        "nodes_visited": 16,
+        "feasible_schedules": 108,
+        "nodes_visited": 157,
         "rejected_schedules": 0,
-        "schedules_examined": 6,
-        "solver_time_seconds": 0.0018225920011900598,
-        "wall_time_seconds": 0.0026604659997246927
+        "schedules_examined": 108,
+        "solver_time_seconds": 0.026020004974270705,
+        "wall_time_seconds": 0.04873587100155419
       },
       "profile_id": null,
       "provenance": {
-        "problem_identity": "1d55137b5278ac5515dfded00ee2c1e8a8d7b6bcb1d9dac4188b7b218198a22e",
+        "problem_identity": "7ee5803f3a06de5419aad1858810b2f065eb63e03f70ec871e6b9cbf02b0d47a",
         "rejection_reasons": [],
         "terminal_status": "exhausted_with_feasible",
-        "whole_plan_identity": "f9a8fd5b53c8e98cd140afe4bfc084ce14d464836c78c2cefa5a6306a272bbc4"
+        "whole_plan_identity": "f9eebf0664a6d68b30e21cd076b512ff4312f362e6e8e2d7183f2d90ad28c5a6"
       },
-      "scenario_id": "weekly-capacity-4",
+      "scenario_id": "slots-per-week-3",
       "seed": 31415,
       "status": "feasible"
     },
     {
       "configuration": {
-        "capacity": 4,
-        "configuration_status": "SYNTHETIC_DEMO_ONLY"
+        "configuration_status": "SYNTHETIC_DEMO_ONLY",
+        "physical_slots_per_week": 3,
+        "weekly_capacity_from_physical_slots": 3
       },
       "error_message": null,
       "error_type": null,
@@ -1377,34 +877,35 @@
       "failure_reasons": [],
       "method": "bt_fc",
       "metrics": {
-        "assignments_attempted": 15,
-        "backtracks": 0,
+        "assignments_attempted": 159,
+        "backtracks": 3,
         "compatibility_checks": 0,
-        "constraint_checks": 232,
-        "domain_prunings": 12,
+        "constraint_checks": 3534,
+        "domain_prunings": 87,
         "exhaustive": 1,
-        "feasible_schedules": 6,
-        "nodes_visited": 16,
+        "feasible_schedules": 108,
+        "nodes_visited": 157,
         "rejected_schedules": 0,
-        "schedules_examined": 6,
-        "solver_time_seconds": 0.0018635659998835763,
-        "wall_time_seconds": 0.0027064539999628323
+        "schedules_examined": 108,
+        "solver_time_seconds": 0.02635164899402298,
+        "wall_time_seconds": 0.04979542899673106
       },
       "profile_id": null,
       "provenance": {
-        "problem_identity": "1d55137b5278ac5515dfded00ee2c1e8a8d7b6bcb1d9dac4188b7b218198a22e",
+        "problem_identity": "7ee5803f3a06de5419aad1858810b2f065eb63e03f70ec871e6b9cbf02b0d47a",
         "rejection_reasons": [],
         "terminal_status": "exhausted_with_feasible",
-        "whole_plan_identity": "f9a8fd5b53c8e98cd140afe4bfc084ce14d464836c78c2cefa5a6306a272bbc4"
+        "whole_plan_identity": "f9eebf0664a6d68b30e21cd076b512ff4312f362e6e8e2d7183f2d90ad28c5a6"
       },
-      "scenario_id": "weekly-capacity-4",
+      "scenario_id": "slots-per-week-3",
       "seed": 271828,
       "status": "feasible"
     },
     {
       "configuration": {
-        "capacity": 4,
-        "configuration_status": "SYNTHETIC_DEMO_ONLY"
+        "configuration_status": "SYNTHETIC_DEMO_ONLY",
+        "physical_slots_per_week": 3,
+        "weekly_capacity_from_physical_slots": 3
       },
       "error_message": null,
       "error_type": null,
@@ -1412,34 +913,35 @@
       "failure_reasons": [],
       "method": "bt_fc_ac3",
       "metrics": {
-        "assignments_attempted": 15,
+        "assignments_attempted": 156,
         "backtracks": 0,
-        "compatibility_checks": 198,
-        "constraint_checks": 388,
-        "domain_prunings": 12,
+        "compatibility_checks": 4416,
+        "constraint_checks": 7353,
+        "domain_prunings": 66,
         "exhaustive": 1,
-        "feasible_schedules": 6,
-        "nodes_visited": 16,
+        "feasible_schedules": 108,
+        "nodes_visited": 157,
         "rejected_schedules": 0,
-        "schedules_examined": 6,
-        "solver_time_seconds": 0.0027937260010730824,
-        "wall_time_seconds": 0.0037047370005893754
+        "schedules_examined": 108,
+        "solver_time_seconds": 0.044687636007438414,
+        "wall_time_seconds": 0.06870001600327669
       },
       "profile_id": null,
       "provenance": {
-        "problem_identity": "1d55137b5278ac5515dfded00ee2c1e8a8d7b6bcb1d9dac4188b7b218198a22e",
+        "problem_identity": "7ee5803f3a06de5419aad1858810b2f065eb63e03f70ec871e6b9cbf02b0d47a",
         "rejection_reasons": [],
         "terminal_status": "exhausted_with_feasible",
-        "whole_plan_identity": "f9a8fd5b53c8e98cd140afe4bfc084ce14d464836c78c2cefa5a6306a272bbc4"
+        "whole_plan_identity": "f9eebf0664a6d68b30e21cd076b512ff4312f362e6e8e2d7183f2d90ad28c5a6"
       },
-      "scenario_id": "weekly-capacity-4",
+      "scenario_id": "slots-per-week-3",
       "seed": 42,
       "status": "feasible"
     },
     {
       "configuration": {
-        "capacity": 4,
-        "configuration_status": "SYNTHETIC_DEMO_ONLY"
+        "configuration_status": "SYNTHETIC_DEMO_ONLY",
+        "physical_slots_per_week": 3,
+        "weekly_capacity_from_physical_slots": 3
       },
       "error_message": null,
       "error_type": null,
@@ -1447,34 +949,35 @@
       "failure_reasons": [],
       "method": "bt_fc_ac3",
       "metrics": {
-        "assignments_attempted": 15,
+        "assignments_attempted": 156,
         "backtracks": 0,
-        "compatibility_checks": 198,
-        "constraint_checks": 388,
-        "domain_prunings": 12,
+        "compatibility_checks": 4416,
+        "constraint_checks": 7353,
+        "domain_prunings": 66,
         "exhaustive": 1,
-        "feasible_schedules": 6,
-        "nodes_visited": 16,
+        "feasible_schedules": 108,
+        "nodes_visited": 157,
         "rejected_schedules": 0,
-        "schedules_examined": 6,
-        "solver_time_seconds": 0.00271375800093665,
-        "wall_time_seconds": 0.003573555999537348
+        "schedules_examined": 108,
+        "solver_time_seconds": 0.04409365398896625,
+        "wall_time_seconds": 0.06809298900043359
       },
       "profile_id": null,
       "provenance": {
-        "problem_identity": "1d55137b5278ac5515dfded00ee2c1e8a8d7b6bcb1d9dac4188b7b218198a22e",
+        "problem_identity": "7ee5803f3a06de5419aad1858810b2f065eb63e03f70ec871e6b9cbf02b0d47a",
         "rejection_reasons": [],
         "terminal_status": "exhausted_with_feasible",
-        "whole_plan_identity": "f9a8fd5b53c8e98cd140afe4bfc084ce14d464836c78c2cefa5a6306a272bbc4"
+        "whole_plan_identity": "f9eebf0664a6d68b30e21cd076b512ff4312f362e6e8e2d7183f2d90ad28c5a6"
       },
-      "scenario_id": "weekly-capacity-4",
+      "scenario_id": "slots-per-week-3",
       "seed": 123,
       "status": "feasible"
     },
     {
       "configuration": {
-        "capacity": 4,
-        "configuration_status": "SYNTHETIC_DEMO_ONLY"
+        "configuration_status": "SYNTHETIC_DEMO_ONLY",
+        "physical_slots_per_week": 3,
+        "weekly_capacity_from_physical_slots": 3
       },
       "error_message": null,
       "error_type": null,
@@ -1482,34 +985,35 @@
       "failure_reasons": [],
       "method": "bt_fc_ac3",
       "metrics": {
-        "assignments_attempted": 15,
+        "assignments_attempted": 156,
         "backtracks": 0,
-        "compatibility_checks": 198,
-        "constraint_checks": 388,
-        "domain_prunings": 12,
+        "compatibility_checks": 4416,
+        "constraint_checks": 7353,
+        "domain_prunings": 66,
         "exhaustive": 1,
-        "feasible_schedules": 6,
-        "nodes_visited": 16,
+        "feasible_schedules": 108,
+        "nodes_visited": 157,
         "rejected_schedules": 0,
-        "schedules_examined": 6,
-        "solver_time_seconds": 0.0029284900019774796,
-        "wall_time_seconds": 0.004540752999673714
+        "schedules_examined": 108,
+        "solver_time_seconds": 0.045828721929865424,
+        "wall_time_seconds": 0.06994496900006197
       },
       "profile_id": null,
       "provenance": {
-        "problem_identity": "1d55137b5278ac5515dfded00ee2c1e8a8d7b6bcb1d9dac4188b7b218198a22e",
+        "problem_identity": "7ee5803f3a06de5419aad1858810b2f065eb63e03f70ec871e6b9cbf02b0d47a",
         "rejection_reasons": [],
         "terminal_status": "exhausted_with_feasible",
-        "whole_plan_identity": "f9a8fd5b53c8e98cd140afe4bfc084ce14d464836c78c2cefa5a6306a272bbc4"
+        "whole_plan_identity": "f9eebf0664a6d68b30e21cd076b512ff4312f362e6e8e2d7183f2d90ad28c5a6"
       },
-      "scenario_id": "weekly-capacity-4",
+      "scenario_id": "slots-per-week-3",
       "seed": 2025,
       "status": "feasible"
     },
     {
       "configuration": {
-        "capacity": 4,
-        "configuration_status": "SYNTHETIC_DEMO_ONLY"
+        "configuration_status": "SYNTHETIC_DEMO_ONLY",
+        "physical_slots_per_week": 3,
+        "weekly_capacity_from_physical_slots": 3
       },
       "error_message": null,
       "error_type": null,
@@ -1517,34 +1021,35 @@
       "failure_reasons": [],
       "method": "bt_fc_ac3",
       "metrics": {
-        "assignments_attempted": 15,
+        "assignments_attempted": 156,
         "backtracks": 0,
-        "compatibility_checks": 198,
-        "constraint_checks": 388,
-        "domain_prunings": 12,
+        "compatibility_checks": 4416,
+        "constraint_checks": 7353,
+        "domain_prunings": 66,
         "exhaustive": 1,
-        "feasible_schedules": 6,
-        "nodes_visited": 16,
+        "feasible_schedules": 108,
+        "nodes_visited": 157,
         "rejected_schedules": 0,
-        "schedules_examined": 6,
-        "solver_time_seconds": 0.002926573000877397,
-        "wall_time_seconds": 0.0044542980003825505
+        "schedules_examined": 108,
+        "solver_time_seconds": 0.044233958091354,
+        "wall_time_seconds": 0.06823840399738401
       },
       "profile_id": null,
       "provenance": {
-        "problem_identity": "1d55137b5278ac5515dfded00ee2c1e8a8d7b6bcb1d9dac4188b7b218198a22e",
+        "problem_identity": "7ee5803f3a06de5419aad1858810b2f065eb63e03f70ec871e6b9cbf02b0d47a",
         "rejection_reasons": [],
         "terminal_status": "exhausted_with_feasible",
-        "whole_plan_identity": "f9a8fd5b53c8e98cd140afe4bfc084ce14d464836c78c2cefa5a6306a272bbc4"
+        "whole_plan_identity": "f9eebf0664a6d68b30e21cd076b512ff4312f362e6e8e2d7183f2d90ad28c5a6"
       },
-      "scenario_id": "weekly-capacity-4",
+      "scenario_id": "slots-per-week-3",
       "seed": 31415,
       "status": "feasible"
     },
     {
       "configuration": {
-        "capacity": 4,
-        "configuration_status": "SYNTHETIC_DEMO_ONLY"
+        "configuration_status": "SYNTHETIC_DEMO_ONLY",
+        "physical_slots_per_week": 3,
+        "weekly_capacity_from_physical_slots": 3
       },
       "error_message": null,
       "error_type": null,
@@ -1552,27 +1057,567 @@
       "failure_reasons": [],
       "method": "bt_fc_ac3",
       "metrics": {
-        "assignments_attempted": 15,
+        "assignments_attempted": 156,
         "backtracks": 0,
-        "compatibility_checks": 198,
-        "constraint_checks": 388,
-        "domain_prunings": 12,
+        "compatibility_checks": 4416,
+        "constraint_checks": 7353,
+        "domain_prunings": 66,
         "exhaustive": 1,
-        "feasible_schedules": 6,
-        "nodes_visited": 16,
+        "feasible_schedules": 108,
+        "nodes_visited": 157,
         "rejected_schedules": 0,
-        "schedules_examined": 6,
-        "solver_time_seconds": 0.0029546559999289457,
-        "wall_time_seconds": 0.003914304999852902
+        "schedules_examined": 108,
+        "solver_time_seconds": 0.04309213600936346,
+        "wall_time_seconds": 0.06746518799627665
       },
       "profile_id": null,
       "provenance": {
-        "problem_identity": "1d55137b5278ac5515dfded00ee2c1e8a8d7b6bcb1d9dac4188b7b218198a22e",
+        "problem_identity": "7ee5803f3a06de5419aad1858810b2f065eb63e03f70ec871e6b9cbf02b0d47a",
         "rejection_reasons": [],
         "terminal_status": "exhausted_with_feasible",
-        "whole_plan_identity": "f9a8fd5b53c8e98cd140afe4bfc084ce14d464836c78c2cefa5a6306a272bbc4"
+        "whole_plan_identity": "f9eebf0664a6d68b30e21cd076b512ff4312f362e6e8e2d7183f2d90ad28c5a6"
       },
-      "scenario_id": "weekly-capacity-4",
+      "scenario_id": "slots-per-week-3",
+      "seed": 271828,
+      "status": "feasible"
+    },
+    {
+      "configuration": {
+        "configuration_status": "SYNTHETIC_DEMO_ONLY",
+        "physical_slots_per_week": 4,
+        "weekly_capacity_from_physical_slots": 4
+      },
+      "error_message": null,
+      "error_type": null,
+      "experiment_id": "csp",
+      "failure_reasons": [],
+      "method": "bt",
+      "metrics": {
+        "assignments_attempted": 968,
+        "backtracks": 372,
+        "compatibility_checks": 0,
+        "constraint_checks": 53484,
+        "domain_prunings": 0,
+        "exhaustive": 1,
+        "feasible_schedules": 480,
+        "nodes_visited": 969,
+        "rejected_schedules": 0,
+        "schedules_examined": 480,
+        "solver_time_seconds": 0.24709635404724395,
+        "wall_time_seconds": 0.35113682500377763
+      },
+      "profile_id": null,
+      "provenance": {
+        "problem_identity": "04cf29c539843b9a6eeee975d249cd0cfd5c86348ca0dc9f81658185b6383cf7",
+        "rejection_reasons": [],
+        "terminal_status": "exhausted_with_feasible",
+        "whole_plan_identity": "f9eebf0664a6d68b30e21cd076b512ff4312f362e6e8e2d7183f2d90ad28c5a6"
+      },
+      "scenario_id": "slots-per-week-4",
+      "seed": 42,
+      "status": "feasible"
+    },
+    {
+      "configuration": {
+        "configuration_status": "SYNTHETIC_DEMO_ONLY",
+        "physical_slots_per_week": 4,
+        "weekly_capacity_from_physical_slots": 4
+      },
+      "error_message": null,
+      "error_type": null,
+      "experiment_id": "csp",
+      "failure_reasons": [],
+      "method": "bt",
+      "metrics": {
+        "assignments_attempted": 968,
+        "backtracks": 372,
+        "compatibility_checks": 0,
+        "constraint_checks": 53484,
+        "domain_prunings": 0,
+        "exhaustive": 1,
+        "feasible_schedules": 480,
+        "nodes_visited": 969,
+        "rejected_schedules": 0,
+        "schedules_examined": 480,
+        "solver_time_seconds": 0.2389499720011372,
+        "wall_time_seconds": 0.3421794429959846
+      },
+      "profile_id": null,
+      "provenance": {
+        "problem_identity": "04cf29c539843b9a6eeee975d249cd0cfd5c86348ca0dc9f81658185b6383cf7",
+        "rejection_reasons": [],
+        "terminal_status": "exhausted_with_feasible",
+        "whole_plan_identity": "f9eebf0664a6d68b30e21cd076b512ff4312f362e6e8e2d7183f2d90ad28c5a6"
+      },
+      "scenario_id": "slots-per-week-4",
+      "seed": 123,
+      "status": "feasible"
+    },
+    {
+      "configuration": {
+        "configuration_status": "SYNTHETIC_DEMO_ONLY",
+        "physical_slots_per_week": 4,
+        "weekly_capacity_from_physical_slots": 4
+      },
+      "error_message": null,
+      "error_type": null,
+      "experiment_id": "csp",
+      "failure_reasons": [],
+      "method": "bt",
+      "metrics": {
+        "assignments_attempted": 968,
+        "backtracks": 372,
+        "compatibility_checks": 0,
+        "constraint_checks": 53484,
+        "domain_prunings": 0,
+        "exhaustive": 1,
+        "feasible_schedules": 480,
+        "nodes_visited": 969,
+        "rejected_schedules": 0,
+        "schedules_examined": 480,
+        "solver_time_seconds": 0.250887275855348,
+        "wall_time_seconds": 0.3558276890034904
+      },
+      "profile_id": null,
+      "provenance": {
+        "problem_identity": "04cf29c539843b9a6eeee975d249cd0cfd5c86348ca0dc9f81658185b6383cf7",
+        "rejection_reasons": [],
+        "terminal_status": "exhausted_with_feasible",
+        "whole_plan_identity": "f9eebf0664a6d68b30e21cd076b512ff4312f362e6e8e2d7183f2d90ad28c5a6"
+      },
+      "scenario_id": "slots-per-week-4",
+      "seed": 2025,
+      "status": "feasible"
+    },
+    {
+      "configuration": {
+        "configuration_status": "SYNTHETIC_DEMO_ONLY",
+        "physical_slots_per_week": 4,
+        "weekly_capacity_from_physical_slots": 4
+      },
+      "error_message": null,
+      "error_type": null,
+      "experiment_id": "csp",
+      "failure_reasons": [],
+      "method": "bt",
+      "metrics": {
+        "assignments_attempted": 968,
+        "backtracks": 372,
+        "compatibility_checks": 0,
+        "constraint_checks": 53484,
+        "domain_prunings": 0,
+        "exhaustive": 1,
+        "feasible_schedules": 480,
+        "nodes_visited": 969,
+        "rejected_schedules": 0,
+        "schedules_examined": 480,
+        "solver_time_seconds": 0.2556548669745098,
+        "wall_time_seconds": 0.3630459339983645
+      },
+      "profile_id": null,
+      "provenance": {
+        "problem_identity": "04cf29c539843b9a6eeee975d249cd0cfd5c86348ca0dc9f81658185b6383cf7",
+        "rejection_reasons": [],
+        "terminal_status": "exhausted_with_feasible",
+        "whole_plan_identity": "f9eebf0664a6d68b30e21cd076b512ff4312f362e6e8e2d7183f2d90ad28c5a6"
+      },
+      "scenario_id": "slots-per-week-4",
+      "seed": 31415,
+      "status": "feasible"
+    },
+    {
+      "configuration": {
+        "configuration_status": "SYNTHETIC_DEMO_ONLY",
+        "physical_slots_per_week": 4,
+        "weekly_capacity_from_physical_slots": 4
+      },
+      "error_message": null,
+      "error_type": null,
+      "experiment_id": "csp",
+      "failure_reasons": [],
+      "method": "bt",
+      "metrics": {
+        "assignments_attempted": 968,
+        "backtracks": 372,
+        "compatibility_checks": 0,
+        "constraint_checks": 53484,
+        "domain_prunings": 0,
+        "exhaustive": 1,
+        "feasible_schedules": 480,
+        "nodes_visited": 969,
+        "rejected_schedules": 0,
+        "schedules_examined": 480,
+        "solver_time_seconds": 0.2367136349712382,
+        "wall_time_seconds": 0.3386134860047605
+      },
+      "profile_id": null,
+      "provenance": {
+        "problem_identity": "04cf29c539843b9a6eeee975d249cd0cfd5c86348ca0dc9f81658185b6383cf7",
+        "rejection_reasons": [],
+        "terminal_status": "exhausted_with_feasible",
+        "whole_plan_identity": "f9eebf0664a6d68b30e21cd076b512ff4312f362e6e8e2d7183f2d90ad28c5a6"
+      },
+      "scenario_id": "slots-per-week-4",
+      "seed": 271828,
+      "status": "feasible"
+    },
+    {
+      "configuration": {
+        "configuration_status": "SYNTHETIC_DEMO_ONLY",
+        "physical_slots_per_week": 4,
+        "weekly_capacity_from_physical_slots": 4
+      },
+      "error_message": null,
+      "error_type": null,
+      "experiment_id": "csp",
+      "failure_reasons": [],
+      "method": "bt_fc",
+      "metrics": {
+        "assignments_attempted": 600,
+        "backtracks": 4,
+        "compatibility_checks": 0,
+        "constraint_checks": 12564,
+        "domain_prunings": 184,
+        "exhaustive": 1,
+        "feasible_schedules": 480,
+        "nodes_visited": 597,
+        "rejected_schedules": 0,
+        "schedules_examined": 480,
+        "solver_time_seconds": 0.09088609605532838,
+        "wall_time_seconds": 0.19108878500264836
+      },
+      "profile_id": null,
+      "provenance": {
+        "problem_identity": "04cf29c539843b9a6eeee975d249cd0cfd5c86348ca0dc9f81658185b6383cf7",
+        "rejection_reasons": [],
+        "terminal_status": "exhausted_with_feasible",
+        "whole_plan_identity": "f9eebf0664a6d68b30e21cd076b512ff4312f362e6e8e2d7183f2d90ad28c5a6"
+      },
+      "scenario_id": "slots-per-week-4",
+      "seed": 42,
+      "status": "feasible"
+    },
+    {
+      "configuration": {
+        "configuration_status": "SYNTHETIC_DEMO_ONLY",
+        "physical_slots_per_week": 4,
+        "weekly_capacity_from_physical_slots": 4
+      },
+      "error_message": null,
+      "error_type": null,
+      "experiment_id": "csp",
+      "failure_reasons": [],
+      "method": "bt_fc",
+      "metrics": {
+        "assignments_attempted": 600,
+        "backtracks": 4,
+        "compatibility_checks": 0,
+        "constraint_checks": 12564,
+        "domain_prunings": 184,
+        "exhaustive": 1,
+        "feasible_schedules": 480,
+        "nodes_visited": 597,
+        "rejected_schedules": 0,
+        "schedules_examined": 480,
+        "solver_time_seconds": 0.09058315601578215,
+        "wall_time_seconds": 0.19116300599853275
+      },
+      "profile_id": null,
+      "provenance": {
+        "problem_identity": "04cf29c539843b9a6eeee975d249cd0cfd5c86348ca0dc9f81658185b6383cf7",
+        "rejection_reasons": [],
+        "terminal_status": "exhausted_with_feasible",
+        "whole_plan_identity": "f9eebf0664a6d68b30e21cd076b512ff4312f362e6e8e2d7183f2d90ad28c5a6"
+      },
+      "scenario_id": "slots-per-week-4",
+      "seed": 123,
+      "status": "feasible"
+    },
+    {
+      "configuration": {
+        "configuration_status": "SYNTHETIC_DEMO_ONLY",
+        "physical_slots_per_week": 4,
+        "weekly_capacity_from_physical_slots": 4
+      },
+      "error_message": null,
+      "error_type": null,
+      "experiment_id": "csp",
+      "failure_reasons": [],
+      "method": "bt_fc",
+      "metrics": {
+        "assignments_attempted": 600,
+        "backtracks": 4,
+        "compatibility_checks": 0,
+        "constraint_checks": 12564,
+        "domain_prunings": 184,
+        "exhaustive": 1,
+        "feasible_schedules": 480,
+        "nodes_visited": 597,
+        "rejected_schedules": 0,
+        "schedules_examined": 480,
+        "solver_time_seconds": 0.09131399685429642,
+        "wall_time_seconds": 0.1941030430025421
+      },
+      "profile_id": null,
+      "provenance": {
+        "problem_identity": "04cf29c539843b9a6eeee975d249cd0cfd5c86348ca0dc9f81658185b6383cf7",
+        "rejection_reasons": [],
+        "terminal_status": "exhausted_with_feasible",
+        "whole_plan_identity": "f9eebf0664a6d68b30e21cd076b512ff4312f362e6e8e2d7183f2d90ad28c5a6"
+      },
+      "scenario_id": "slots-per-week-4",
+      "seed": 2025,
+      "status": "feasible"
+    },
+    {
+      "configuration": {
+        "configuration_status": "SYNTHETIC_DEMO_ONLY",
+        "physical_slots_per_week": 4,
+        "weekly_capacity_from_physical_slots": 4
+      },
+      "error_message": null,
+      "error_type": null,
+      "experiment_id": "csp",
+      "failure_reasons": [],
+      "method": "bt_fc",
+      "metrics": {
+        "assignments_attempted": 600,
+        "backtracks": 4,
+        "compatibility_checks": 0,
+        "constraint_checks": 12564,
+        "domain_prunings": 184,
+        "exhaustive": 1,
+        "feasible_schedules": 480,
+        "nodes_visited": 597,
+        "rejected_schedules": 0,
+        "schedules_examined": 480,
+        "solver_time_seconds": 0.09221424794668565,
+        "wall_time_seconds": 0.19432727200182853
+      },
+      "profile_id": null,
+      "provenance": {
+        "problem_identity": "04cf29c539843b9a6eeee975d249cd0cfd5c86348ca0dc9f81658185b6383cf7",
+        "rejection_reasons": [],
+        "terminal_status": "exhausted_with_feasible",
+        "whole_plan_identity": "f9eebf0664a6d68b30e21cd076b512ff4312f362e6e8e2d7183f2d90ad28c5a6"
+      },
+      "scenario_id": "slots-per-week-4",
+      "seed": 31415,
+      "status": "feasible"
+    },
+    {
+      "configuration": {
+        "configuration_status": "SYNTHETIC_DEMO_ONLY",
+        "physical_slots_per_week": 4,
+        "weekly_capacity_from_physical_slots": 4
+      },
+      "error_message": null,
+      "error_type": null,
+      "experiment_id": "csp",
+      "failure_reasons": [],
+      "method": "bt_fc",
+      "metrics": {
+        "assignments_attempted": 600,
+        "backtracks": 4,
+        "compatibility_checks": 0,
+        "constraint_checks": 12564,
+        "domain_prunings": 184,
+        "exhaustive": 1,
+        "feasible_schedules": 480,
+        "nodes_visited": 597,
+        "rejected_schedules": 0,
+        "schedules_examined": 480,
+        "solver_time_seconds": 0.0879264460891136,
+        "wall_time_seconds": 0.18810438299988164
+      },
+      "profile_id": null,
+      "provenance": {
+        "problem_identity": "04cf29c539843b9a6eeee975d249cd0cfd5c86348ca0dc9f81658185b6383cf7",
+        "rejection_reasons": [],
+        "terminal_status": "exhausted_with_feasible",
+        "whole_plan_identity": "f9eebf0664a6d68b30e21cd076b512ff4312f362e6e8e2d7183f2d90ad28c5a6"
+      },
+      "scenario_id": "slots-per-week-4",
+      "seed": 271828,
+      "status": "feasible"
+    },
+    {
+      "configuration": {
+        "configuration_status": "SYNTHETIC_DEMO_ONLY",
+        "physical_slots_per_week": 4,
+        "weekly_capacity_from_physical_slots": 4
+      },
+      "error_message": null,
+      "error_type": null,
+      "experiment_id": "csp",
+      "failure_reasons": [],
+      "method": "bt_fc_ac3",
+      "metrics": {
+        "assignments_attempted": 596,
+        "backtracks": 0,
+        "compatibility_checks": 16468,
+        "constraint_checks": 27264,
+        "domain_prunings": 144,
+        "exhaustive": 1,
+        "feasible_schedules": 480,
+        "nodes_visited": 597,
+        "rejected_schedules": 0,
+        "schedules_examined": 480,
+        "solver_time_seconds": 0.1675298580157687,
+        "wall_time_seconds": 0.2791224310058169
+      },
+      "profile_id": null,
+      "provenance": {
+        "problem_identity": "04cf29c539843b9a6eeee975d249cd0cfd5c86348ca0dc9f81658185b6383cf7",
+        "rejection_reasons": [],
+        "terminal_status": "exhausted_with_feasible",
+        "whole_plan_identity": "f9eebf0664a6d68b30e21cd076b512ff4312f362e6e8e2d7183f2d90ad28c5a6"
+      },
+      "scenario_id": "slots-per-week-4",
+      "seed": 42,
+      "status": "feasible"
+    },
+    {
+      "configuration": {
+        "configuration_status": "SYNTHETIC_DEMO_ONLY",
+        "physical_slots_per_week": 4,
+        "weekly_capacity_from_physical_slots": 4
+      },
+      "error_message": null,
+      "error_type": null,
+      "experiment_id": "csp",
+      "failure_reasons": [],
+      "method": "bt_fc_ac3",
+      "metrics": {
+        "assignments_attempted": 596,
+        "backtracks": 0,
+        "compatibility_checks": 16468,
+        "constraint_checks": 27264,
+        "domain_prunings": 144,
+        "exhaustive": 1,
+        "feasible_schedules": 480,
+        "nodes_visited": 597,
+        "rejected_schedules": 0,
+        "schedules_examined": 480,
+        "solver_time_seconds": 0.16741536308109062,
+        "wall_time_seconds": 0.2769766970013734
+      },
+      "profile_id": null,
+      "provenance": {
+        "problem_identity": "04cf29c539843b9a6eeee975d249cd0cfd5c86348ca0dc9f81658185b6383cf7",
+        "rejection_reasons": [],
+        "terminal_status": "exhausted_with_feasible",
+        "whole_plan_identity": "f9eebf0664a6d68b30e21cd076b512ff4312f362e6e8e2d7183f2d90ad28c5a6"
+      },
+      "scenario_id": "slots-per-week-4",
+      "seed": 123,
+      "status": "feasible"
+    },
+    {
+      "configuration": {
+        "configuration_status": "SYNTHETIC_DEMO_ONLY",
+        "physical_slots_per_week": 4,
+        "weekly_capacity_from_physical_slots": 4
+      },
+      "error_message": null,
+      "error_type": null,
+      "experiment_id": "csp",
+      "failure_reasons": [],
+      "method": "bt_fc_ac3",
+      "metrics": {
+        "assignments_attempted": 596,
+        "backtracks": 0,
+        "compatibility_checks": 16468,
+        "constraint_checks": 27264,
+        "domain_prunings": 144,
+        "exhaustive": 1,
+        "feasible_schedules": 480,
+        "nodes_visited": 597,
+        "rejected_schedules": 0,
+        "schedules_examined": 480,
+        "solver_time_seconds": 0.15962818291882286,
+        "wall_time_seconds": 0.2656713780015707
+      },
+      "profile_id": null,
+      "provenance": {
+        "problem_identity": "04cf29c539843b9a6eeee975d249cd0cfd5c86348ca0dc9f81658185b6383cf7",
+        "rejection_reasons": [],
+        "terminal_status": "exhausted_with_feasible",
+        "whole_plan_identity": "f9eebf0664a6d68b30e21cd076b512ff4312f362e6e8e2d7183f2d90ad28c5a6"
+      },
+      "scenario_id": "slots-per-week-4",
+      "seed": 2025,
+      "status": "feasible"
+    },
+    {
+      "configuration": {
+        "configuration_status": "SYNTHETIC_DEMO_ONLY",
+        "physical_slots_per_week": 4,
+        "weekly_capacity_from_physical_slots": 4
+      },
+      "error_message": null,
+      "error_type": null,
+      "experiment_id": "csp",
+      "failure_reasons": [],
+      "method": "bt_fc_ac3",
+      "metrics": {
+        "assignments_attempted": 596,
+        "backtracks": 0,
+        "compatibility_checks": 16468,
+        "constraint_checks": 27264,
+        "domain_prunings": 144,
+        "exhaustive": 1,
+        "feasible_schedules": 480,
+        "nodes_visited": 597,
+        "rejected_schedules": 0,
+        "schedules_examined": 480,
+        "solver_time_seconds": 0.15876028609636705,
+        "wall_time_seconds": 0.26401941000221996
+      },
+      "profile_id": null,
+      "provenance": {
+        "problem_identity": "04cf29c539843b9a6eeee975d249cd0cfd5c86348ca0dc9f81658185b6383cf7",
+        "rejection_reasons": [],
+        "terminal_status": "exhausted_with_feasible",
+        "whole_plan_identity": "f9eebf0664a6d68b30e21cd076b512ff4312f362e6e8e2d7183f2d90ad28c5a6"
+      },
+      "scenario_id": "slots-per-week-4",
+      "seed": 31415,
+      "status": "feasible"
+    },
+    {
+      "configuration": {
+        "configuration_status": "SYNTHETIC_DEMO_ONLY",
+        "physical_slots_per_week": 4,
+        "weekly_capacity_from_physical_slots": 4
+      },
+      "error_message": null,
+      "error_type": null,
+      "experiment_id": "csp",
+      "failure_reasons": [],
+      "method": "bt_fc_ac3",
+      "metrics": {
+        "assignments_attempted": 596,
+        "backtracks": 0,
+        "compatibility_checks": 16468,
+        "constraint_checks": 27264,
+        "domain_prunings": 144,
+        "exhaustive": 1,
+        "feasible_schedules": 480,
+        "nodes_visited": 597,
+        "rejected_schedules": 0,
+        "schedules_examined": 480,
+        "solver_time_seconds": 0.17435529105569003,
+        "wall_time_seconds": 0.28865938400122104
+      },
+      "profile_id": null,
+      "provenance": {
+        "problem_identity": "04cf29c539843b9a6eeee975d249cd0cfd5c86348ca0dc9f81658185b6383cf7",
+        "rejection_reasons": [],
+        "terminal_status": "exhausted_with_feasible",
+        "whole_plan_identity": "f9eebf0664a6d68b30e21cd076b512ff4312f362e6e8e2d7183f2d90ad28c5a6"
+      },
+      "scenario_id": "slots-per-week-4",
       "seed": 271828,
       "status": "feasible"
     }
@@ -1582,169 +1627,13 @@
     {
       "error_count": 0,
       "experiment_id": "csp",
-      "feasible_count": 0,
-      "incomplete_count": 0,
-      "infeasible_count": 5,
-      "mean": 30.0,
-      "method": "bt",
-      "metric": "assignments_attempted",
-      "scenario_id": "weekly-capacity-2",
-      "standard_deviation": 0.0,
-      "valid_count": 5
-    },
-    {
-      "error_count": 0,
-      "experiment_id": "csp",
-      "feasible_count": 0,
-      "incomplete_count": 0,
-      "infeasible_count": 5,
-      "mean": 30.0,
-      "method": "bt",
-      "metric": "backtracks",
-      "scenario_id": "weekly-capacity-2",
-      "standard_deviation": 0.0,
-      "valid_count": 5
-    },
-    {
-      "error_count": 0,
-      "experiment_id": "csp",
-      "feasible_count": 0,
-      "incomplete_count": 0,
-      "infeasible_count": 5,
-      "mean": 0.0,
-      "method": "bt",
-      "metric": "compatibility_checks",
-      "scenario_id": "weekly-capacity-2",
-      "standard_deviation": 0.0,
-      "valid_count": 5
-    },
-    {
-      "error_count": 0,
-      "experiment_id": "csp",
-      "feasible_count": 0,
-      "incomplete_count": 0,
-      "infeasible_count": 5,
-      "mean": 847.0,
-      "method": "bt",
-      "metric": "constraint_checks",
-      "scenario_id": "weekly-capacity-2",
-      "standard_deviation": 0.0,
-      "valid_count": 5
-    },
-    {
-      "error_count": 0,
-      "experiment_id": "csp",
-      "feasible_count": 0,
-      "incomplete_count": 0,
-      "infeasible_count": 5,
-      "mean": 0.0,
-      "method": "bt",
-      "metric": "domain_prunings",
-      "scenario_id": "weekly-capacity-2",
-      "standard_deviation": 0.0,
-      "valid_count": 5
-    },
-    {
-      "error_count": 0,
-      "experiment_id": "csp",
-      "feasible_count": 0,
-      "incomplete_count": 0,
-      "infeasible_count": 5,
-      "mean": 1.0,
-      "method": "bt",
-      "metric": "exhaustive",
-      "scenario_id": "weekly-capacity-2",
-      "standard_deviation": 0.0,
-      "valid_count": 5
-    },
-    {
-      "error_count": 0,
-      "experiment_id": "csp",
-      "feasible_count": 0,
-      "incomplete_count": 0,
-      "infeasible_count": 5,
-      "mean": 0.0,
-      "method": "bt",
-      "metric": "feasible_schedules",
-      "scenario_id": "weekly-capacity-2",
-      "standard_deviation": 0.0,
-      "valid_count": 5
-    },
-    {
-      "error_count": 0,
-      "experiment_id": "csp",
-      "feasible_count": 0,
-      "incomplete_count": 0,
-      "infeasible_count": 5,
-      "mean": 31.0,
-      "method": "bt",
-      "metric": "nodes_visited",
-      "scenario_id": "weekly-capacity-2",
-      "standard_deviation": 0.0,
-      "valid_count": 5
-    },
-    {
-      "error_count": 0,
-      "experiment_id": "csp",
-      "feasible_count": 0,
-      "incomplete_count": 0,
-      "infeasible_count": 5,
-      "mean": 0.0,
-      "method": "bt",
-      "metric": "rejected_schedules",
-      "scenario_id": "weekly-capacity-2",
-      "standard_deviation": 0.0,
-      "valid_count": 5
-    },
-    {
-      "error_count": 0,
-      "experiment_id": "csp",
-      "feasible_count": 0,
-      "incomplete_count": 0,
-      "infeasible_count": 5,
-      "mean": 0.0,
-      "method": "bt",
-      "metric": "schedules_examined",
-      "scenario_id": "weekly-capacity-2",
-      "standard_deviation": 0.0,
-      "valid_count": 5
-    },
-    {
-      "error_count": 0,
-      "experiment_id": "csp",
-      "feasible_count": 0,
-      "incomplete_count": 0,
-      "infeasible_count": 5,
-      "mean": 0.004282867199981411,
-      "method": "bt",
-      "metric": "solver_time_seconds",
-      "scenario_id": "weekly-capacity-2",
-      "standard_deviation": 0.00022020301440289335,
-      "valid_count": 5
-    },
-    {
-      "error_count": 0,
-      "experiment_id": "csp",
-      "feasible_count": 0,
-      "incomplete_count": 0,
-      "infeasible_count": 5,
-      "mean": 0.004300704399975075,
-      "method": "bt",
-      "metric": "wall_time_seconds",
-      "scenario_id": "weekly-capacity-2",
-      "standard_deviation": 0.0002320301147401146,
-      "valid_count": 5
-    },
-    {
-      "error_count": 0,
-      "experiment_id": "csp",
       "feasible_count": 5,
       "incomplete_count": 0,
       "infeasible_count": 0,
-      "mean": 30.0,
+      "mean": 68.0,
       "method": "bt",
       "metric": "assignments_attempted",
-      "scenario_id": "weekly-capacity-3",
+      "scenario_id": "slots-per-week-2",
       "standard_deviation": 0.0,
       "valid_count": 5
     },
@@ -1754,10 +1643,10 @@
       "feasible_count": 5,
       "incomplete_count": 0,
       "infeasible_count": 0,
-      "mean": 15.0,
+      "mean": 46.0,
       "method": "bt",
       "metric": "backtracks",
-      "scenario_id": "weekly-capacity-3",
+      "scenario_id": "slots-per-week-2",
       "standard_deviation": 0.0,
       "valid_count": 5
     },
@@ -1770,7 +1659,7 @@
       "mean": 0.0,
       "method": "bt",
       "metric": "compatibility_checks",
-      "scenario_id": "weekly-capacity-3",
+      "scenario_id": "slots-per-week-2",
       "standard_deviation": 0.0,
       "valid_count": 5
     },
@@ -1780,10 +1669,10 @@
       "feasible_count": 5,
       "incomplete_count": 0,
       "infeasible_count": 0,
-      "mean": 847.0,
+      "mean": 5244.0,
       "method": "bt",
       "metric": "constraint_checks",
-      "scenario_id": "weekly-capacity-3",
+      "scenario_id": "slots-per-week-2",
       "standard_deviation": 0.0,
       "valid_count": 5
     },
@@ -1796,7 +1685,7 @@
       "mean": 0.0,
       "method": "bt",
       "metric": "domain_prunings",
-      "scenario_id": "weekly-capacity-3",
+      "scenario_id": "slots-per-week-2",
       "standard_deviation": 0.0,
       "valid_count": 5
     },
@@ -1809,7 +1698,7 @@
       "mean": 1.0,
       "method": "bt",
       "metric": "exhaustive",
-      "scenario_id": "weekly-capacity-3",
+      "scenario_id": "slots-per-week-2",
       "standard_deviation": 0.0,
       "valid_count": 5
     },
@@ -1819,10 +1708,10 @@
       "feasible_count": 5,
       "incomplete_count": 0,
       "infeasible_count": 0,
-      "mean": 6.0,
+      "mean": 8.0,
       "method": "bt",
       "metric": "feasible_schedules",
-      "scenario_id": "weekly-capacity-3",
+      "scenario_id": "slots-per-week-2",
       "standard_deviation": 0.0,
       "valid_count": 5
     },
@@ -1832,10 +1721,10 @@
       "feasible_count": 5,
       "incomplete_count": 0,
       "infeasible_count": 0,
-      "mean": 31.0,
+      "mean": 69.0,
       "method": "bt",
       "metric": "nodes_visited",
-      "scenario_id": "weekly-capacity-3",
+      "scenario_id": "slots-per-week-2",
       "standard_deviation": 0.0,
       "valid_count": 5
     },
@@ -1848,7 +1737,7 @@
       "mean": 0.0,
       "method": "bt",
       "metric": "rejected_schedules",
-      "scenario_id": "weekly-capacity-3",
+      "scenario_id": "slots-per-week-2",
       "standard_deviation": 0.0,
       "valid_count": 5
     },
@@ -1858,10 +1747,10 @@
       "feasible_count": 5,
       "incomplete_count": 0,
       "infeasible_count": 0,
-      "mean": 6.0,
+      "mean": 8.0,
       "method": "bt",
       "metric": "schedules_examined",
-      "scenario_id": "weekly-capacity-3",
+      "scenario_id": "slots-per-week-2",
       "standard_deviation": 0.0,
       "valid_count": 5
     },
@@ -1871,11 +1760,11 @@
       "feasible_count": 5,
       "incomplete_count": 0,
       "infeasible_count": 0,
-      "mean": 0.004432662600447656,
+      "mean": 0.021792867399926762,
       "method": "bt",
       "metric": "solver_time_seconds",
-      "scenario_id": "weekly-capacity-3",
-      "standard_deviation": 0.0002105429642560224,
+      "scenario_id": "slots-per-week-2",
+      "standard_deviation": 0.0004796944214891049,
       "valid_count": 5
     },
     {
@@ -1884,11 +1773,11 @@
       "feasible_count": 5,
       "incomplete_count": 0,
       "infeasible_count": 0,
-      "mean": 0.0054247159998340065,
+      "mean": 0.023771032999502496,
       "method": "bt",
       "metric": "wall_time_seconds",
-      "scenario_id": "weekly-capacity-3",
-      "standard_deviation": 0.00030624411539221076,
+      "scenario_id": "slots-per-week-2",
+      "standard_deviation": 0.0004980346785579596,
       "valid_count": 5
     },
     {
@@ -1897,10 +1786,10 @@
       "feasible_count": 5,
       "incomplete_count": 0,
       "infeasible_count": 0,
-      "mean": 30.0,
+      "mean": 312.0,
       "method": "bt",
       "metric": "assignments_attempted",
-      "scenario_id": "weekly-capacity-4",
+      "scenario_id": "slots-per-week-3",
       "standard_deviation": 0.0,
       "valid_count": 5
     },
@@ -1910,10 +1799,10 @@
       "feasible_count": 5,
       "incomplete_count": 0,
       "infeasible_count": 0,
-      "mean": 15.0,
+      "mean": 156.0,
       "method": "bt",
       "metric": "backtracks",
-      "scenario_id": "weekly-capacity-4",
+      "scenario_id": "slots-per-week-3",
       "standard_deviation": 0.0,
       "valid_count": 5
     },
@@ -1926,7 +1815,7 @@
       "mean": 0.0,
       "method": "bt",
       "metric": "compatibility_checks",
-      "scenario_id": "weekly-capacity-4",
+      "scenario_id": "slots-per-week-3",
       "standard_deviation": 0.0,
       "valid_count": 5
     },
@@ -1936,10 +1825,10 @@
       "feasible_count": 5,
       "incomplete_count": 0,
       "infeasible_count": 0,
-      "mean": 847.0,
+      "mean": 19596.0,
       "method": "bt",
       "metric": "constraint_checks",
-      "scenario_id": "weekly-capacity-4",
+      "scenario_id": "slots-per-week-3",
       "standard_deviation": 0.0,
       "valid_count": 5
     },
@@ -1952,7 +1841,7 @@
       "mean": 0.0,
       "method": "bt",
       "metric": "domain_prunings",
-      "scenario_id": "weekly-capacity-4",
+      "scenario_id": "slots-per-week-3",
       "standard_deviation": 0.0,
       "valid_count": 5
     },
@@ -1965,7 +1854,7 @@
       "mean": 1.0,
       "method": "bt",
       "metric": "exhaustive",
-      "scenario_id": "weekly-capacity-4",
+      "scenario_id": "slots-per-week-3",
       "standard_deviation": 0.0,
       "valid_count": 5
     },
@@ -1975,10 +1864,10 @@
       "feasible_count": 5,
       "incomplete_count": 0,
       "infeasible_count": 0,
-      "mean": 6.0,
+      "mean": 108.0,
       "method": "bt",
       "metric": "feasible_schedules",
-      "scenario_id": "weekly-capacity-4",
+      "scenario_id": "slots-per-week-3",
       "standard_deviation": 0.0,
       "valid_count": 5
     },
@@ -1988,10 +1877,10 @@
       "feasible_count": 5,
       "incomplete_count": 0,
       "infeasible_count": 0,
-      "mean": 31.0,
+      "mean": 313.0,
       "method": "bt",
       "metric": "nodes_visited",
-      "scenario_id": "weekly-capacity-4",
+      "scenario_id": "slots-per-week-3",
       "standard_deviation": 0.0,
       "valid_count": 5
     },
@@ -2004,7 +1893,7 @@
       "mean": 0.0,
       "method": "bt",
       "metric": "rejected_schedules",
-      "scenario_id": "weekly-capacity-4",
+      "scenario_id": "slots-per-week-3",
       "standard_deviation": 0.0,
       "valid_count": 5
     },
@@ -2014,10 +1903,10 @@
       "feasible_count": 5,
       "incomplete_count": 0,
       "infeasible_count": 0,
-      "mean": 6.0,
+      "mean": 108.0,
       "method": "bt",
       "metric": "schedules_examined",
-      "scenario_id": "weekly-capacity-4",
+      "scenario_id": "slots-per-week-3",
       "standard_deviation": 0.0,
       "valid_count": 5
     },
@@ -2027,11 +1916,11 @@
       "feasible_count": 5,
       "incomplete_count": 0,
       "infeasible_count": 0,
-      "mean": 0.00442670319989702,
+      "mean": 0.09089482801791746,
       "method": "bt",
       "metric": "solver_time_seconds",
-      "scenario_id": "weekly-capacity-4",
-      "standard_deviation": 0.0002952534601846513,
+      "scenario_id": "slots-per-week-3",
+      "standard_deviation": 0.00681900313334398,
       "valid_count": 5
     },
     {
@@ -2040,192 +1929,504 @@
       "feasible_count": 5,
       "incomplete_count": 0,
       "infeasible_count": 0,
-      "mean": 0.005423121000058017,
+      "mean": 0.1158337095999741,
       "method": "bt",
       "metric": "wall_time_seconds",
-      "scenario_id": "weekly-capacity-4",
-      "standard_deviation": 0.0004683813336389573,
+      "scenario_id": "slots-per-week-3",
+      "standard_deviation": 0.008803259951814645,
       "valid_count": 5
     },
     {
       "error_count": 0,
       "experiment_id": "csp",
-      "feasible_count": 0,
+      "feasible_count": 5,
       "incomplete_count": 0,
-      "infeasible_count": 5,
-      "mean": 9.0,
+      "infeasible_count": 0,
+      "mean": 968.0,
+      "method": "bt",
+      "metric": "assignments_attempted",
+      "scenario_id": "slots-per-week-4",
+      "standard_deviation": 0.0,
+      "valid_count": 5
+    },
+    {
+      "error_count": 0,
+      "experiment_id": "csp",
+      "feasible_count": 5,
+      "incomplete_count": 0,
+      "infeasible_count": 0,
+      "mean": 372.0,
+      "method": "bt",
+      "metric": "backtracks",
+      "scenario_id": "slots-per-week-4",
+      "standard_deviation": 0.0,
+      "valid_count": 5
+    },
+    {
+      "error_count": 0,
+      "experiment_id": "csp",
+      "feasible_count": 5,
+      "incomplete_count": 0,
+      "infeasible_count": 0,
+      "mean": 0.0,
+      "method": "bt",
+      "metric": "compatibility_checks",
+      "scenario_id": "slots-per-week-4",
+      "standard_deviation": 0.0,
+      "valid_count": 5
+    },
+    {
+      "error_count": 0,
+      "experiment_id": "csp",
+      "feasible_count": 5,
+      "incomplete_count": 0,
+      "infeasible_count": 0,
+      "mean": 53484.0,
+      "method": "bt",
+      "metric": "constraint_checks",
+      "scenario_id": "slots-per-week-4",
+      "standard_deviation": 0.0,
+      "valid_count": 5
+    },
+    {
+      "error_count": 0,
+      "experiment_id": "csp",
+      "feasible_count": 5,
+      "incomplete_count": 0,
+      "infeasible_count": 0,
+      "mean": 0.0,
+      "method": "bt",
+      "metric": "domain_prunings",
+      "scenario_id": "slots-per-week-4",
+      "standard_deviation": 0.0,
+      "valid_count": 5
+    },
+    {
+      "error_count": 0,
+      "experiment_id": "csp",
+      "feasible_count": 5,
+      "incomplete_count": 0,
+      "infeasible_count": 0,
+      "mean": 1.0,
+      "method": "bt",
+      "metric": "exhaustive",
+      "scenario_id": "slots-per-week-4",
+      "standard_deviation": 0.0,
+      "valid_count": 5
+    },
+    {
+      "error_count": 0,
+      "experiment_id": "csp",
+      "feasible_count": 5,
+      "incomplete_count": 0,
+      "infeasible_count": 0,
+      "mean": 480.0,
+      "method": "bt",
+      "metric": "feasible_schedules",
+      "scenario_id": "slots-per-week-4",
+      "standard_deviation": 0.0,
+      "valid_count": 5
+    },
+    {
+      "error_count": 0,
+      "experiment_id": "csp",
+      "feasible_count": 5,
+      "incomplete_count": 0,
+      "infeasible_count": 0,
+      "mean": 969.0,
+      "method": "bt",
+      "metric": "nodes_visited",
+      "scenario_id": "slots-per-week-4",
+      "standard_deviation": 0.0,
+      "valid_count": 5
+    },
+    {
+      "error_count": 0,
+      "experiment_id": "csp",
+      "feasible_count": 5,
+      "incomplete_count": 0,
+      "infeasible_count": 0,
+      "mean": 0.0,
+      "method": "bt",
+      "metric": "rejected_schedules",
+      "scenario_id": "slots-per-week-4",
+      "standard_deviation": 0.0,
+      "valid_count": 5
+    },
+    {
+      "error_count": 0,
+      "experiment_id": "csp",
+      "feasible_count": 5,
+      "incomplete_count": 0,
+      "infeasible_count": 0,
+      "mean": 480.0,
+      "method": "bt",
+      "metric": "schedules_examined",
+      "scenario_id": "slots-per-week-4",
+      "standard_deviation": 0.0,
+      "valid_count": 5
+    },
+    {
+      "error_count": 0,
+      "experiment_id": "csp",
+      "feasible_count": 5,
+      "incomplete_count": 0,
+      "infeasible_count": 0,
+      "mean": 0.24586042076989542,
+      "method": "bt",
+      "metric": "solver_time_seconds",
+      "scenario_id": "slots-per-week-4",
+      "standard_deviation": 0.007970978174029704,
+      "valid_count": 5
+    },
+    {
+      "error_count": 0,
+      "experiment_id": "csp",
+      "feasible_count": 5,
+      "incomplete_count": 0,
+      "infeasible_count": 0,
+      "mean": 0.3501606754012755,
+      "method": "bt",
+      "metric": "wall_time_seconds",
+      "scenario_id": "slots-per-week-4",
+      "standard_deviation": 0.00995157593040248,
+      "valid_count": 5
+    },
+    {
+      "error_count": 0,
+      "experiment_id": "csp",
+      "feasible_count": 5,
+      "incomplete_count": 0,
+      "infeasible_count": 0,
+      "mean": 24.0,
       "method": "bt_fc",
       "metric": "assignments_attempted",
-      "scenario_id": "weekly-capacity-2",
+      "scenario_id": "slots-per-week-2",
       "standard_deviation": 0.0,
       "valid_count": 5
     },
     {
       "error_count": 0,
       "experiment_id": "csp",
-      "feasible_count": 0,
+      "feasible_count": 5,
       "incomplete_count": 0,
-      "infeasible_count": 5,
-      "mean": 9.0,
+      "infeasible_count": 0,
+      "mean": 2.0,
       "method": "bt_fc",
       "metric": "backtracks",
-      "scenario_id": "weekly-capacity-2",
+      "scenario_id": "slots-per-week-2",
       "standard_deviation": 0.0,
       "valid_count": 5
     },
     {
       "error_count": 0,
       "experiment_id": "csp",
-      "feasible_count": 0,
+      "feasible_count": 5,
       "incomplete_count": 0,
-      "infeasible_count": 5,
+      "infeasible_count": 0,
       "mean": 0.0,
       "method": "bt_fc",
       "metric": "compatibility_checks",
-      "scenario_id": "weekly-capacity-2",
+      "scenario_id": "slots-per-week-2",
       "standard_deviation": 0.0,
       "valid_count": 5
     },
     {
       "error_count": 0,
       "experiment_id": "csp",
-      "feasible_count": 0,
+      "feasible_count": 5,
       "incomplete_count": 0,
-      "infeasible_count": 5,
-      "mean": 148.0,
+      "infeasible_count": 0,
+      "mean": 616.0,
       "method": "bt_fc",
       "metric": "constraint_checks",
-      "scenario_id": "weekly-capacity-2",
+      "scenario_id": "slots-per-week-2",
       "standard_deviation": 0.0,
       "valid_count": 5
     },
     {
       "error_count": 0,
       "experiment_id": "csp",
-      "feasible_count": 0,
+      "feasible_count": 5,
       "incomplete_count": 0,
-      "infeasible_count": 5,
-      "mean": 18.0,
+      "infeasible_count": 0,
+      "mean": 32.0,
       "method": "bt_fc",
       "metric": "domain_prunings",
-      "scenario_id": "weekly-capacity-2",
+      "scenario_id": "slots-per-week-2",
       "standard_deviation": 0.0,
       "valid_count": 5
     },
     {
       "error_count": 0,
       "experiment_id": "csp",
-      "feasible_count": 0,
+      "feasible_count": 5,
       "incomplete_count": 0,
-      "infeasible_count": 5,
+      "infeasible_count": 0,
       "mean": 1.0,
       "method": "bt_fc",
       "metric": "exhaustive",
-      "scenario_id": "weekly-capacity-2",
+      "scenario_id": "slots-per-week-2",
       "standard_deviation": 0.0,
       "valid_count": 5
     },
     {
       "error_count": 0,
       "experiment_id": "csp",
-      "feasible_count": 0,
+      "feasible_count": 5,
       "incomplete_count": 0,
-      "infeasible_count": 5,
-      "mean": 0.0,
+      "infeasible_count": 0,
+      "mean": 8.0,
       "method": "bt_fc",
       "metric": "feasible_schedules",
-      "scenario_id": "weekly-capacity-2",
+      "scenario_id": "slots-per-week-2",
       "standard_deviation": 0.0,
       "valid_count": 5
     },
     {
       "error_count": 0,
       "experiment_id": "csp",
-      "feasible_count": 0,
+      "feasible_count": 5,
       "incomplete_count": 0,
-      "infeasible_count": 5,
+      "infeasible_count": 0,
+      "mean": 23.0,
+      "method": "bt_fc",
+      "metric": "nodes_visited",
+      "scenario_id": "slots-per-week-2",
+      "standard_deviation": 0.0,
+      "valid_count": 5
+    },
+    {
+      "error_count": 0,
+      "experiment_id": "csp",
+      "feasible_count": 5,
+      "incomplete_count": 0,
+      "infeasible_count": 0,
+      "mean": 0.0,
+      "method": "bt_fc",
+      "metric": "rejected_schedules",
+      "scenario_id": "slots-per-week-2",
+      "standard_deviation": 0.0,
+      "valid_count": 5
+    },
+    {
+      "error_count": 0,
+      "experiment_id": "csp",
+      "feasible_count": 5,
+      "incomplete_count": 0,
+      "infeasible_count": 0,
+      "mean": 8.0,
+      "method": "bt_fc",
+      "metric": "schedules_examined",
+      "scenario_id": "slots-per-week-2",
+      "standard_deviation": 0.0,
+      "valid_count": 5
+    },
+    {
+      "error_count": 0,
+      "experiment_id": "csp",
+      "feasible_count": 5,
+      "incomplete_count": 0,
+      "infeasible_count": 0,
+      "mean": 0.004887088398390915,
+      "method": "bt_fc",
+      "metric": "solver_time_seconds",
+      "scenario_id": "slots-per-week-2",
+      "standard_deviation": 0.00040169271982989934,
+      "valid_count": 5
+    },
+    {
+      "error_count": 0,
+      "experiment_id": "csp",
+      "feasible_count": 5,
+      "incomplete_count": 0,
+      "infeasible_count": 0,
+      "mean": 0.006746803001442458,
+      "method": "bt_fc",
+      "metric": "wall_time_seconds",
+      "scenario_id": "slots-per-week-2",
+      "standard_deviation": 0.0005847487618498892,
+      "valid_count": 5
+    },
+    {
+      "error_count": 0,
+      "experiment_id": "csp",
+      "feasible_count": 5,
+      "incomplete_count": 0,
+      "infeasible_count": 0,
+      "mean": 159.0,
+      "method": "bt_fc",
+      "metric": "assignments_attempted",
+      "scenario_id": "slots-per-week-3",
+      "standard_deviation": 0.0,
+      "valid_count": 5
+    },
+    {
+      "error_count": 0,
+      "experiment_id": "csp",
+      "feasible_count": 5,
+      "incomplete_count": 0,
+      "infeasible_count": 0,
+      "mean": 3.0,
+      "method": "bt_fc",
+      "metric": "backtracks",
+      "scenario_id": "slots-per-week-3",
+      "standard_deviation": 0.0,
+      "valid_count": 5
+    },
+    {
+      "error_count": 0,
+      "experiment_id": "csp",
+      "feasible_count": 5,
+      "incomplete_count": 0,
+      "infeasible_count": 0,
+      "mean": 0.0,
+      "method": "bt_fc",
+      "metric": "compatibility_checks",
+      "scenario_id": "slots-per-week-3",
+      "standard_deviation": 0.0,
+      "valid_count": 5
+    },
+    {
+      "error_count": 0,
+      "experiment_id": "csp",
+      "feasible_count": 5,
+      "incomplete_count": 0,
+      "infeasible_count": 0,
+      "mean": 3534.0,
+      "method": "bt_fc",
+      "metric": "constraint_checks",
+      "scenario_id": "slots-per-week-3",
+      "standard_deviation": 0.0,
+      "valid_count": 5
+    },
+    {
+      "error_count": 0,
+      "experiment_id": "csp",
+      "feasible_count": 5,
+      "incomplete_count": 0,
+      "infeasible_count": 0,
+      "mean": 87.0,
+      "method": "bt_fc",
+      "metric": "domain_prunings",
+      "scenario_id": "slots-per-week-3",
+      "standard_deviation": 0.0,
+      "valid_count": 5
+    },
+    {
+      "error_count": 0,
+      "experiment_id": "csp",
+      "feasible_count": 5,
+      "incomplete_count": 0,
+      "infeasible_count": 0,
+      "mean": 1.0,
+      "method": "bt_fc",
+      "metric": "exhaustive",
+      "scenario_id": "slots-per-week-3",
+      "standard_deviation": 0.0,
+      "valid_count": 5
+    },
+    {
+      "error_count": 0,
+      "experiment_id": "csp",
+      "feasible_count": 5,
+      "incomplete_count": 0,
+      "infeasible_count": 0,
+      "mean": 108.0,
+      "method": "bt_fc",
+      "metric": "feasible_schedules",
+      "scenario_id": "slots-per-week-3",
+      "standard_deviation": 0.0,
+      "valid_count": 5
+    },
+    {
+      "error_count": 0,
+      "experiment_id": "csp",
+      "feasible_count": 5,
+      "incomplete_count": 0,
+      "infeasible_count": 0,
+      "mean": 157.0,
+      "method": "bt_fc",
+      "metric": "nodes_visited",
+      "scenario_id": "slots-per-week-3",
+      "standard_deviation": 0.0,
+      "valid_count": 5
+    },
+    {
+      "error_count": 0,
+      "experiment_id": "csp",
+      "feasible_count": 5,
+      "incomplete_count": 0,
+      "infeasible_count": 0,
+      "mean": 0.0,
+      "method": "bt_fc",
+      "metric": "rejected_schedules",
+      "scenario_id": "slots-per-week-3",
+      "standard_deviation": 0.0,
+      "valid_count": 5
+    },
+    {
+      "error_count": 0,
+      "experiment_id": "csp",
+      "feasible_count": 5,
+      "incomplete_count": 0,
+      "infeasible_count": 0,
+      "mean": 108.0,
+      "method": "bt_fc",
+      "metric": "schedules_examined",
+      "scenario_id": "slots-per-week-3",
+      "standard_deviation": 0.0,
+      "valid_count": 5
+    },
+    {
+      "error_count": 0,
+      "experiment_id": "csp",
+      "feasible_count": 5,
+      "incomplete_count": 0,
+      "infeasible_count": 0,
+      "mean": 0.026194044805015436,
+      "method": "bt_fc",
+      "metric": "solver_time_seconds",
+      "scenario_id": "slots-per-week-3",
+      "standard_deviation": 0.0002722264040905962,
+      "valid_count": 5
+    },
+    {
+      "error_count": 0,
+      "experiment_id": "csp",
+      "feasible_count": 5,
+      "incomplete_count": 0,
+      "infeasible_count": 0,
+      "mean": 0.049145267400308515,
+      "method": "bt_fc",
+      "metric": "wall_time_seconds",
+      "scenario_id": "slots-per-week-3",
+      "standard_deviation": 0.00042704655829416105,
+      "valid_count": 5
+    },
+    {
+      "error_count": 0,
+      "experiment_id": "csp",
+      "feasible_count": 5,
+      "incomplete_count": 0,
+      "infeasible_count": 0,
+      "mean": 600.0,
+      "method": "bt_fc",
+      "metric": "assignments_attempted",
+      "scenario_id": "slots-per-week-4",
+      "standard_deviation": 0.0,
+      "valid_count": 5
+    },
+    {
+      "error_count": 0,
+      "experiment_id": "csp",
+      "feasible_count": 5,
+      "incomplete_count": 0,
+      "infeasible_count": 0,
       "mean": 4.0,
       "method": "bt_fc",
-      "metric": "nodes_visited",
-      "scenario_id": "weekly-capacity-2",
-      "standard_deviation": 0.0,
-      "valid_count": 5
-    },
-    {
-      "error_count": 0,
-      "experiment_id": "csp",
-      "feasible_count": 0,
-      "incomplete_count": 0,
-      "infeasible_count": 5,
-      "mean": 0.0,
-      "method": "bt_fc",
-      "metric": "rejected_schedules",
-      "scenario_id": "weekly-capacity-2",
-      "standard_deviation": 0.0,
-      "valid_count": 5
-    },
-    {
-      "error_count": 0,
-      "experiment_id": "csp",
-      "feasible_count": 0,
-      "incomplete_count": 0,
-      "infeasible_count": 5,
-      "mean": 0.0,
-      "method": "bt_fc",
-      "metric": "schedules_examined",
-      "scenario_id": "weekly-capacity-2",
-      "standard_deviation": 0.0,
-      "valid_count": 5
-    },
-    {
-      "error_count": 0,
-      "experiment_id": "csp",
-      "feasible_count": 0,
-      "incomplete_count": 0,
-      "infeasible_count": 5,
-      "mean": 0.0012344663997282622,
-      "method": "bt_fc",
-      "metric": "solver_time_seconds",
-      "scenario_id": "weekly-capacity-2",
-      "standard_deviation": 5.058130413635693e-05,
-      "valid_count": 5
-    },
-    {
-      "error_count": 0,
-      "experiment_id": "csp",
-      "feasible_count": 0,
-      "incomplete_count": 0,
-      "infeasible_count": 5,
-      "mean": 0.0012463962000765604,
-      "method": "bt_fc",
-      "metric": "wall_time_seconds",
-      "scenario_id": "weekly-capacity-2",
-      "standard_deviation": 5.4666963404245704e-05,
-      "valid_count": 5
-    },
-    {
-      "error_count": 0,
-      "experiment_id": "csp",
-      "feasible_count": 5,
-      "incomplete_count": 0,
-      "infeasible_count": 0,
-      "mean": 15.0,
-      "method": "bt_fc",
-      "metric": "assignments_attempted",
-      "scenario_id": "weekly-capacity-3",
-      "standard_deviation": 0.0,
-      "valid_count": 5
-    },
-    {
-      "error_count": 0,
-      "experiment_id": "csp",
-      "feasible_count": 5,
-      "incomplete_count": 0,
-      "infeasible_count": 0,
-      "mean": 0.0,
-      "method": "bt_fc",
       "metric": "backtracks",
-      "scenario_id": "weekly-capacity-3",
+      "scenario_id": "slots-per-week-4",
       "standard_deviation": 0.0,
       "valid_count": 5
     },
@@ -2238,7 +2439,7 @@
       "mean": 0.0,
       "method": "bt_fc",
       "metric": "compatibility_checks",
-      "scenario_id": "weekly-capacity-3",
+      "scenario_id": "slots-per-week-4",
       "standard_deviation": 0.0,
       "valid_count": 5
     },
@@ -2248,10 +2449,10 @@
       "feasible_count": 5,
       "incomplete_count": 0,
       "infeasible_count": 0,
-      "mean": 232.0,
+      "mean": 12564.0,
       "method": "bt_fc",
       "metric": "constraint_checks",
-      "scenario_id": "weekly-capacity-3",
+      "scenario_id": "slots-per-week-4",
       "standard_deviation": 0.0,
       "valid_count": 5
     },
@@ -2261,10 +2462,10 @@
       "feasible_count": 5,
       "incomplete_count": 0,
       "infeasible_count": 0,
-      "mean": 12.0,
+      "mean": 184.0,
       "method": "bt_fc",
       "metric": "domain_prunings",
-      "scenario_id": "weekly-capacity-3",
+      "scenario_id": "slots-per-week-4",
       "standard_deviation": 0.0,
       "valid_count": 5
     },
@@ -2277,7 +2478,7 @@
       "mean": 1.0,
       "method": "bt_fc",
       "metric": "exhaustive",
-      "scenario_id": "weekly-capacity-3",
+      "scenario_id": "slots-per-week-4",
       "standard_deviation": 0.0,
       "valid_count": 5
     },
@@ -2287,10 +2488,10 @@
       "feasible_count": 5,
       "incomplete_count": 0,
       "infeasible_count": 0,
-      "mean": 6.0,
+      "mean": 480.0,
       "method": "bt_fc",
       "metric": "feasible_schedules",
-      "scenario_id": "weekly-capacity-3",
+      "scenario_id": "slots-per-week-4",
       "standard_deviation": 0.0,
       "valid_count": 5
     },
@@ -2300,10 +2501,10 @@
       "feasible_count": 5,
       "incomplete_count": 0,
       "infeasible_count": 0,
-      "mean": 16.0,
+      "mean": 597.0,
       "method": "bt_fc",
       "metric": "nodes_visited",
-      "scenario_id": "weekly-capacity-3",
+      "scenario_id": "slots-per-week-4",
       "standard_deviation": 0.0,
       "valid_count": 5
     },
@@ -2316,7 +2517,7 @@
       "mean": 0.0,
       "method": "bt_fc",
       "metric": "rejected_schedules",
-      "scenario_id": "weekly-capacity-3",
+      "scenario_id": "slots-per-week-4",
       "standard_deviation": 0.0,
       "valid_count": 5
     },
@@ -2326,10 +2527,10 @@
       "feasible_count": 5,
       "incomplete_count": 0,
       "infeasible_count": 0,
-      "mean": 6.0,
+      "mean": 480.0,
       "method": "bt_fc",
       "metric": "schedules_examined",
-      "scenario_id": "weekly-capacity-3",
+      "scenario_id": "slots-per-week-4",
       "standard_deviation": 0.0,
       "valid_count": 5
     },
@@ -2339,11 +2540,11 @@
       "feasible_count": 5,
       "incomplete_count": 0,
       "infeasible_count": 0,
-      "mean": 0.001941497799816716,
+      "mean": 0.09058478859224124,
       "method": "bt_fc",
       "metric": "solver_time_seconds",
-      "scenario_id": "weekly-capacity-3",
-      "standard_deviation": 7.492842980023422e-05,
+      "scenario_id": "slots-per-week-4",
+      "standard_deviation": 0.0016081399343487463,
       "valid_count": 5
     },
     {
@@ -2352,11 +2553,11 @@
       "feasible_count": 5,
       "incomplete_count": 0,
       "infeasible_count": 0,
-      "mean": 0.0028635385999223216,
+      "mean": 0.1917572978010867,
       "method": "bt_fc",
       "metric": "wall_time_seconds",
-      "scenario_id": "weekly-capacity-3",
-      "standard_deviation": 0.00014699544745879744,
+      "scenario_id": "slots-per-week-4",
+      "standard_deviation": 0.002561794614901407,
       "valid_count": 5
     },
     {
@@ -2365,322 +2566,10 @@
       "feasible_count": 5,
       "incomplete_count": 0,
       "infeasible_count": 0,
-      "mean": 15.0,
-      "method": "bt_fc",
-      "metric": "assignments_attempted",
-      "scenario_id": "weekly-capacity-4",
-      "standard_deviation": 0.0,
-      "valid_count": 5
-    },
-    {
-      "error_count": 0,
-      "experiment_id": "csp",
-      "feasible_count": 5,
-      "incomplete_count": 0,
-      "infeasible_count": 0,
-      "mean": 0.0,
-      "method": "bt_fc",
-      "metric": "backtracks",
-      "scenario_id": "weekly-capacity-4",
-      "standard_deviation": 0.0,
-      "valid_count": 5
-    },
-    {
-      "error_count": 0,
-      "experiment_id": "csp",
-      "feasible_count": 5,
-      "incomplete_count": 0,
-      "infeasible_count": 0,
-      "mean": 0.0,
-      "method": "bt_fc",
-      "metric": "compatibility_checks",
-      "scenario_id": "weekly-capacity-4",
-      "standard_deviation": 0.0,
-      "valid_count": 5
-    },
-    {
-      "error_count": 0,
-      "experiment_id": "csp",
-      "feasible_count": 5,
-      "incomplete_count": 0,
-      "infeasible_count": 0,
-      "mean": 232.0,
-      "method": "bt_fc",
-      "metric": "constraint_checks",
-      "scenario_id": "weekly-capacity-4",
-      "standard_deviation": 0.0,
-      "valid_count": 5
-    },
-    {
-      "error_count": 0,
-      "experiment_id": "csp",
-      "feasible_count": 5,
-      "incomplete_count": 0,
-      "infeasible_count": 0,
-      "mean": 12.0,
-      "method": "bt_fc",
-      "metric": "domain_prunings",
-      "scenario_id": "weekly-capacity-4",
-      "standard_deviation": 0.0,
-      "valid_count": 5
-    },
-    {
-      "error_count": 0,
-      "experiment_id": "csp",
-      "feasible_count": 5,
-      "incomplete_count": 0,
-      "infeasible_count": 0,
-      "mean": 1.0,
-      "method": "bt_fc",
-      "metric": "exhaustive",
-      "scenario_id": "weekly-capacity-4",
-      "standard_deviation": 0.0,
-      "valid_count": 5
-    },
-    {
-      "error_count": 0,
-      "experiment_id": "csp",
-      "feasible_count": 5,
-      "incomplete_count": 0,
-      "infeasible_count": 0,
-      "mean": 6.0,
-      "method": "bt_fc",
-      "metric": "feasible_schedules",
-      "scenario_id": "weekly-capacity-4",
-      "standard_deviation": 0.0,
-      "valid_count": 5
-    },
-    {
-      "error_count": 0,
-      "experiment_id": "csp",
-      "feasible_count": 5,
-      "incomplete_count": 0,
-      "infeasible_count": 0,
-      "mean": 16.0,
-      "method": "bt_fc",
-      "metric": "nodes_visited",
-      "scenario_id": "weekly-capacity-4",
-      "standard_deviation": 0.0,
-      "valid_count": 5
-    },
-    {
-      "error_count": 0,
-      "experiment_id": "csp",
-      "feasible_count": 5,
-      "incomplete_count": 0,
-      "infeasible_count": 0,
-      "mean": 0.0,
-      "method": "bt_fc",
-      "metric": "rejected_schedules",
-      "scenario_id": "weekly-capacity-4",
-      "standard_deviation": 0.0,
-      "valid_count": 5
-    },
-    {
-      "error_count": 0,
-      "experiment_id": "csp",
-      "feasible_count": 5,
-      "incomplete_count": 0,
-      "infeasible_count": 0,
-      "mean": 6.0,
-      "method": "bt_fc",
-      "metric": "schedules_examined",
-      "scenario_id": "weekly-capacity-4",
-      "standard_deviation": 0.0,
-      "valid_count": 5
-    },
-    {
-      "error_count": 0,
-      "experiment_id": "csp",
-      "feasible_count": 5,
-      "incomplete_count": 0,
-      "infeasible_count": 0,
-      "mean": 0.0018450951998602249,
-      "method": "bt_fc",
-      "metric": "solver_time_seconds",
-      "scenario_id": "weekly-capacity-4",
-      "standard_deviation": 1.5483308247669943e-05,
-      "valid_count": 5
-    },
-    {
-      "error_count": 0,
-      "experiment_id": "csp",
-      "feasible_count": 5,
-      "incomplete_count": 0,
-      "infeasible_count": 0,
-      "mean": 0.0027173140000741115,
-      "method": "bt_fc",
-      "metric": "wall_time_seconds",
-      "scenario_id": "weekly-capacity-4",
-      "standard_deviation": 4.0676432907707174e-05,
-      "valid_count": 5
-    },
-    {
-      "error_count": 0,
-      "experiment_id": "csp",
-      "feasible_count": 0,
-      "incomplete_count": 0,
-      "infeasible_count": 5,
-      "mean": 9.0,
+      "mean": 22.0,
       "method": "bt_fc_ac3",
       "metric": "assignments_attempted",
-      "scenario_id": "weekly-capacity-2",
-      "standard_deviation": 0.0,
-      "valid_count": 5
-    },
-    {
-      "error_count": 0,
-      "experiment_id": "csp",
-      "feasible_count": 0,
-      "incomplete_count": 0,
-      "infeasible_count": 5,
-      "mean": 9.0,
-      "method": "bt_fc_ac3",
-      "metric": "backtracks",
-      "scenario_id": "weekly-capacity-2",
-      "standard_deviation": 0.0,
-      "valid_count": 5
-    },
-    {
-      "error_count": 0,
-      "experiment_id": "csp",
-      "feasible_count": 0,
-      "incomplete_count": 0,
-      "infeasible_count": 5,
-      "mean": 102.0,
-      "method": "bt_fc_ac3",
-      "metric": "compatibility_checks",
-      "scenario_id": "weekly-capacity-2",
-      "standard_deviation": 0.0,
-      "valid_count": 5
-    },
-    {
-      "error_count": 0,
-      "experiment_id": "csp",
-      "feasible_count": 0,
-      "incomplete_count": 0,
-      "infeasible_count": 5,
-      "mean": 208.0,
-      "method": "bt_fc_ac3",
-      "metric": "constraint_checks",
-      "scenario_id": "weekly-capacity-2",
-      "standard_deviation": 0.0,
-      "valid_count": 5
-    },
-    {
-      "error_count": 0,
-      "experiment_id": "csp",
-      "feasible_count": 0,
-      "incomplete_count": 0,
-      "infeasible_count": 5,
-      "mean": 18.0,
-      "method": "bt_fc_ac3",
-      "metric": "domain_prunings",
-      "scenario_id": "weekly-capacity-2",
-      "standard_deviation": 0.0,
-      "valid_count": 5
-    },
-    {
-      "error_count": 0,
-      "experiment_id": "csp",
-      "feasible_count": 0,
-      "incomplete_count": 0,
-      "infeasible_count": 5,
-      "mean": 1.0,
-      "method": "bt_fc_ac3",
-      "metric": "exhaustive",
-      "scenario_id": "weekly-capacity-2",
-      "standard_deviation": 0.0,
-      "valid_count": 5
-    },
-    {
-      "error_count": 0,
-      "experiment_id": "csp",
-      "feasible_count": 0,
-      "incomplete_count": 0,
-      "infeasible_count": 5,
-      "mean": 0.0,
-      "method": "bt_fc_ac3",
-      "metric": "feasible_schedules",
-      "scenario_id": "weekly-capacity-2",
-      "standard_deviation": 0.0,
-      "valid_count": 5
-    },
-    {
-      "error_count": 0,
-      "experiment_id": "csp",
-      "feasible_count": 0,
-      "incomplete_count": 0,
-      "infeasible_count": 5,
-      "mean": 4.0,
-      "method": "bt_fc_ac3",
-      "metric": "nodes_visited",
-      "scenario_id": "weekly-capacity-2",
-      "standard_deviation": 0.0,
-      "valid_count": 5
-    },
-    {
-      "error_count": 0,
-      "experiment_id": "csp",
-      "feasible_count": 0,
-      "incomplete_count": 0,
-      "infeasible_count": 5,
-      "mean": 0.0,
-      "method": "bt_fc_ac3",
-      "metric": "rejected_schedules",
-      "scenario_id": "weekly-capacity-2",
-      "standard_deviation": 0.0,
-      "valid_count": 5
-    },
-    {
-      "error_count": 0,
-      "experiment_id": "csp",
-      "feasible_count": 0,
-      "incomplete_count": 0,
-      "infeasible_count": 5,
-      "mean": 0.0,
-      "method": "bt_fc_ac3",
-      "metric": "schedules_examined",
-      "scenario_id": "weekly-capacity-2",
-      "standard_deviation": 0.0,
-      "valid_count": 5
-    },
-    {
-      "error_count": 0,
-      "experiment_id": "csp",
-      "feasible_count": 0,
-      "incomplete_count": 0,
-      "infeasible_count": 5,
-      "mean": 0.0013323147999471986,
-      "method": "bt_fc_ac3",
-      "metric": "solver_time_seconds",
-      "scenario_id": "weekly-capacity-2",
-      "standard_deviation": 6.589461648356705e-05,
-      "valid_count": 5
-    },
-    {
-      "error_count": 0,
-      "experiment_id": "csp",
-      "feasible_count": 0,
-      "incomplete_count": 0,
-      "infeasible_count": 5,
-      "mean": 0.0013456748001772212,
-      "method": "bt_fc_ac3",
-      "metric": "wall_time_seconds",
-      "scenario_id": "weekly-capacity-2",
-      "standard_deviation": 7.181353087660504e-05,
-      "valid_count": 5
-    },
-    {
-      "error_count": 0,
-      "experiment_id": "csp",
-      "feasible_count": 5,
-      "incomplete_count": 0,
-      "infeasible_count": 0,
-      "mean": 15.0,
-      "method": "bt_fc_ac3",
-      "metric": "assignments_attempted",
-      "scenario_id": "weekly-capacity-3",
+      "scenario_id": "slots-per-week-2",
       "standard_deviation": 0.0,
       "valid_count": 5
     },
@@ -2693,7 +2582,7 @@
       "mean": 0.0,
       "method": "bt_fc_ac3",
       "metric": "backtracks",
-      "scenario_id": "weekly-capacity-3",
+      "scenario_id": "slots-per-week-2",
       "standard_deviation": 0.0,
       "valid_count": 5
     },
@@ -2703,10 +2592,10 @@
       "feasible_count": 5,
       "incomplete_count": 0,
       "infeasible_count": 0,
-      "mean": 198.0,
+      "mean": 688.0,
       "method": "bt_fc_ac3",
       "metric": "compatibility_checks",
-      "scenario_id": "weekly-capacity-3",
+      "scenario_id": "slots-per-week-2",
       "standard_deviation": 0.0,
       "valid_count": 5
     },
@@ -2716,10 +2605,10 @@
       "feasible_count": 5,
       "incomplete_count": 0,
       "infeasible_count": 0,
-      "mean": 388.0,
+      "mean": 1152.0,
       "method": "bt_fc_ac3",
       "metric": "constraint_checks",
-      "scenario_id": "weekly-capacity-3",
+      "scenario_id": "slots-per-week-2",
       "standard_deviation": 0.0,
       "valid_count": 5
     },
@@ -2729,10 +2618,10 @@
       "feasible_count": 5,
       "incomplete_count": 0,
       "infeasible_count": 0,
-      "mean": 12.0,
+      "mean": 24.0,
       "method": "bt_fc_ac3",
       "metric": "domain_prunings",
-      "scenario_id": "weekly-capacity-3",
+      "scenario_id": "slots-per-week-2",
       "standard_deviation": 0.0,
       "valid_count": 5
     },
@@ -2745,7 +2634,7 @@
       "mean": 1.0,
       "method": "bt_fc_ac3",
       "metric": "exhaustive",
-      "scenario_id": "weekly-capacity-3",
+      "scenario_id": "slots-per-week-2",
       "standard_deviation": 0.0,
       "valid_count": 5
     },
@@ -2755,10 +2644,10 @@
       "feasible_count": 5,
       "incomplete_count": 0,
       "infeasible_count": 0,
-      "mean": 6.0,
+      "mean": 8.0,
       "method": "bt_fc_ac3",
       "metric": "feasible_schedules",
-      "scenario_id": "weekly-capacity-3",
+      "scenario_id": "slots-per-week-2",
       "standard_deviation": 0.0,
       "valid_count": 5
     },
@@ -2768,10 +2657,10 @@
       "feasible_count": 5,
       "incomplete_count": 0,
       "infeasible_count": 0,
-      "mean": 16.0,
+      "mean": 23.0,
       "method": "bt_fc_ac3",
       "metric": "nodes_visited",
-      "scenario_id": "weekly-capacity-3",
+      "scenario_id": "slots-per-week-2",
       "standard_deviation": 0.0,
       "valid_count": 5
     },
@@ -2784,7 +2673,7 @@
       "mean": 0.0,
       "method": "bt_fc_ac3",
       "metric": "rejected_schedules",
-      "scenario_id": "weekly-capacity-3",
+      "scenario_id": "slots-per-week-2",
       "standard_deviation": 0.0,
       "valid_count": 5
     },
@@ -2794,10 +2683,10 @@
       "feasible_count": 5,
       "incomplete_count": 0,
       "infeasible_count": 0,
-      "mean": 6.0,
+      "mean": 8.0,
       "method": "bt_fc_ac3",
       "metric": "schedules_examined",
-      "scenario_id": "weekly-capacity-3",
+      "scenario_id": "slots-per-week-2",
       "standard_deviation": 0.0,
       "valid_count": 5
     },
@@ -2807,11 +2696,11 @@
       "feasible_count": 5,
       "incomplete_count": 0,
       "infeasible_count": 0,
-      "mean": 0.0033277979997365036,
+      "mean": 0.007115222202264704,
       "method": "bt_fc_ac3",
       "metric": "solver_time_seconds",
-      "scenario_id": "weekly-capacity-3",
-      "standard_deviation": 0.000310645922889165,
+      "scenario_id": "slots-per-week-2",
+      "standard_deviation": 0.0005749409714537299,
       "valid_count": 5
     },
     {
@@ -2820,11 +2709,11 @@
       "feasible_count": 5,
       "incomplete_count": 0,
       "infeasible_count": 0,
-      "mean": 0.004407134399843926,
+      "mean": 0.008940616800100543,
       "method": "bt_fc_ac3",
       "metric": "wall_time_seconds",
-      "scenario_id": "weekly-capacity-3",
-      "standard_deviation": 0.0003545561478123746,
+      "scenario_id": "slots-per-week-2",
+      "standard_deviation": 0.000780479286610625,
       "valid_count": 5
     },
     {
@@ -2833,10 +2722,10 @@
       "feasible_count": 5,
       "incomplete_count": 0,
       "infeasible_count": 0,
-      "mean": 15.0,
+      "mean": 156.0,
       "method": "bt_fc_ac3",
       "metric": "assignments_attempted",
-      "scenario_id": "weekly-capacity-4",
+      "scenario_id": "slots-per-week-3",
       "standard_deviation": 0.0,
       "valid_count": 5
     },
@@ -2849,7 +2738,7 @@
       "mean": 0.0,
       "method": "bt_fc_ac3",
       "metric": "backtracks",
-      "scenario_id": "weekly-capacity-4",
+      "scenario_id": "slots-per-week-3",
       "standard_deviation": 0.0,
       "valid_count": 5
     },
@@ -2859,10 +2748,10 @@
       "feasible_count": 5,
       "incomplete_count": 0,
       "infeasible_count": 0,
-      "mean": 198.0,
+      "mean": 4416.0,
       "method": "bt_fc_ac3",
       "metric": "compatibility_checks",
-      "scenario_id": "weekly-capacity-4",
+      "scenario_id": "slots-per-week-3",
       "standard_deviation": 0.0,
       "valid_count": 5
     },
@@ -2872,10 +2761,10 @@
       "feasible_count": 5,
       "incomplete_count": 0,
       "infeasible_count": 0,
-      "mean": 388.0,
+      "mean": 7353.0,
       "method": "bt_fc_ac3",
       "metric": "constraint_checks",
-      "scenario_id": "weekly-capacity-4",
+      "scenario_id": "slots-per-week-3",
       "standard_deviation": 0.0,
       "valid_count": 5
     },
@@ -2885,10 +2774,10 @@
       "feasible_count": 5,
       "incomplete_count": 0,
       "infeasible_count": 0,
-      "mean": 12.0,
+      "mean": 66.0,
       "method": "bt_fc_ac3",
       "metric": "domain_prunings",
-      "scenario_id": "weekly-capacity-4",
+      "scenario_id": "slots-per-week-3",
       "standard_deviation": 0.0,
       "valid_count": 5
     },
@@ -2901,7 +2790,7 @@
       "mean": 1.0,
       "method": "bt_fc_ac3",
       "metric": "exhaustive",
-      "scenario_id": "weekly-capacity-4",
+      "scenario_id": "slots-per-week-3",
       "standard_deviation": 0.0,
       "valid_count": 5
     },
@@ -2911,10 +2800,10 @@
       "feasible_count": 5,
       "incomplete_count": 0,
       "infeasible_count": 0,
-      "mean": 6.0,
+      "mean": 108.0,
       "method": "bt_fc_ac3",
       "metric": "feasible_schedules",
-      "scenario_id": "weekly-capacity-4",
+      "scenario_id": "slots-per-week-3",
       "standard_deviation": 0.0,
       "valid_count": 5
     },
@@ -2924,10 +2813,10 @@
       "feasible_count": 5,
       "incomplete_count": 0,
       "infeasible_count": 0,
-      "mean": 16.0,
+      "mean": 157.0,
       "method": "bt_fc_ac3",
       "metric": "nodes_visited",
-      "scenario_id": "weekly-capacity-4",
+      "scenario_id": "slots-per-week-3",
       "standard_deviation": 0.0,
       "valid_count": 5
     },
@@ -2940,7 +2829,7 @@
       "mean": 0.0,
       "method": "bt_fc_ac3",
       "metric": "rejected_schedules",
-      "scenario_id": "weekly-capacity-4",
+      "scenario_id": "slots-per-week-3",
       "standard_deviation": 0.0,
       "valid_count": 5
     },
@@ -2950,10 +2839,10 @@
       "feasible_count": 5,
       "incomplete_count": 0,
       "infeasible_count": 0,
-      "mean": 6.0,
+      "mean": 108.0,
       "method": "bt_fc_ac3",
       "metric": "schedules_examined",
-      "scenario_id": "weekly-capacity-4",
+      "scenario_id": "slots-per-week-3",
       "standard_deviation": 0.0,
       "valid_count": 5
     },
@@ -2963,11 +2852,11 @@
       "feasible_count": 5,
       "incomplete_count": 0,
       "infeasible_count": 0,
-      "mean": 0.002863440600958711,
+      "mean": 0.04438722120539751,
       "method": "bt_fc_ac3",
       "metric": "solver_time_seconds",
-      "scenario_id": "weekly-capacity-4",
-      "standard_deviation": 0.00010464509029126748,
+      "scenario_id": "slots-per-week-3",
+      "standard_deviation": 0.00099437044777121,
       "valid_count": 5
     },
     {
@@ -2976,11 +2865,167 @@
       "feasible_count": 5,
       "incomplete_count": 0,
       "infeasible_count": 0,
-      "mean": 0.004037529800007178,
+      "mean": 0.06848831319948659,
       "method": "bt_fc_ac3",
       "metric": "wall_time_seconds",
-      "scenario_id": "weekly-capacity-4",
-      "standard_deviation": 0.0004382169576153374,
+      "scenario_id": "slots-per-week-3",
+      "standard_deviation": 0.0009263078877428277,
+      "valid_count": 5
+    },
+    {
+      "error_count": 0,
+      "experiment_id": "csp",
+      "feasible_count": 5,
+      "incomplete_count": 0,
+      "infeasible_count": 0,
+      "mean": 596.0,
+      "method": "bt_fc_ac3",
+      "metric": "assignments_attempted",
+      "scenario_id": "slots-per-week-4",
+      "standard_deviation": 0.0,
+      "valid_count": 5
+    },
+    {
+      "error_count": 0,
+      "experiment_id": "csp",
+      "feasible_count": 5,
+      "incomplete_count": 0,
+      "infeasible_count": 0,
+      "mean": 0.0,
+      "method": "bt_fc_ac3",
+      "metric": "backtracks",
+      "scenario_id": "slots-per-week-4",
+      "standard_deviation": 0.0,
+      "valid_count": 5
+    },
+    {
+      "error_count": 0,
+      "experiment_id": "csp",
+      "feasible_count": 5,
+      "incomplete_count": 0,
+      "infeasible_count": 0,
+      "mean": 16468.0,
+      "method": "bt_fc_ac3",
+      "metric": "compatibility_checks",
+      "scenario_id": "slots-per-week-4",
+      "standard_deviation": 0.0,
+      "valid_count": 5
+    },
+    {
+      "error_count": 0,
+      "experiment_id": "csp",
+      "feasible_count": 5,
+      "incomplete_count": 0,
+      "infeasible_count": 0,
+      "mean": 27264.0,
+      "method": "bt_fc_ac3",
+      "metric": "constraint_checks",
+      "scenario_id": "slots-per-week-4",
+      "standard_deviation": 0.0,
+      "valid_count": 5
+    },
+    {
+      "error_count": 0,
+      "experiment_id": "csp",
+      "feasible_count": 5,
+      "incomplete_count": 0,
+      "infeasible_count": 0,
+      "mean": 144.0,
+      "method": "bt_fc_ac3",
+      "metric": "domain_prunings",
+      "scenario_id": "slots-per-week-4",
+      "standard_deviation": 0.0,
+      "valid_count": 5
+    },
+    {
+      "error_count": 0,
+      "experiment_id": "csp",
+      "feasible_count": 5,
+      "incomplete_count": 0,
+      "infeasible_count": 0,
+      "mean": 1.0,
+      "method": "bt_fc_ac3",
+      "metric": "exhaustive",
+      "scenario_id": "slots-per-week-4",
+      "standard_deviation": 0.0,
+      "valid_count": 5
+    },
+    {
+      "error_count": 0,
+      "experiment_id": "csp",
+      "feasible_count": 5,
+      "incomplete_count": 0,
+      "infeasible_count": 0,
+      "mean": 480.0,
+      "method": "bt_fc_ac3",
+      "metric": "feasible_schedules",
+      "scenario_id": "slots-per-week-4",
+      "standard_deviation": 0.0,
+      "valid_count": 5
+    },
+    {
+      "error_count": 0,
+      "experiment_id": "csp",
+      "feasible_count": 5,
+      "incomplete_count": 0,
+      "infeasible_count": 0,
+      "mean": 597.0,
+      "method": "bt_fc_ac3",
+      "metric": "nodes_visited",
+      "scenario_id": "slots-per-week-4",
+      "standard_deviation": 0.0,
+      "valid_count": 5
+    },
+    {
+      "error_count": 0,
+      "experiment_id": "csp",
+      "feasible_count": 5,
+      "incomplete_count": 0,
+      "infeasible_count": 0,
+      "mean": 0.0,
+      "method": "bt_fc_ac3",
+      "metric": "rejected_schedules",
+      "scenario_id": "slots-per-week-4",
+      "standard_deviation": 0.0,
+      "valid_count": 5
+    },
+    {
+      "error_count": 0,
+      "experiment_id": "csp",
+      "feasible_count": 5,
+      "incomplete_count": 0,
+      "infeasible_count": 0,
+      "mean": 480.0,
+      "method": "bt_fc_ac3",
+      "metric": "schedules_examined",
+      "scenario_id": "slots-per-week-4",
+      "standard_deviation": 0.0,
+      "valid_count": 5
+    },
+    {
+      "error_count": 0,
+      "experiment_id": "csp",
+      "feasible_count": 5,
+      "incomplete_count": 0,
+      "infeasible_count": 0,
+      "mean": 0.16553779623354786,
+      "method": "bt_fc_ac3",
+      "metric": "solver_time_seconds",
+      "scenario_id": "slots-per-week-4",
+      "standard_deviation": 0.0064439885850854075,
+      "valid_count": 5
+    },
+    {
+      "error_count": 0,
+      "experiment_id": "csp",
+      "feasible_count": 5,
+      "incomplete_count": 0,
+      "infeasible_count": 0,
+      "mean": 0.2748898600024404,
+      "method": "bt_fc_ac3",
+      "metric": "wall_time_seconds",
+      "scenario_id": "slots-per-week-4",
+      "standard_deviation": 0.010185976029809153,
       "valid_count": 5
     }
   ]

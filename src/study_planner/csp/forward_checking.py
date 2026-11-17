@@ -128,6 +128,17 @@ class ForwardCheckingEnumerator:
         self._problem = problem
         self._options = selected
         self._domains = {v: list(problem.domain_for(v)) for v in problem.variables}
+        # Most CSP work only concerns constraints that mention the variable
+        # being assigned. Keep the original order while avoiding a full scan
+        # of unrelated constraints in every propagation and value-order probe.
+        self._constraints_by_variable = {
+            variable: tuple(
+                constraint
+                for constraint in problem.constraints
+                if variable in constraint.scope
+            )
+            for variable in problem.variables
+        }
         self._assigned: list[tuple[SessionVariable, WeeklySlot]] = []
         self._started = perf_counter()
         self._solver_time = 0.0
@@ -238,7 +249,7 @@ class ForwardCheckingEnumerator:
             for other in unassigned:
                 if other == variable:
                     continue
-                for constraint in self._problem.constraints:
+                for constraint in self._constraints_by_variable[other]:
                     scope = constraint.scope
                     if other not in scope or any(
                         v not in assigned_set for v in scope if v != other
@@ -291,8 +302,8 @@ class ForwardCheckingEnumerator:
                 len(self._domains[v]),
                 -sum(
                     1
-                    for c in self._problem.constraints
-                    if v in c.scope and any(n != v and n in unassigned for n in c.scope)
+                    for c in self._constraints_by_variable[v]
+                    if any(n != v and n in unassigned for n in c.scope)
                 ),
                 v,
             ),
@@ -321,7 +332,7 @@ class ForwardCheckingEnumerator:
                         (*probe.entries, AssignmentEntry(other, candidate))
                     )
                     valid = True
-                    for constraint in self._problem.constraints:
+                    for constraint in self._constraints_by_variable[variable]:
                         if (
                             variable in constraint.scope
                             and other in constraint.scope
