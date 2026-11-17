@@ -1,0 +1,58 @@
+{
+  "batch_size": 512,
+  "device": "cpu",
+  "early_stopping_metric": "validation Huber loss",
+  "early_stopping_patience": 6,
+  "experiment": "strict_fff_validation_only_extended_training",
+  "feature_mode": "strict",
+  "input_hashes": {
+    "train": {
+      "csv_sha256": "ab1bf7bb93463b220763ae7de2f5928cf779751effb5f9711e6be1783767575d",
+      "row_ordered_ids_and_target_sha256": "a7d6287fd4643465756faf4be9d6cc491da5fbc102abf1dfa775afb15f0c87d8",
+      "rows": 25229
+    },
+    "validation": {
+      "csv_sha256": "3068eeaf99c94d8450aa84e275d6d42aae2e5d4bf765c32ac659cc907dd783d8",
+      "row_ordered_ids_and_target_sha256": "bb49323f5c0e465d420a8240caf8534ee544a03f84cbe140e2a4c1e6197762ee",
+      "rows": 9013
+    }
+  },
+  "learning_rate": 0.001,
+  "loss": "huber",
+  "max_epochs": 60,
+  "model_files": [
+    "mlp_seed_42.pt",
+    "mlp_seed_123.pt",
+    "mlp_seed_2025.pt"
+  ],
+  "optimizer": "Adam",
+  "prediction_policy": "clip predictions to [0, 100] before metrics",
+  "preprocessed_feature_count": 18,
+  "seed_list": [
+    42,
+    123,
+    2025
+  ],
+  "selected_mlp_config": {
+    "dropout": 0.1,
+    "hidden_sizes": [
+      64,
+      32
+    ],
+    "learning_rate": 0.001,
+    "loss_name": "huber",
+    "name": "mlp_64_32_dropout",
+    "weight_decay": 0.0001
+  },
+  "target_scale_for_optimization": 100.0,
+  "validation_selection_metric": "MAE from best validation-Huber checkpoint",
+  "versions": {
+    "joblib": "1.6.0",
+    "numpy": "2.5.4",
+    "pandas": "3.1.0",
+    "python": "3.12.3",
+    "scikit_learn": "1.9.1",
+    "torch": "2.15.0+cpu"
+  },
+  "weight_decay": 0.0001
+}

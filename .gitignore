@@ -16,11 +16,23 @@ venv/
 .env.*
 !.env.example
 
-# Local data and generated outputs
+# Raw data - keep local
 data/raw/*
 !data/raw/.gitkeep
+
+# Processed data - ignore by default
 data/processed/*
 !data/processed/.gitkeep
+
+# Required feature datasets
+!data/processed/strict/
+!data/processed/proxy/
+
+# Required trained model artifacts
+!data/processed/nn_experiment/
+!data/processed/nn_experiment_60ep/
+!data/processed/nn_experiment_previous_marks/
+
+# Generated figures
 reports/figures/*
 !reports/figures/.gitkeep
-

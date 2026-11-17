@@ -1,0 +1,270 @@
+{
+  "coverage": {
+    "test": {
+      "missing_by_lag": {
+        "previous_assessment_score_lag_1": 3898,
+        "previous_assessment_score_lag_2": 4903,
+        "previous_assessment_score_lag_3": 5917,
+        "previous_assessment_score_lag_4": 6012,
+        "previous_assessment_score_lag_5": 6515
+      },
+      "missing_history_rate": 0.12442946422301804,
+      "prior_mark_coverage": 0.875570535776982,
+      "rows": 14241,
+      "rows_with_any_prior_mark": 12469,
+      "rows_without_prior_mark": 1772
+    },
+    "train": {
+      "missing_by_lag": {
+        "previous_assessment_score_lag_1": 7073,
+        "previous_assessment_score_lag_2": 9235,
+        "previous_assessment_score_lag_3": 11120,
+        "previous_assessment_score_lag_4": 10462,
+        "previous_assessment_score_lag_5": 11638
+      },
+      "missing_history_rate": 0.1274723532442824,
+      "prior_mark_coverage": 0.8725276467557176,
+      "rows": 25229,
+      "rows_with_any_prior_mark": 22013,
+      "rows_without_prior_mark": 3216
+    },
+    "validation": {
+      "missing_by_lag": {
+        "previous_assessment_score_lag_1": 2445,
+        "previous_assessment_score_lag_2": 3367,
+        "previous_assessment_score_lag_3": 3988,
+        "previous_assessment_score_lag_4": 3726,
+        "previous_assessment_score_lag_5": 4263
+      },
+      "missing_history_rate": 0.13369577277266176,
+      "prior_mark_coverage": 0.8663042272273382,
+      "rows": 9013,
+      "rows_with_any_prior_mark": 7808,
+      "rows_without_prior_mark": 1205
+    }
+  },
+  "grade_release_timestamps_available": false,
+  "max_epochs": 40,
+  "paired_metrics": {
+    "test": {
+      "Model A \u2014 Strict MLP": {
+        "by_assessment_type": {
+          "CMA": {
+            "mae": 9.302347839946608,
+            "n": 8260,
+            "r2": 0.057092083982575814,
+            "rmse": 11.77999024955498
+          },
+          "TMA": {
+            "mae": 11.110189598911363,
+            "n": 5981,
+            "r2": 0.07102030775318069,
+            "rmse": 14.161853933011157
+          }
+        },
+        "overall": {
+          "mae": 10.06161345053352,
+          "n": 14241,
+          "r2": 0.07446691550942663,
+          "rmse": 12.83428958196664
+        }
+      },
+      "Model B \u2014 Previous Marks MLP": {
+        "by_assessment_type": {
+          "CMA": {
+            "mae": 8.26333840949772,
+            "n": 8260,
+            "r2": 0.23219879374805352,
+            "rmse": 10.630034771314058
+          },
+          "TMA": {
+            "mae": 9.084782551132582,
+            "n": 5981,
+            "r2": 0.30740390315087107,
+            "rmse": 12.228044778711201
+          }
+        },
+        "overall": {
+          "mae": 8.608332259025008,
+          "n": 14241,
+          "r2": 0.2788832623122254,
+          "rmse": 11.328662749693475
+        }
+      }
+    },
+    "validation": {
+      "Model A \u2014 Strict MLP": {
+        "by_assessment_type": {
+          "CMA": {
+            "mae": 9.279046407198276,
+            "n": 5144,
+            "r2": 0.07071349141442329,
+            "rmse": 11.606099426316405
+          },
+          "TMA": {
+            "mae": 11.469496919499345,
+            "n": 3869,
+            "r2": 0.1352616924174893,
+            "rmse": 14.852174872932434
+          }
+        },
+        "overall": {
+          "mae": 10.219338544343826,
+          "n": 9013,
+          "r2": 0.11854996559447528,
+          "rmse": 13.098455471927188
+        }
+      },
+      "Model B \u2014 Previous Marks MLP": {
+        "by_assessment_type": {
+          "CMA": {
+            "mae": 8.384576878317779,
+            "n": 5144,
+            "r2": 0.21824264633873336,
+            "rmse": 10.645043935759478
+          },
+          "TMA": {
+            "mae": 9.507958834902757,
+            "n": 3869,
+            "r2": 0.36325148065965385,
+            "rmse": 12.74476044416522
+          }
+        },
+        "overall": {
+          "mae": 8.866809740852704,
+          "n": 9013,
+          "r2": 0.3095150999993467,
+          "rmse": 11.593066613325739
+        }
+      }
+    }
+  },
+  "paired_population_coverage": {
+    "test": 1.0,
+    "train": 1.0,
+    "validation": 1.0
+  },
+  "paired_row_counts": {
+    "test": 14241,
+    "train": 25229,
+    "validation": 9013
+  },
+  "proxy_assumption": "Prior score is treated as a candidate input when non-banked, valid, submitted on time for a strictly earlier assessment in the same student and presentation; score release is unverified.",
+  "scientific_status": "submission_based_proxy_sensitivity_experiment",
+  "search_results": [
+    {
+      "config": {
+        "dropout": 0.0,
+        "hidden_sizes": [
+          32
+        ],
+        "learning_rate": 0.001,
+        "loss_name": "huber",
+        "name": "mlp_32",
+        "weight_decay": 0.0001
+      },
+      "validation_mae_mean": 9.015233593141545,
+      "validation_mae_std": 0.0724140134916833
+    },
+    {
+      "config": {
+        "dropout": 0.1,
+        "hidden_sizes": [
+          64,
+          32
+        ],
+        "learning_rate": 0.001,
+        "loss_name": "huber",
+        "name": "mlp_64_32_dropout",
+        "weight_decay": 0.0001
+      },
+      "validation_mae_mean": 8.90062626039776,
+      "validation_mae_std": 0.016414948701305984
+    }
+  ],
+  "seeds": [
+    42,
+    123,
+    2025
+  ],
+  "selected_config": {
+    "dropout": 0.1,
+    "hidden_sizes": [
+      64,
+      32
+    ],
+    "learning_rate": 0.001,
+    "loss_name": "huber",
+    "name": "mlp_64_32_dropout",
+    "weight_decay": 0.0001
+  },
+  "selected_seed_test_metrics": [
+    {
+      "by_assessment_type": {
+        "CMA": {
+          "mae": 8.346061703310175,
+          "n": 8260,
+          "r2": 0.22760140529586537,
+          "rmse": 10.661812177487825
+        },
+        "TMA": {
+          "mae": 9.142657663447066,
+          "n": 5981,
+          "r2": 0.29800038950179564,
+          "rmse": 12.310776196724634
+        }
+      },
+      "overall": {
+        "mae": 8.680619700471803,
+        "n": 14241,
+        "r2": 0.27188743152818395,
+        "rmse": 11.383481971948406
+      }
+    },
+    {
+      "by_assessment_type": {
+        "CMA": {
+          "mae": 8.328855378287178,
+          "n": 8260,
+          "r2": 0.2173270803623757,
+          "rmse": 10.732488798077542
+        },
+        "TMA": {
+          "mae": 8.983940027565726,
+          "n": 5981,
+          "r2": 0.3141032425247967,
+          "rmse": 12.168761392239475
+        }
+      },
+      "overall": {
+        "mae": 8.603980811005036,
+        "n": 14241,
+        "r2": 0.2751633969457651,
+        "rmse": 11.357844497765504
+      }
+    },
+    {
+      "by_assessment_type": {
+        "CMA": {
+          "mae": 8.25386057292578,
+          "n": 8260,
+          "r2": 0.22860814871414759,
+          "rmse": 10.654861615195578
+        },
+        "TMA": {
+          "mae": 9.254074843546515,
+          "n": 5981,
+          "r2": 0.2948696113158862,
+          "rmse": 12.338197460069205
+        }
+      },
+      "overall": {
+        "mae": 8.673935114923015,
+        "n": 14241,
+        "r2": 0.27077527171347304,
+        "rmse": 11.3921725377645
+      }
+    }
+  ],
+  "training_duration_seconds": 38.77605400399989
+}

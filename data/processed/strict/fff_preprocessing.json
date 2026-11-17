@@ -1,0 +1,120 @@
+{
+  "activity_groups": {
+    "assessment_activity": [
+      "questionnaire",
+      "quiz"
+    ],
+    "collaboration": [
+      "forumng",
+      "oucollaborate",
+      "ouelluminate",
+      "ouwiki"
+    ],
+    "content_navigation": [
+      "dataplus",
+      "dualpane",
+      "folder",
+      "glossary",
+      "homepage",
+      "htmlactivity",
+      "oucontent",
+      "page",
+      "repeatactivity",
+      "resource",
+      "subpage",
+      "url"
+    ]
+  },
+  "assessment_type_categories_fitted_from_training_presentations": [
+    "CMA",
+    "Exam",
+    "TMA"
+  ],
+  "click_window_day_offsets_relative_to_deadline": [
+    {
+      "end_exclusive": -21,
+      "start_inclusive": -28,
+      "week": 1
+    },
+    {
+      "end_exclusive": -14,
+      "start_inclusive": -21,
+      "week": 2
+    },
+    {
+      "end_exclusive": -7,
+      "start_inclusive": -14,
+      "week": 3
+    },
+    {
+      "end_exclusive": 0,
+      "start_inclusive": -7,
+      "week": 4
+    }
+  ],
+  "course_module": "FFF",
+  "feature_names": [
+    "assessment_type_cma",
+    "assessment_type_exam",
+    "assessment_type_tma",
+    "assessment_weight",
+    "assessment_weight_available",
+    "assessment_deadline_day",
+    "weeks_since_course_start",
+    "click_content_navigation_week_1",
+    "click_content_navigation_week_2",
+    "click_content_navigation_week_3",
+    "click_content_navigation_week_4",
+    "click_assessment_activity_week_1",
+    "click_assessment_activity_week_2",
+    "click_assessment_activity_week_3",
+    "click_assessment_activity_week_4",
+    "click_collaboration_week_1",
+    "click_collaboration_week_2",
+    "click_collaboration_week_3",
+    "click_collaboration_week_4"
+  ],
+  "feature_schema_version": 1,
+  "identifiers_not_features": [
+    "code_module",
+    "code_presentation",
+    "id_student",
+    "id_assessment"
+  ],
+  "missing_value_policy": "Unavailable prior scores and incomplete click windows are blank, with prior-score availability indicators. A complete click window with no matching event is zero recorded clicks. No imputation or scaling is fit.",
+  "prediction_cutoff": "Start of the published assessment deadline day (integer day offset D). Only VLE events with day < D are included.",
+  "previous_score_lags_fitted_from_training_schedule": 0,
+  "row_counts": {
+    "test": 14241,
+    "train": 25229,
+    "validation": 9013
+  },
+  "score_availability_assumption": "Strict mode excludes all previous assessment score features.",
+  "score_feature_mode": "strict",
+  "source_sha256": {
+    "assessments.csv": "9ce92381e4a0ac457f8e251b2eb2c179ed51e023ab30d1d671a0268bd62316ba",
+    "courses.csv": "4f16eee7454b15e109b0a21a0e43be820e6846ed6f9301bb7feb5ab5ad737a75",
+    "studentAssessment.csv": "b1839e17618a5de36b6d189a242d3123f7939a56c8c9ccef0c17b9199c614a6b",
+    "studentVle.csv": "52668253d876c5becbcb72185977152700cecab2942aca807fecc3dd54b937f0",
+    "vle.csv": "d7a146497edd0e47ef536144b58796c07b554002d3753e848b8e4cd8a56f4c38"
+  },
+  "split_files": {
+    "test": "fff_test.csv",
+    "train": "fff_train.csv",
+    "validation": "fff_validation.csv"
+  },
+  "split_presentations": {
+    "test": [
+      "2014J"
+    ],
+    "train": [
+      "2013B",
+      "2013J"
+    ],
+    "validation": [
+      "2014B"
+    ]
+  },
+  "target": "target_score",
+  "target_policy": "Only scores in [0, 100] from non-banked submissions on or before the target deadline are retained. Submission dates and target scores are not input features."
+}

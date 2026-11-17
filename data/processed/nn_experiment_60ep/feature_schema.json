@@ -1,0 +1,59 @@
+{
+  "assessment_type_indicator_columns": [
+    "assessment_type_cma",
+    "assessment_type_exam",
+    "assessment_type_tma"
+  ],
+  "cutoff": "Start of the published assessment deadline day (integer day offset D). Only VLE events with day < D are included.",
+  "identifiers_excluded": [
+    "code_module",
+    "code_presentation",
+    "id_student",
+    "id_assessment"
+  ],
+  "mode": "strict",
+  "numeric_feature_columns": [
+    "assessment_weight",
+    "assessment_weight_available",
+    "assessment_deadline_day",
+    "weeks_since_course_start",
+    "click_content_navigation_week_1",
+    "click_content_navigation_week_2",
+    "click_content_navigation_week_3",
+    "click_content_navigation_week_4",
+    "click_assessment_activity_week_1",
+    "click_assessment_activity_week_2",
+    "click_assessment_activity_week_3",
+    "click_assessment_activity_week_4",
+    "click_collaboration_week_1",
+    "click_collaboration_week_2",
+    "click_collaboration_week_3",
+    "click_collaboration_week_4"
+  ],
+  "prediction_bounds": [
+    0.0,
+    100.0
+  ],
+  "source_feature_columns": [
+    "assessment_type_cma",
+    "assessment_type_exam",
+    "assessment_type_tma",
+    "assessment_weight",
+    "assessment_weight_available",
+    "assessment_deadline_day",
+    "weeks_since_course_start",
+    "click_content_navigation_week_1",
+    "click_content_navigation_week_2",
+    "click_content_navigation_week_3",
+    "click_content_navigation_week_4",
+    "click_assessment_activity_week_1",
+    "click_assessment_activity_week_2",
+    "click_assessment_activity_week_3",
+    "click_assessment_activity_week_4",
+    "click_collaboration_week_1",
+    "click_collaboration_week_2",
+    "click_collaboration_week_3",
+    "click_collaboration_week_4"
+  ],
+  "target": "target_score"
+}
