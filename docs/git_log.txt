@@ -1,0 +1,159 @@
+Commit: 37aae54
+Author: Nouran Ibrahem
+Date: 2026-11-18
+Message: Add individual contribution statements
+
+Commit: ee368d8
+Author: Nouran Ibrahem
+Date: 2026-11-18
+Message: Add final search experiment results
+
+Commit: aa56e1c
+Author: Nouran Ibrahem
+Date: 2026-11-18
+Message: Improve search traces and experiment reporting
+
+Commit: dff4fb6
+Author: Nouran Ibrahem
+Date: 2026-11-18
+Message: Update README with complete project documentation
+
+Commit: ca7626d
+Author: Nouran Ibrahem
+Date: 2026-11-18
+Message: Add NN models and processed feature artifacts
+
+Commit: 20f3cf2
+Author: Nouran Ibrahem
+Date: 2026-11-17
+Message: latest version
+
+Commit: 669cbb4
+Author: Nouran Ibrahem
+Date: 2026-11-16
+Message: Merge branch 'main' of github.com:nouranibrahem77-crypto/assessment-aware-study-planner
+
+Commit: 52d1e0f
+Author: Nouran Ibrahem
+Date: 2026-11-16
+Message: accepted nn
+
+Commit: e47d31b
+Author: Nouran Ibrahem
+Date: 2026-11-16
+Message:  implement coursework execution and testing for 30-profile scenario
+
+Commit: 1971ab3
+Author: jana
+Date: 2026-11-16
+Message: latest
+
+Commit: 8005332
+Author: jana
+Date: 2026-11-16
+Message: latest updates
+
+Commit: 891bdbb
+Author: jana
+Date: 2026-11-16
+Message: Merge branch 'main' of https://github.com/nouranibrahem77-crypto/assessment-aware-study-planner
+
+Commit: f8a8deb
+Author: jana
+Date: 2026-11-16
+Message: changes
+
+Commit: 2c02f4f
+Author: Jana Madkour
+Date: 2026-11-16
+Message: Merge branch 'expermints'
+
+Commit: c253532
+Author: Nouran Ibrahem
+Date: 2026-11-16
+Message: demo integration
+
+Commit: 35e01f5
+Author: Jana Madkour
+Date: 2026-11-16
+Message: demo implementation
+
+Commit: 6897da3
+Author: Jana Madkour
+Date: 2026-11-16
+Message: monotonicity evaluation
+
+Commit: 2d42f16
+Author: Jana Madkour
+Date: 2026-11-16
+Message: average mark
+
+Commit: 1140272
+Author: Jana Madkour
+Date: 2026-11-16
+Message: student profile
+
+Commit: 114dd22
+Author: Nouran Ibrahem
+Date: 2026-11-15
+Message: feat: add integrated planner demo scenarios
+
+Commit: 878e93e
+Author: Jana Madkour
+Date: 2026-11-15
+Message: profile check
+
+Commit: 9de471a
+Author: Nouran Ibrahem
+Date: 2026-11-15
+Message: feat: complete application planning integration
+
+Commit: 5a29003
+Author: Nouran Ibrahem
+Date: 2026-11-11
+Message: checkpoint: Model B and CSP foundation
+
+Commit: dee62a2
+Author: Nouran Ibrahem
+Date: 2026-11-11
+Message: feat: add search-facing NN adapter
+
+Commit: e4fb3e6
+Author: Nouran Ibrahem
+Date: 2026-11-11
+Message: feat: implement session-to-clicks mapping
+
+Commit: facbd1a
+Author: Nouran Ibrahem
+Date: 2026-11-11
+Message: feat: implement UCS and Greedy search algorithms
+
+Commit: 500c88c
+Author: Nouran Ibrahem
+Date: 2026-11-11
+Message: docs: align CSP design with P1 requirements
+
+Commit: 4427650
+Author: Nouran Ibrahem
+Date: 2026-11-11
+Message: feat: implement search core and uniform cost search
+
+Commit: 2571e46
+Author: Nouran Ibrahem
+Date: 2026-11-11
+Message: docs: finalize search and integration architecture
+
+Commit: badebd1
+Author: Nouran Ibrahem
+Date: 2026-11-05
+Message: feat: add validation-only extended training experiment
+
+Commit: 9ce62b8
+Author: Nouran Ibrahem
+Date: 2026-11-02
+Message: feat: implement FFF neural network training pipeline
+
+Commit: bcaea5a
+Author: Nouran Ibrahem
+Date: 2026-11-02
+Message: chore: initialize project structure
