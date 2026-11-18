@@ -61,6 +61,7 @@ def greedy_best_first_search(
     sequence = count()
     nodes_expanded = 0
     nodes_generated = 0
+    expanded_order: list[StateT] = []
     parents: dict[StateT, tuple[StateT, ActionT]] = {}
     path_costs: dict[StateT, float] = {initial_state: 0.0}
 
@@ -103,11 +104,13 @@ def greedy_best_first_search(
                     nodes_expanded=nodes_expanded,
                     nodes_generated=nodes_generated,
                     execution_time_seconds=perf_counter() - started,
+                    expanded_order=tuple(expanded_order),
                 ),
             )
 
         expanded.add(state)
         nodes_expanded += 1
+        expanded_order.append(state)
         for action in problem.actions(state):
             next_state = problem.transition(state, action)
             nodes_generated += 1
@@ -137,5 +140,6 @@ def greedy_best_first_search(
             nodes_expanded=nodes_expanded,
             nodes_generated=nodes_generated,
             execution_time_seconds=perf_counter() - started,
+            expanded_order=tuple(expanded_order),
         ),
     )

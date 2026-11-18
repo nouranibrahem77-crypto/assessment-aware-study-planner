@@ -77,7 +77,11 @@ def test_write_experiment_results_writes_csv_and_json(tmp_path) -> None:
         (case,),
         lambda _case, seed: ExperimentOutcome(
             ExperimentRunStatus.FEASIBLE,
-            {"solution_cost": 2, "nodes_expanded": 5},
+            {
+                "solution_cost": 2,
+                "nodes_expanded": 5,
+                "expanded_order": ("start", "left", "right"),
+            },
             provenance={"model": "baseline"},
         ),
         seeds=(42,),
@@ -98,6 +102,16 @@ def test_write_experiment_results_writes_csv_and_json(tmp_path) -> None:
     assert json.loads(run_row["configuration_json"]) == {
         "heuristic": "sessions_left"
     }
+    assert json.loads(run_row["expanded_order"]) == ["start", "left", "right"]
     assert len(summary_rows) == 2
+    assert {row["metric"] for row in summary_rows} == {
+        "nodes_expanded",
+        "solution_cost",
+    }
     assert payload["schema_version"] == 1
     assert payload["runs"][0]["provenance"] == {"model": "baseline"}
+    assert payload["runs"][0]["metrics"]["expanded_order"] == [
+        "start",
+        "left",
+        "right",
+    ]

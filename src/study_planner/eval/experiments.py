@@ -427,6 +427,7 @@ def _search_outcome(result: SearchResult[Any, Any]) -> ExperimentOutcome:
             "solution_cost": result.solution_cost,
             "elapsed_seconds": result.statistics.execution_time_seconds,
             "path_length": len(result.action_path),
+            "expanded_order": result.statistics.expanded_order,
         },
     )
 

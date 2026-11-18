@@ -32,12 +32,14 @@ from study_planner.eval.experiments import (
     CspScenario,
     PredictionScenario,
     SearchScenario,
+    _search_outcome,
     run_csp_comparison,
     run_prediction_comparison,
     run_search_comparison,
     write_experiment_bundle,
 )
 from study_planner.integration.planner import PlannerStatus
+from study_planner.search.ucs import uniform_cost_search
 
 
 class _NoOrdering:
@@ -69,6 +71,14 @@ class _SearchProblem:
     def action_cost(self, state: str, action: str, next_state: str) -> float:
         del state, next_state
         return 5.0 if action == "goal" else 1.0
+
+
+def test_search_outcome_captures_expanded_order() -> None:
+    result = uniform_cost_search(_SearchProblem())
+
+    outcome = _search_outcome(result)
+
+    assert outcome.metrics["expanded_order"] == ("start", "detour")
 
 
 def test_search_comparison_runs_both_methods_for_every_seed() -> None:

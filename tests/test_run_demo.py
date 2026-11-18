@@ -25,7 +25,8 @@ def test_normal_demo_returns_feasible_three_assignment_plan(capsys) -> None:
     assert "Search:" in output and "CSP:" in output
     assert len(result.search_state_path) == len(result.search_action_path) + 1
     assert "Search solution path (actual SearchResult path):" in output
-    assert "Search expansion trace: not available" in output
+    assert "Search expansion trace (non-goal states):" in output
+    assert result.search_statistics.search.expanded_order
 
 
 def test_edge_demo_returns_valid_zero_session_plan(capsys) -> None:

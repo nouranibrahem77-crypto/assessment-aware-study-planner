@@ -75,6 +75,7 @@ class SearchStatistics:
     nodes_expanded: int
     nodes_generated: int
     execution_time_seconds: float
+    expanded_order: tuple[Hashable, ...] = ()
 
 
 @dataclass(frozen=True, slots=True)

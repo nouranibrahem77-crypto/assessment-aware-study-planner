@@ -64,6 +64,11 @@ def test_finds_known_minimum_cost_solution() -> None:
     assert result.state_path == ("start", "a", "goal")
     assert tuple(edge.action for edge in result.action_path) == ("to-a", "a-to-goal")
     assert result.solution_cost == 4
+    assert result.statistics.expanded_order == ("start", "b", "a")
+    assert result.statistics.nodes_expanded == 3
+    assert result.statistics.nodes_generated == 5
+    assert "goal" not in result.statistics.expanded_order
+    assert isinstance(result.statistics.expanded_order, tuple)
 
 
 def test_a_star_finds_optimal_path_with_consistent_heuristic() -> None:
@@ -90,6 +95,8 @@ def test_a_star_finds_optimal_path_with_consistent_heuristic() -> None:
     assert result.solution_cost == 4
     assert result.statistics.nodes_expanded == 2
     assert result.statistics.nodes_generated == 4
+    assert result.statistics.expanded_order == ("start", "a")
+    assert "goal" not in result.statistics.expanded_order
 
 
 def test_a_star_rejects_inconsistent_heuristic() -> None:
@@ -175,6 +182,8 @@ def test_returns_clean_no_solution_when_frontier_is_exhausted() -> None:
     assert result.statistics.nodes_expanded == 2
     assert result.statistics.nodes_generated == 1
     assert result.statistics.execution_time_seconds >= 0
+    assert result.statistics.expanded_order == ("start", "dead")
+    assert "unreachable" not in result.statistics.expanded_order
 
 
 def test_initial_goal_returns_zero_cost_empty_action_path() -> None:
@@ -188,6 +197,7 @@ def test_initial_goal_returns_zero_cost_empty_action_path() -> None:
     assert result.solution_cost == 0
     assert result.statistics.nodes_expanded == 0
     assert result.statistics.nodes_generated == 0
+    assert result.statistics.expanded_order == ()
 
 
 @pytest.mark.parametrize("cost", [-1, float("nan"), float("inf")])
@@ -261,6 +271,10 @@ def test_greedy_follows_low_heuristic_path_and_reconstructs_solution() -> None:
     assert result.state_path == ("start", "b", "goal")
     assert tuple(edge.action for edge in result.action_path) == ("to-b", "finish-b")
     assert result.solution_cost == 2
+    assert result.statistics.expanded_order == ("start", "b")
+    assert result.statistics.nodes_expanded == 2
+    assert result.statistics.nodes_generated == 3
+    assert "goal" not in result.statistics.expanded_order
 
 
 def test_greedy_can_return_a_higher_cost_solution_than_ucs() -> None:
@@ -315,6 +329,8 @@ def test_greedy_ignores_duplicate_states_after_first_discovery() -> None:
     assert result.state_path == ("start", "a", "shared", "goal")
     assert result.statistics.nodes_expanded == 4
     assert result.statistics.nodes_generated == 5
+    assert result.statistics.expanded_order == ("start", "a", "b", "shared")
+    assert "goal" not in result.statistics.expanded_order
 
 
 def test_greedy_equal_heuristics_follow_deterministic_insertion_order() -> None:
@@ -352,6 +368,8 @@ def test_greedy_returns_no_solution_when_frontier_is_exhausted() -> None:
     assert result.statistics.nodes_expanded == 2
     assert result.statistics.nodes_generated == 1
     assert result.statistics.execution_time_seconds >= 0
+    assert result.statistics.expanded_order == ("start", "dead")
+    assert "missing" not in result.statistics.expanded_order
 
 
 def test_greedy_initial_goal_does_not_need_heuristic_evaluation() -> None:
@@ -368,6 +386,21 @@ def test_greedy_initial_goal_does_not_need_heuristic_evaluation() -> None:
     assert result.solution_cost == 0
     assert result.statistics.nodes_expanded == 0
     assert result.statistics.nodes_generated == 0
+    assert result.statistics.expanded_order == ()
+
+
+def test_a_star_initial_goal_has_empty_expansion_order() -> None:
+    result = a_star_search(
+        GraphProblem(start="goal", goals=frozenset({"goal"}), graph={}),
+        lambda _: 0,
+    )
+
+    assert result.found
+    assert result.state_path == ("goal",)
+    assert result.solution_cost == 0
+    assert result.statistics.nodes_expanded == 0
+    assert result.statistics.nodes_generated == 0
+    assert result.statistics.expanded_order == ()
 
 
 @pytest.mark.parametrize("value", [-1, float("nan"), float("inf")])

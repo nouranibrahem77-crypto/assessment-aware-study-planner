@@ -291,7 +291,13 @@ def _print_result(scenario: Scenario, result: FinalPlannerResult) -> None:
             "Search solution path: none (SearchResult returns no path after "
             "exhaustion)."
         )
-    print("Search expansion trace: not available; Search counters above are aggregate.")
+    expanded_order = result.search_statistics.search.expanded_order
+    if expanded_order:
+        print("Search expansion trace (non-goal states):")
+        for index, state in enumerate(expanded_order, start=1):
+            print(f"  {index}. {state}")
+    else:
+        print("Search expansion trace: empty (no non-goal states expanded).")
     if result.failure_reasons:
         print(f"Reasons: {', '.join(result.failure_reasons)}")
 

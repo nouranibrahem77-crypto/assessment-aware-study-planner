@@ -48,6 +48,7 @@ def uniform_cost_search(
     parents: dict[StateT, tuple[StateT, ActionT]] = {}
     nodes_expanded = 0
     nodes_generated = 0
+    expanded_order: list[StateT] = []
 
     while frontier:
         path_cost, _, state = heapq.heappop(frontier)
@@ -66,10 +67,12 @@ def uniform_cost_search(
                     nodes_expanded=nodes_expanded,
                     nodes_generated=nodes_generated,
                     execution_time_seconds=perf_counter() - started,
+                    expanded_order=tuple(expanded_order),
                 ),
             )
 
         nodes_expanded += 1
+        expanded_order.append(state)
         for action in problem.actions(state):
             next_state = problem.transition(state, action)
             nodes_generated += 1
@@ -97,5 +100,6 @@ def uniform_cost_search(
             nodes_expanded=nodes_expanded,
             nodes_generated=nodes_generated,
             execution_time_seconds=perf_counter() - started,
+            expanded_order=tuple(expanded_order),
         ),
     )

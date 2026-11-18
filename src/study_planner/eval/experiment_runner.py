@@ -7,7 +7,7 @@ import json
 import math
 import tempfile
 from collections import Counter, defaultdict
-from collections.abc import Callable, Mapping, Sequence
+from collections.abc import Callable, Hashable, Mapping, Sequence
 from dataclasses import dataclass
 from enum import StrEnum
 from pathlib import Path
@@ -45,7 +45,7 @@ class ExperimentOutcome:
     """Output returned by an experiment-specific case evaluator."""
 
     status: ExperimentRunStatus
-    metrics: Mapping[str, float | int | None]
+    metrics: Mapping[str, Any]
     provenance: Mapping[str, Any] | None = None
     failure_reasons: tuple[str, ...] = ()
 
@@ -60,7 +60,7 @@ class ExperimentRunRecord:
     profile_id: str | None
     seed: int
     status: ExperimentRunStatus
-    metrics: Mapping[str, float | int | None]
+    metrics: Mapping[str, Any]
     configuration: Mapping[str, Any]
     provenance: Mapping[str, Any]
     failure_reasons: tuple[str, ...] = ()
@@ -104,13 +104,20 @@ def _jsonable(value: Any) -> Any:
 
 
 def _validate_metrics(
-    metrics: Mapping[str, float | int | None],
-) -> dict[str, float | int | None]:
-    """Validate and normalize metric names and values for persistence."""
-    normalized: dict[str, float | int | None] = {}
+    metrics: Mapping[str, Any],
+) -> dict[str, Any]:
+    """Validate numeric metrics and the ordered search expansion trace."""
+    normalized: dict[str, Any] = {}
     for name, value in metrics.items():
         if not isinstance(name, str) or not name:
             raise ValueError("metric names must be non-empty strings")
+        if name == "expanded_order":
+            if not isinstance(value, tuple) or any(
+                not isinstance(state, Hashable) for state in value
+            ):
+                raise ValueError("expanded_order must be a tuple of hashable states")
+            normalized[name] = _jsonable(value)
+            continue
         if value is None:
             normalized[name] = None
         elif isinstance(value, bool) or not isinstance(value, int | float):
@@ -200,7 +207,14 @@ def summarize_runs(
     summaries: list[MetricSummary] = []
     for (experiment_id, method, scenario_id), group in sorted(grouped.items()):
         statuses = Counter(record.status for record in group)
-        metric_names = sorted({name for record in group for name in record.metrics})
+        metric_names = sorted(
+            {
+                name
+                for record in group
+                for name in record.metrics
+                if name != "expanded_order"
+            }
+        )
         for metric in metric_names:
             values = [
                 float(value)
@@ -279,7 +293,10 @@ def write_experiment_results(
                 "profile_id": row.profile_id,
                 "seed": row.seed,
                 "status": row.status.value,
-                **row.metrics,
+                **{
+                    name: _dump_json(value) if name == "expanded_order" else value
+                    for name, value in row.metrics.items()
+                },
                 "configuration_json": _dump_json(row.configuration),
                 "provenance_json": _dump_json(row.provenance),
                 "failure_reasons_json": _dump_json(row.failure_reasons),

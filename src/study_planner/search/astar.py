@@ -55,6 +55,7 @@ def a_star_search(
     initial_state = problem.initial_state
     nodes_expanded = 0
     nodes_generated = 0
+    expanded_order: list[StateT] = []
     if problem.is_goal(initial_state):
         state_path, action_path = _reconstruct_path(
             initial_state, initial_state, {}
@@ -67,6 +68,7 @@ def a_star_search(
                 nodes_expanded,
                 nodes_generated,
                 perf_counter() - started,
+                tuple(expanded_order),
             ),
         )
 
@@ -97,10 +99,12 @@ def a_star_search(
                     nodes_expanded,
                     nodes_generated,
                     perf_counter() - started,
+                    tuple(expanded_order),
                 ),
             )
 
         nodes_expanded += 1
+        expanded_order.append(state)
         state_heuristic = heuristic_values[state]
         for action in problem.actions(state):
             next_state = problem.transition(state, action)
@@ -138,5 +142,6 @@ def a_star_search(
             nodes_expanded,
             nodes_generated,
             perf_counter() - started,
+            tuple(expanded_order),
         ),
     )
